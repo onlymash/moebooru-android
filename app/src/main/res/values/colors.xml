@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
+    <color name="background">@color/md_light_background</color>
     <color name="primary_icon">@color/md_grey_600</color>
 
     <!-- MaterialDrawer colors -->

@@ -11,8 +11,12 @@
 
 package im.mash.moebooru
 
+import android.content.ActivityNotFoundException
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.customtabs.CustomTabsIntent
+import android.support.v4.content.ContextCompat
 import android.support.v7.content.res.AppCompatResources
 import android.util.DisplayMetrics
 import android.view.View
@@ -104,10 +108,11 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 .withActionBarDrawerToggle(true)
                 .withSavedInstance(savedInstanceState)
                 .withDrawerWidthPx((width*0.7).toInt())
-                .withActionBarDrawerToggle(true)
                 .build()
 
-        if (savedInstanceState == null) displayFragment(PostsFragment())
+        if (savedInstanceState == null) {
+            displayFragment(PostsFragment())
+        }
 
         previousSelectedDrawer = drawer.currentSelection
 
@@ -115,13 +120,14 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
     override fun onItemClick(view: View?, position: Int, drawerItem: IDrawerItem<*, *>?): Boolean {
         val id = drawerItem!!.identifier
-        if (id == previousSelectedDrawer)
+        if (id == previousSelectedDrawer) {
             drawer.closeDrawer()
-        else {
+        } else {
             previousSelectedDrawer = id
             when (id) {
                 DRAWER_POSTS -> displayFragment(PostsFragment())
                 DRAWER_SETTINGS -> displayFragment(SettingsFragment())
+                DRAWER_ABOUT -> displayFragment(AboutFragment())
             }
         }
         return true
@@ -148,4 +154,15 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
             }
         }
     }
+
+    private val customTabsIntent by lazy {
+        CustomTabsIntent.Builder()
+                .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .build()
+    }
+
+    fun launchUrl(uri: Uri) = try {
+        customTabsIntent.launchUrl(this, uri)
+    } catch (_: ActivityNotFoundException) { }  // ignore
+    fun launchUrl(uri: String) = launchUrl(Uri.parse(uri))
 }
