@@ -23,17 +23,18 @@ object Settings {
 
     internal lateinit var sContext:Context
     internal lateinit var sSharedPreferences: SharedPreferences
-    internal lateinit var editor: SharedPreferences.Editor
+    internal lateinit var sEditor: SharedPreferences.Editor
 
+    @SuppressLint("CommitPrefEdits")
     fun initialize(context: Context) {
         sContext = context.applicationContext
         sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(sContext)
-
+        sEditor = sSharedPreferences.edit()
     }
 
     var nightModeString: String
         get() = sSharedPreferences.getString(Key.night_mode, Key.night_mode_system)
-        set(value) = editor.putString(Key.night_mode, value).apply()
+        set(value) = sEditor.putString(Key.night_mode, value).apply()
 
     @AppCompatDelegate.NightMode
     val nightMode: Int get() = when (nightModeString) {
