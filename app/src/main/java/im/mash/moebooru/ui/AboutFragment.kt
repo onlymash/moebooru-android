@@ -25,7 +25,12 @@ import im.mash.moebooru.R
 class AboutFragment : ToolbarFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.layout_about, container, false)
+        val configuration = resources.configuration
+        val result = inflater.inflate(R.layout.layout_about, container, false)
+        if (resources.configuration !== configuration) {
+            activity?.recreate()
+        }
+        return result
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
