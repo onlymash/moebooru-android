@@ -17,4 +17,8 @@ object Key {
     const val night_mode_auto = "auto"
     const val night_mode_off = "off"
     const val night_mode_on = "on"
+
+    const val grid_mode = "grid_mode"
+    const val grid_mode_grid = "grid"
+    const val grid_mode_staggered_grid = "staggered_grid"
 }

@@ -11,7 +11,8 @@
   -->
 
 <!--suppress AndroidElementNotAllowed -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory
         android:title="@string/appearance">
 
@@ -21,7 +22,19 @@
             android:entryValues="@array/night_mode_values"
             android:defaultValue="system"
             android:summary="%s"
-            android:title="@string/night_mode"/>
+            android:title="@string/night_mode"
+            android:icon="@drawable/ic_action_time_24dp"
+            app:iconSpaceReserved="true"/>
+
+        <SimpleMenuPreference
+            android:key="grid_mode"
+            android:entries="@array/grid_modes"
+            android:entryValues="@array/grid_mode_values"
+            android:defaultValue="staggered_grid"
+            android:summary="%s"
+            android:title="@string/grid_mode"
+            android:icon="@drawable/ic_action_grid_24dp"
+            app:iconSpaceReserved="true"/>
 
     </PreferenceCategory>
 </PreferenceScreen>

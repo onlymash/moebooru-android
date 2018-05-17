@@ -3,6 +3,11 @@
 
     <string name="posts">Posts</string>
     <string name="settings">Settings</string>
+    <string name="search">Search</string>
+
+    <string name="grid_mode">Grid mode</string>
+    <string name="grid">Grid</string>
+    <string name="staggered_grid">Staggered Grid</string>
 
     <string name="about">About</string>
     <string name="about_url" translatable="false">file:///android_asset/pages/about.html</string>

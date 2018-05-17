@@ -44,4 +44,8 @@ class SettingsPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSha
         super.onResume()
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
+
+    override fun onCreateItemDecoration(): DividerDecoration {
+        return CategoryDivideDividerDecoration()
+    }
 }

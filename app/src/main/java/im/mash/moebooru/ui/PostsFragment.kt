@@ -12,12 +12,13 @@
 package im.mash.moebooru.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.support.v7.widget.Toolbar
 import im.mash.moebooru.R
+import im.mash.moebooru.Settings
+import im.mash.moebooru.utils.Key
 
-class PostsFragment : ToolbarFragment() {
+class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.layout_posts, container, false)
@@ -25,5 +26,34 @@ class PostsFragment : ToolbarFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar.setTitle(R.string.posts)
+        toolbar.inflateMenu(R.menu.menu_main)
+        toolbar.setOnMenuItemClickListener(this)
+        setGridItem()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.menu_main, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_grid -> {
+                Settings.gridModeString = Key.grid_mode_grid
+                setGridItem()
+            }
+            R.id.action_staggered_grid -> {
+                Settings.gridModeString = Key.grid_mode_staggered_grid
+                setGridItem()
+            }
+        }
+        return true
+    }
+
+    fun setGridItem() {
+        when (Settings.gridModeString) {
+            Key.grid_mode_grid -> toolbar.menu.findItem(R.id.action_grid).setChecked(true)
+            Key.grid_mode_staggered_grid -> toolbar.menu.findItem(R.id.action_staggered_grid).setChecked(true)
+        }
     }
 }

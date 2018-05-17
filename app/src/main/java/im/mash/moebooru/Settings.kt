@@ -25,16 +25,19 @@ object Settings {
     internal lateinit var sSharedPreferences: SharedPreferences
     internal lateinit var sEditor: SharedPreferences.Editor
 
-    @SuppressLint("CommitPrefEdits")
     fun initialize(context: Context) {
         sContext = context.applicationContext
         sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(sContext)
-        sEditor = sSharedPreferences.edit()
     }
 
     var nightModeString: String
         get() = sSharedPreferences.getString(Key.night_mode, Key.night_mode_system)
-        set(value) = sEditor.putString(Key.night_mode, value).apply()
+        @SuppressLint("CommitPrefEdits")
+        set(value) {
+            sEditor = sSharedPreferences.edit()
+            sEditor.putString(Key.night_mode, value)
+            sEditor.commit()
+        }
 
     @AppCompatDelegate.NightMode
     val nightMode: Int get() = when (nightModeString) {
@@ -44,4 +47,12 @@ object Settings {
         else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     }
 
+    var gridModeString: String
+        get() = sSharedPreferences.getString(Key.grid_mode, Key.grid_mode_staggered_grid)
+        @SuppressLint("CommitPrefEdits")
+        set(value) {
+            sEditor = sSharedPreferences.edit()
+            sEditor.putString(Key.grid_mode, value)
+            sEditor.commit()
+        }
 }
