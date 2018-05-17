@@ -9,7 +9,7 @@
  *
  */
 
-package im.mash.moebooru
+package im.mash.moebooru.ui
 
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
@@ -19,6 +19,8 @@ import android.view.ViewGroup
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import im.mash.moebooru.BuildConfig
+import im.mash.moebooru.R
 
 class AboutFragment : ToolbarFragment() {
 
@@ -30,7 +32,7 @@ class AboutFragment : ToolbarFragment() {
         super.onViewCreated(view, savedInstanceState)
         toolbar.title = getString(R.string.about_title) + " " + BuildConfig.VERSION_NAME
         val web = view.findViewById<WebView>(R.id.web_view)
-        web.setBackgroundColor(ContextCompat.getColor(activity, R.color.background))
+        web.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.background))
         web.loadUrl(getString(R.string.about_url))
         web.webViewClient = object : WebViewClient() {
             @Suppress("OverridingDeprecatedMember")

@@ -5,32 +5,59 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file(".keystore_onlymash.jks")
+            storePassword System.getenv("KEYSTORE_PASS")
+            keyAlias System.getenv("ALIAS_NAME")
+            keyPassword System.getenv("ALIAS_PASS")
+        }
+    }
     compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "im.mash.moebooru"
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 1
         versionName "0.01"
+        signingConfig signingConfigs.release
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            applicationIdSuffix ".debug"
+            multiDexEnabled true
+            pseudoLocalesEnabled true
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$support_library_version"
     implementation "com.android.support:design:$support_library_version"
     implementation "com.android.support:customtabs:$support_library_version"
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     implementation 'com.mikepenz:materialdrawer:6.0.7'
+    implementation "moe.shizuku.preference:preference:$rikka_preference"
+    implementation "moe.shizuku.preference:preference-simplemenu:$rikka_preference"
+    implementation "moe.shizuku.preference:preference-switchcompat:$rikka_preference"
+    implementation "moe.shizuku.preference:preference-dialog-android:$rikka_preference"
+    implementation 'com.google.firebase:firebase-core:15.0.2'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
+
+apply plugin: 'com.google.gms.google-services'

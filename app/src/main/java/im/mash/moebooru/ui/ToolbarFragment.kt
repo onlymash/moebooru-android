@@ -9,31 +9,24 @@
  *
  */
 
-package im.mash.moebooru
+package im.mash.moebooru.ui
 
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.support.v4.app.Fragment
+import android.support.v7.widget.Toolbar
 import android.view.View
-import android.view.ViewGroup
-import im.mash.moebooru.utils.childFragManager
+import im.mash.moebooru.R
 
-class SettingsFragment : ToolbarFragment() {
+open class ToolbarFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-            inflater.inflate(R.layout.layout_settings, container, false)
+    protected lateinit var toolbar: Toolbar
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbar.setTitle(R.string.settings)
-
-        val fm = childFragmentManager
-        fm.beginTransaction().replace(R.id.content, SettingsPreferenceFragment()).commit()
-        fm.executePendingTransactions()
+        toolbar = view.findViewById(R.id.toolbar)
+        val activity = activity as MainActivity
+        activity.drawer.setToolbar(activity, toolbar, true)
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        childFragManager = null
-    }
-
+    open fun onBackPressed(): Boolean = false
 }

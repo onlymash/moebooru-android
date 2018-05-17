@@ -9,7 +9,7 @@
  *
  */
 
-package im.mash.moebooru
+package im.mash.moebooru.ui
 
 import android.content.ActivityNotFoundException
 import android.net.Uri
@@ -29,6 +29,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
+import im.mash.moebooru.R
 
 class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
@@ -134,7 +135,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
     }
 
     private fun displayFragment(fragment: ToolbarFragment) {
-        fragmentManager.beginTransaction()
+        supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_main, fragment)
                 .commitAllowingStateLoss()
         drawer.closeDrawer()
@@ -144,7 +145,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         if (drawer.isDrawerOpen) {
             drawer.closeDrawer()
         } else {
-            val currentFragment = fragmentManager.findFragmentById(R.id.fragment_main) as ToolbarFragment
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_main) as ToolbarFragment
             if (!currentFragment.onBackPressed()) {
                 if (currentFragment is PostsFragment) {
                     super.onBackPressed()

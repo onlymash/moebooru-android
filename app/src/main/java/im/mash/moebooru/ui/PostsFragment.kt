@@ -9,18 +9,21 @@
  *
  */
 
-package im.mash.moebooru.utils
+package im.mash.moebooru.ui
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import im.mash.moebooru.R
 
+class PostsFragment : ToolbarFragment() {
 
-private val fieldChildFragmentManager by lazy {
-    val field = Fragment::class.java.getDeclaredField("mChildFragmentManager")
-    field.isAccessible = true
-    field
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.layout_posts, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        toolbar.setTitle(R.string.posts)
+    }
 }
-
-var Fragment.childFragManager: FragmentManager?
-    get() = childFragmentManager
-    set(value) = fieldChildFragmentManager.set(this, value)

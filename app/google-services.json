@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "528191874988",
+    "firebase_url": "https://moebooru-android.firebaseio.com",
+    "project_id": "moebooru-android",
+    "storage_bucket": "moebooru-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528191874988:android:aafc11437b1a5a01",
+        "android_client_info": {
+          "package_name": "im.mash.moebooru"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "528191874988-1t2nc0akf25ge74fsm7h5ei675ri8gff.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "im.mash.moebooru",
+            "certificate_hash": "a96d1bd5f3a9fc4f82dff8ee91865184284ecdc8"
+          }
+        },
+        {
+          "client_id": "528191874988-15ir59bgugviblm0psv5bqepgm26ndba.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQVt00uewzBpgEr9FSDhVctYuHP6OcIzw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "528191874988-15ir59bgugviblm0psv5bqepgm26ndba.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528191874988:android:ac5a4085024158b2",
+        "android_client_info": {
+          "package_name": "im.mash.moebooru.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "528191874988-aib8e34hmrck9lu53apbq0r929dq52go.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "im.mash.moebooru.debug",
+            "certificate_hash": "de67bb7a43a01ad200c9d05fb31c6409bbdab729"
+          }
+        },
+        {
+          "client_id": "528191874988-ttq5u32cts8p67oidvrp0k4b14uq78hd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "im.mash.moebooru.debug",
+            "certificate_hash": "a96d1bd5f3a9fc4f82dff8ee91865184284ecdc8"
+          }
+        },
+        {
+          "client_id": "528191874988-15ir59bgugviblm0psv5bqepgm26ndba.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQVt00uewzBpgEr9FSDhVctYuHP6OcIzw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "528191874988-15ir59bgugviblm0psv5bqepgm26ndba.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

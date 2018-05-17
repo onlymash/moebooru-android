@@ -9,10 +9,18 @@
  *
  */
 
-package im.mash.moebooru
+package im.mash.moebooru;
 
-import android.preference.PreferenceFragment
+import android.app.Application;
+import android.support.v7.app.AppCompatDelegate;
 
-class SettingsPreferenceFragment : PreferenceFragment() {
+public class AppJava extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Settings.INSTANCE.initialize(this);
+        AppCompatDelegate.setDefaultNightMode(Settings.INSTANCE.getNightMode());
+    }
 
 }

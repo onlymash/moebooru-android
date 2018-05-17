@@ -7,6 +7,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
+        <item name="preferenceTheme">@style/AppTheme.PreferenceTheme</item>
+
         <!-- MaterialDrawer specific values -->
         <item name="material_drawer_background">@color/drawer_background</item>
         <item name="material_drawer_primary_text">@color/drawer_primary_text</item>
@@ -20,5 +22,10 @@
     </style>
 
     <style name="ThemeOverlay.AppCompat.DayNight" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="AppTheme.PreferenceTheme" parent="PreferenceThemeOverlay">
+        <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>
+        <item name="switchPreferenceCompatStyle">@style/Preference.SwitchPreferenceCompat</item>
+    </style>
 
 </resources>

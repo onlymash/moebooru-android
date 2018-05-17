@@ -9,20 +9,12 @@
  *
  */
 
-package im.mash.moebooru
+package im.mash.moebooru.utils
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-
-class PostsFragment : ToolbarFragment() {
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-            inflater.inflate(R.layout.layout_posts, container, false)
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        toolbar.setTitle(R.string.posts)
-    }
+object Key {
+    const val night_mode = "night_mode"
+    const val night_mode_system = "system"
+    const val night_mode_auto = "auto"
+    const val night_mode_off = "off"
+    const val night_mode_on = "on"
 }
