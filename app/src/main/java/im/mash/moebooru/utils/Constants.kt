@@ -12,17 +12,24 @@
 package im.mash.moebooru.utils
 
 object Key {
-    const val night_mode = "night_mode"
-    const val night_mode_system = "system"
-    const val night_mode_auto = "auto"
-    const val night_mode_off = "off"
-    const val night_mode_on = "on"
+    const val NIGHT_MODE = "night_mode"
+    const val NIGHT_MODE_SYSTEM = "system"
+    const val NIGHT_MODE_AUTO = "auto"
+    const val NIGHT_MODE_OFF = "off"
+    const val NIGHT_MODE_ON = "on"
 
-    const val grid_mode = "grid_mode"
-    const val grid_mode_grid = "grid"
-    const val grid_mode_staggered_grid = "staggered_grid"
+    const val GRID_MODE = "grid_mode"
+    const val GRID_MODE_GRID = "grid"
+    const val GRID_MODE_STAGGERED_GRID = "staggered_grid"
 
-    const val post_limit = "post_limit"
-    const val cache_memory = "cache_memory"
-    const val cache_disk = "cache_disk"
+    const val POST_LIMIT = "post_limit"
+    const val CACHE_MEMORY = "cache_memory"
+    const val CACHE_DISK = "cache_disk"
+}
+
+object BoorusTable {
+    const val TABLE_NAME = "boorus"
+    const val ID = "_id"
+    const val NAME = "name"
+    const val URL = "url"
 }

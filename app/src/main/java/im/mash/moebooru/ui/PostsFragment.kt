@@ -80,11 +80,11 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.action_grid -> {
-                Settings.gridModeString = Key.grid_mode_grid
+                Settings.gridModeString = Key.GRID_MODE_GRID
                 setGridItem()
             }
             R.id.action_staggered_grid -> {
-                Settings.gridModeString = Key.grid_mode_staggered_grid
+                Settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
                 setGridItem()
             }
             R.id.action_search_open -> {
@@ -99,8 +99,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     fun setGridItem() {
         when (Settings.gridModeString) {
-            Key.grid_mode_grid -> toolbar.menu.findItem(R.id.action_grid).setChecked(true)
-            Key.grid_mode_staggered_grid -> toolbar.menu.findItem(R.id.action_staggered_grid).setChecked(true)
+            Key.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).setChecked(true)
+            Key.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).setChecked(true)
         }
     }
 

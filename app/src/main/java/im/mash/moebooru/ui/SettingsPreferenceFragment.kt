@@ -28,7 +28,7 @@ class SettingsPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSha
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
-            Key.night_mode -> {
+            Key.NIGHT_MODE -> {
                 AppCompatDelegate.setDefaultNightMode(Settings.nightMode)
                 activity?.recreate()
             }

@@ -31,50 +31,50 @@ object Settings {
     }
 
     var nightModeString: String
-        get() = sSharedPreferences.getString(Key.night_mode, Key.night_mode_system)
+        get() = sSharedPreferences.getString(Key.NIGHT_MODE, Key.NIGHT_MODE_SYSTEM)
         set(value) {
             sEditor = sSharedPreferences.edit()
-            sEditor.putString(Key.night_mode, value)
+            sEditor.putString(Key.NIGHT_MODE, value)
             sEditor.apply()
         }
 
     @AppCompatDelegate.NightMode
     val nightMode: Int get() = when (nightModeString) {
-        Key.night_mode_auto -> AppCompatDelegate.MODE_NIGHT_AUTO
-        Key.night_mode_off -> AppCompatDelegate.MODE_NIGHT_NO
-        Key.night_mode_on -> AppCompatDelegate.MODE_NIGHT_YES
+        Key.NIGHT_MODE_AUTO -> AppCompatDelegate.MODE_NIGHT_AUTO
+        Key.NIGHT_MODE_OFF -> AppCompatDelegate.MODE_NIGHT_NO
+        Key.NIGHT_MODE_ON -> AppCompatDelegate.MODE_NIGHT_YES
         else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     }
 
     var gridModeString: String
-        get() = sSharedPreferences.getString(Key.grid_mode, Key.grid_mode_staggered_grid)
+        get() = sSharedPreferences.getString(Key.GRID_MODE, Key.GRID_MODE_STAGGERED_GRID)
         set(value) {
             sEditor = sSharedPreferences.edit()
-            sEditor.putString(Key.grid_mode, value)
+            sEditor.putString(Key.GRID_MODE, value)
             sEditor.apply()
         }
 
     var postLimitInt: Int
-        get() = sSharedPreferences.getInt(Key.post_limit, 30)
+        get() = sSharedPreferences.getInt(Key.POST_LIMIT, 30)
         set(value) {
             sEditor = sSharedPreferences.edit()
-            sEditor.putInt(Key.post_limit, value)
+            sEditor.putInt(Key.POST_LIMIT, value)
             sEditor.apply()
         }
 
     var cacheMemoryInt: Int
-        get() = sSharedPreferences.getInt(Key.cache_memory, 30)
+        get() = sSharedPreferences.getInt(Key.CACHE_MEMORY, 256)
         set(value) {
             sEditor = sSharedPreferences.edit()
-            sEditor.putInt(Key.cache_memory, value)
+            sEditor.putInt(Key.CACHE_MEMORY, value)
             sEditor.apply()
         }
 
     var cacheDiskInt: Int
-        get() = sSharedPreferences.getInt(Key.cache_disk, 30)
+        get() = sSharedPreferences.getInt(Key.CACHE_DISK, 256)
         set(value) {
             sEditor = sSharedPreferences.edit()
-            sEditor.putInt(Key.cache_disk, value)
+            sEditor.putInt(Key.CACHE_DISK, value)
             sEditor.apply()
         }
 }
