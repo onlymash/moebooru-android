@@ -23,7 +23,6 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.widget.Toast
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -50,6 +49,14 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
     private val TAG = this.javaClass.simpleName
 
+    internal lateinit var drawer: Drawer
+    private lateinit var header: AccountHeader
+    private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
+    private var previousSelectedDrawer: Long = 0    // it's actually lateinit
+
+    private var metric: DisplayMetrics = DisplayMetrics()
+    private var width: Int = 0
+
     private val boorus: MutableList<Boorus.Booru> = mutableListOf()
     private fun loadAsync() {
         doAsync {
@@ -61,17 +68,21 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 boorus.addAll(DatabaseBoorusManager(database).loadBoorus())
             }
             uiThread {
-
+                if (!boorus.isEmpty()) {
+                    boorus.forEach {
+                        val profileDrawerItem = ProfileDrawerItem()
+                                .withName(it.name)
+                                .withEmail(it.url)
+                                .withIcon(R.mipmap.ic_launcher_round)
+                        header.addProfile(profileDrawerItem, boorus.lastIndex)
+                    }
+                    header.addProfile(profileSettingDrawerItem, boorus.size)
+                } else {
+                    header.addProfiles(profileSettingDrawerItem)
+                }
             }
         }
     }
-
-    internal lateinit var drawer: Drawer
-    private lateinit var header: AccountHeader
-    private var previousSelectedDrawer: Long = 0    // it's actually lateinit
-
-    private var metric: DisplayMetrics = DisplayMetrics()
-    private var width: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,33 +91,16 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         windowManager.defaultDisplay.getMetrics(metric)
         width = metric.widthPixels
 
-        val profileDrawerItem = ProfileDrawerItem()
-                .withName("onlymash")
-                .withEmail("im@mash.im")
-                .withIcon(R.mipmap.ic_launcher_round)
-                .withOnDrawerItemClickListener{ view, position, drawerItem ->
-                    false
-                }
-
-        val profileSettingDrawerItem = ProfileSettingDrawerItem()
+        profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
                 .withIcon(R.drawable.ic_action_settings_24dp)
 
         header = AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.background_header)
-                .addProfiles(
-                        profileDrawerItem,
-                        profileSettingDrawerItem
-                )
-                .withOnAccountHeaderListener { view, profile, current ->
-                    when (profile) {
-                        profileDrawerItem -> Toast.makeText(this, "profile", Toast.LENGTH_SHORT).show()
-                        profileSettingDrawerItem -> Toast.makeText(this, "Edit", Toast.LENGTH_SHORT).show()
-                    }
-                    false
-                }
                 .build()
+
+        loadAsync()
 
         drawer = DrawerBuilder()
                 .withActivity(this)
@@ -145,8 +139,6 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         if (savedInstanceState == null) {
             displayFragment(PostsFragment())
         }
-
-        loadAsync()
     }
 
     override fun onItemClick(view: View?, position: Int, drawerItem: IDrawerItem<*, *>?): Boolean {
