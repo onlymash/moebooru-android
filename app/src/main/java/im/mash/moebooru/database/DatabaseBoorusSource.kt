@@ -19,7 +19,7 @@ interface DatabaseBoorusSource {
 
     fun loadBoorus(): MutableList<Boorus.Booru>
 
-    fun detailBooru(id: Long): Boorus.Booru
+    fun getBooru(id: Long): Boorus.Booru
 
-    fun deleteBooru(booru: Boorus.Booru): Boolean
+    fun deleteBooru(booru: Boorus.Booru)
 }

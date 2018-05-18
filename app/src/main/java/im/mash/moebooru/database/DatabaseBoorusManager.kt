@@ -46,7 +46,7 @@ class DatabaseBoorusManager(private var database: DatabaseHelper) : DatabaseBoor
         return boorus
     }
 
-    override fun detailBooru(id: Long): Boorus.Booru {
+    override fun getBooru(id: Long): Boorus.Booru {
         var booru: Boorus.Booru? = null
         database.use {
             select(BoorusTable.TABLE_NAME)
@@ -63,18 +63,9 @@ class DatabaseBoorusManager(private var database: DatabaseHelper) : DatabaseBoor
         return booru!!
     }
 
-    override fun deleteBooru(booru: Boorus.Booru): Boolean {
-        var isDelete: Boolean? = null
+    override fun deleteBooru(booru: Boorus.Booru) {
         database.use {
-            beginTransaction()
-            val result = delete(BoorusTable.TABLE_NAME, "${BoorusTable.ID} = ${booru.id}") > 0
-            isDelete = if (result) {
-                setTransactionSuccessful()
-                true
-            } else {
-                false
-            }
+            delete(BoorusTable.TABLE_NAME, "${BoorusTable.ID} = ${booru.id}")
         }
-        return isDelete!!
     }
 }
