@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 .withOnDrawerItemClickListener(this)
                 .withActionBarDrawerToggle(true)
                 .withSavedInstance(savedInstanceState)
-                .withDrawerWidthPx((width*0.7).toInt())
+                .withDrawerWidthPx((width*0.7F).toInt())
                 .build()
 
         if (savedInstanceState == null) {
