@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.ui
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
@@ -19,6 +20,7 @@ import android.support.customtabs.CustomTabsIntent
 import android.support.v4.content.ContextCompat
 import android.support.v7.content.res.AppCompatResources
 import android.util.DisplayMetrics
+import android.view.Gravity
 import android.view.View
 import android.widget.Toast
 import com.mikepenz.materialdrawer.AccountHeader
@@ -31,6 +33,7 @@ import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import im.mash.moebooru.R
 
+@SuppressLint("RtlHardcoded")
 class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
     companion object {
@@ -40,7 +43,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
     }
 
     internal lateinit var drawer: Drawer
-    internal lateinit var header: AccountHeader
+    private lateinit var header: AccountHeader
     private var previousSelectedDrawer: Long = 0    // it's actually lateinit
 
     private var metric: DisplayMetrics = DisplayMetrics()
@@ -84,6 +87,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         drawer = DrawerBuilder()
                 .withActivity(this)
                 .withTranslucentStatusBar(true)
+                .withDrawerGravity(Gravity.LEFT)
                 .withAccountHeader(header)
                 .addDrawerItems(
                         PrimaryDrawerItem()
@@ -107,15 +111,16 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 )
                 .withOnDrawerItemClickListener(this)
                 .withActionBarDrawerToggle(true)
+                .withActionBarDrawerToggleAnimated(true)
                 .withSavedInstance(savedInstanceState)
-                .withDrawerWidthPx((width*0.7F).toInt())
+                .withDrawerWidthPx((width*0.75F).toInt())
                 .build()
+
+        previousSelectedDrawer = drawer.currentSelection
 
         if (savedInstanceState == null) {
             displayFragment(PostsFragment())
         }
-
-        previousSelectedDrawer = drawer.currentSelection
 
     }
 
