@@ -20,6 +20,7 @@ import android.support.customtabs.CustomTabsIntent
 import android.support.v4.content.ContextCompat
 import android.support.v7.content.res.AppCompatResources
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.Toast
@@ -32,6 +33,11 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import im.mash.moebooru.R
+import im.mash.moebooru.database.DatabaseBoorusManager
+import im.mash.moebooru.database.database
+import im.mash.moebooru.models.Boorus
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 @SuppressLint("RtlHardcoded")
 class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
@@ -40,6 +46,24 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         private const val DRAWER_POSTS = 0L
         private const val DRAWER_SETTINGS = 1L
         private const val DRAWER_ABOUT = 2L
+    }
+
+    private val TAG = this.javaClass.simpleName
+
+    private val boorus: MutableList<Boorus.Booru> = mutableListOf()
+    private fun loadAsync() {
+        doAsync {
+            boorus.addAll(DatabaseBoorusManager(database).loadBoorus())
+            if (boorus.isEmpty()) {
+                Log.i(TAG, "boorus.isEmpty()")
+                val booru: Boorus.Booru = Boorus.Booru(0, "Konachan", "https://konachan.com")
+                DatabaseBoorusManager(database).saveBooru(booru)
+                boorus.addAll(DatabaseBoorusManager(database).loadBoorus())
+            }
+            uiThread {
+
+            }
+        }
     }
 
     internal lateinit var drawer: Drawer
@@ -122,6 +146,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
             displayFragment(PostsFragment())
         }
 
+        loadAsync()
     }
 
     override fun onItemClick(view: View?, position: Int, drawerItem: IDrawerItem<*, *>?): Boolean {

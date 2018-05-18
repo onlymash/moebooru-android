@@ -55,6 +55,7 @@ dependencies {
     implementation "moe.shizuku.preference:preference-switchcompat:$rikka_preference"
     implementation "moe.shizuku.preference:preference-dialog-android:$rikka_preference"
     implementation 'com.google.firebase:firebase-core:15.0.2'
+    implementation 'org.jetbrains.anko:anko-sqlite:0.10.5'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
