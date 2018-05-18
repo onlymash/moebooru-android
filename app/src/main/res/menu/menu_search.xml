@@ -10,15 +10,16 @@
   ~
   -->
 
-<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/toolbar_drawer_posts"
-    android:layout_width="match_parent"
-    android:layout_height="?android:attr/actionBarSize"
-    android:background="?android:attr/colorPrimary"
-    android:elevation="4dp"
-    android:touchscreenBlocksFocus="false"
-    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight"
-    app:contentInsetStart="0dp"
-    app:contentInsetEnd="0dp"/>
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/action_search"
+        android:title="@string/search"
+        android:icon="@drawable/ic_action_search_24dp"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+</menu>

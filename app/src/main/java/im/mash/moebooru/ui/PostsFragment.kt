@@ -31,7 +31,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private lateinit var drawerView: View
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerToolbar: Toolbar
-    private lateinit var close: ImageView
 
     private var metric: DisplayMetrics = DisplayMetrics()
     private var width: Int = 0
@@ -54,6 +53,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         drawer = DrawerBuilder()
                 .withActivity(activity)
+                .withToolbar(toolbar)
                 .withDrawerGravity(Gravity.RIGHT)
                 .withDisplayBelowStatusBar(true)
                 .withRootView(R.id.fragment_main)
@@ -65,9 +65,11 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 .buildForFragment()
         drawerLayout = drawer.drawerLayout
 
-        drawerToolbar = drawerLayout.findViewById(R.id.toolbar_drawer_posts)
-        close = drawerLayout.findViewById<ImageView>(R.id.close)
-        close.setOnClickListener(this)
+        drawerToolbar = drawerView.findViewById(R.id.toolbar_drawer_posts)
+        drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
+        drawerToolbar.inflateMenu(R.menu.menu_search)
+        drawerToolbar.setOnMenuItemClickListener(this)
+        drawerToolbar.setOnClickListener(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -85,6 +87,12 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 Settings.gridModeString = Key.grid_mode_staggered_grid
                 setGridItem()
             }
+            R.id.action_search_open -> {
+                drawer.openDrawer()
+            }
+            R.id.action_search -> {
+                drawer.closeDrawer()
+            }
         }
         return true
     }
@@ -96,24 +104,27 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT)
+    override fun onClick(v: View?) {
+        when (v) {
+            drawerToolbar -> drawer.closeDrawer()
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.RIGHT)
+        drawer.closeDrawer()
     }
 
-    override fun onClick(v: View?) {
-        when (v) {
-            close -> drawer.closeDrawer()
+    override fun onPause() {
+        super.onPause()
+        drawer.closeDrawer()
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (drawer.isDrawerOpen) {
+            drawer.closeDrawer()
+            return true
         }
+        return super.onBackPressed()
     }
 }

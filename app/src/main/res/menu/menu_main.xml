@@ -16,7 +16,7 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_search"
+        android:id="@+id/action_search_open"
         android:title="@string/search"
         android:icon="@drawable/ic_action_search_24dp"
         app:showAsAction="always"
