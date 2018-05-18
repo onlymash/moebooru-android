@@ -21,9 +21,9 @@ import moe.shizuku.preference.PreferenceManager
 @SuppressLint("StaticFieldLeak")
 object Settings {
 
-    internal lateinit var sContext:Context
-    internal lateinit var sSharedPreferences: SharedPreferences
-    internal lateinit var sEditor: SharedPreferences.Editor
+    private lateinit var sContext:Context
+    private lateinit var sSharedPreferences: SharedPreferences
+    private lateinit var sEditor: SharedPreferences.Editor
 
     fun initialize(context: Context) {
         sContext = context.applicationContext
@@ -32,11 +32,10 @@ object Settings {
 
     var nightModeString: String
         get() = sSharedPreferences.getString(Key.night_mode, Key.night_mode_system)
-        @SuppressLint("CommitPrefEdits")
         set(value) {
             sEditor = sSharedPreferences.edit()
             sEditor.putString(Key.night_mode, value)
-            sEditor.commit()
+            sEditor.apply()
         }
 
     @AppCompatDelegate.NightMode
@@ -49,10 +48,33 @@ object Settings {
 
     var gridModeString: String
         get() = sSharedPreferences.getString(Key.grid_mode, Key.grid_mode_staggered_grid)
-        @SuppressLint("CommitPrefEdits")
         set(value) {
             sEditor = sSharedPreferences.edit()
             sEditor.putString(Key.grid_mode, value)
-            sEditor.commit()
+            sEditor.apply()
+        }
+
+    var postLimitInt: Int
+        get() = sSharedPreferences.getInt(Key.post_limit, 30)
+        set(value) {
+            sEditor = sSharedPreferences.edit()
+            sEditor.putInt(Key.post_limit, value)
+            sEditor.apply()
+        }
+
+    var cacheMemoryInt: Int
+        get() = sSharedPreferences.getInt(Key.cache_memory, 30)
+        set(value) {
+            sEditor = sSharedPreferences.edit()
+            sEditor.putInt(Key.cache_memory, value)
+            sEditor.apply()
+        }
+
+    var cacheDiskInt: Int
+        get() = sSharedPreferences.getInt(Key.cache_disk, 30)
+        set(value) {
+            sEditor = sSharedPreferences.edit()
+            sEditor.putInt(Key.cache_disk, value)
+            sEditor.apply()
         }
 }

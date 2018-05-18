@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Moebooru</string>
 
+    <string name="post">Post</string>
+    <string name="post_limit">Post limit</string>
     <string name="posts">Posts</string>
     <string name="settings">Settings</string>
     <string name="search">Search</string>
@@ -8,6 +10,10 @@
     <string name="grid_mode">Grid mode</string>
     <string name="grid">Grid</string>
     <string name="staggered_grid">Staggered Grid</string>
+
+    <string name="cache">Cache</string>
+    <string name="cache_memory">Memory cache</string>
+    <string name="cache_disk">Disk cache</string>
 
     <string name="about">About</string>
     <string name="about_url" translatable="false">file:///android_asset/pages/about.html</string>

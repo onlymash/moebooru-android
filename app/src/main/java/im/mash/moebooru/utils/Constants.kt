@@ -21,4 +21,8 @@ object Key {
     const val grid_mode = "grid_mode"
     const val grid_mode_grid = "grid"
     const val grid_mode_staggered_grid = "staggered_grid"
+
+    const val post_limit = "post_limit"
+    const val cache_memory = "cache_memory"
+    const val cache_disk = "cache_disk"
 }

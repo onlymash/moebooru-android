@@ -36,4 +36,48 @@
         <item>staggered_grid</item>
     </string-array>
 
+    <string-array name="post_limit_values" translatable="false">
+        <item>20</item>
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>60</item>
+        <item>70</item>
+        <item>80</item>
+        <item>90</item>
+        <item>100</item>
+    </string-array>
+
+    <string-array name="cache_memory" translatable="false">
+        <item>128 MiB</item>
+        <item>256 MiB</item>
+        <item>512 MiB</item>
+        <item>1 GiB</item>
+        <item>2 GiB</item>
+    </string-array>
+
+    <string-array name="cache_memory_values" translatable="false">
+        <item>128</item>
+        <item>256</item>
+        <item>512</item>
+        <item>1024</item>
+        <item>2048</item>
+    </string-array>
+
+    <string-array name="cache_disk" translatable="false">
+        <item>128 MiB</item>
+        <item>256 MiB</item>
+        <item>512 MiB</item>
+        <item>1 GiB</item>
+        <item>2 GiB</item>
+    </string-array>
+
+    <string-array name="cache_disk_values" translatable="false">
+        <item>128</item>
+        <item>256</item>
+        <item>512</item>
+        <item>1024</item>
+        <item>2048</item>
+    </string-array>
+
 </resources>
