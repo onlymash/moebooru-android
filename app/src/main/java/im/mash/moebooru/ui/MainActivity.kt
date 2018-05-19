@@ -32,6 +32,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import im.mash.moebooru.R
+import im.mash.moebooru.Settings
 import im.mash.moebooru.database.DatabaseBoorusManager
 import im.mash.moebooru.database.database
 import im.mash.moebooru.models.Boorus
@@ -63,23 +64,30 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
             boorus.addAll(DatabaseBoorusManager(database).loadBoorus())
             if (boorus.isEmpty()) {
                 Log.i(TAG, "boorus.isEmpty()")
-                val booru: Boorus.Booru = Boorus.Booru(0, "Konachan", "https://konachan.com")
-                DatabaseBoorusManager(database).saveBooru(booru)
+                DatabaseBoorusManager(database).saveBooru(Boorus.Booru(0L, "Konachan", "https://konachan.com"))
+                DatabaseBoorusManager(database).saveBooru(Boorus.Booru(1L, "yande.re", "https://yande.re"))
                 boorus.addAll(DatabaseBoorusManager(database).loadBoorus())
             }
             uiThread {
-                if (!boorus.isEmpty()) {
+                if (boorus.isNotEmpty()) {
+                    Log.i(TAG, boorus.size.toString())
+                    var i = 0
                     boorus.forEach {
                         val profileDrawerItem = ProfileDrawerItem()
                                 .withName(it.name)
                                 .withEmail(it.url)
                                 .withIcon(R.mipmap.ic_launcher_round)
-                        header.addProfile(profileDrawerItem, boorus.lastIndex)
+                        profileDrawerItem.withIdentifier(i.toLong())
+                        header.addProfile(profileDrawerItem, i)
+                        i += 1
                     }
                     header.addProfile(profileSettingDrawerItem, boorus.size)
                 } else {
                     header.addProfiles(profileSettingDrawerItem)
                 }
+
+                header.setActiveProfile(Settings.activeProfile)
+
             }
         }
     }
@@ -88,9 +96,6 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        windowManager.defaultDisplay.getMetrics(metric)
-        width = metric.widthPixels
-
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
                 .withIcon(R.drawable.ic_action_settings_24dp)
@@ -98,9 +103,17 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         header = AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.background_header)
+                .withOnAccountHeaderListener { _, profile, _ ->
+                    Settings.activeProfile = profile.identifier
+                    Log.i(TAG, profile.identifier.toString())
+                    false
+                }
                 .build()
 
         loadAsync()
+
+        windowManager.defaultDisplay.getMetrics(metric)
+        width = metric.widthPixels
 
         drawer = DrawerBuilder()
                 .withActivity(this)

@@ -77,4 +77,12 @@ object Settings {
             sEditor.putInt(Key.CACHE_DISK, value)
             sEditor.apply()
         }
+
+    var activeProfile: Long
+        get() = sSharedPreferences.getLong(Key.ACTIVE_PROFILE, 0)
+        set(value) {
+            sEditor = sSharedPreferences.edit()
+            sEditor.putLong(Key.ACTIVE_PROFILE, value)
+            sEditor.apply()
+        }
 }

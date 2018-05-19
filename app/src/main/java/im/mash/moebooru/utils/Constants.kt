@@ -25,6 +25,8 @@ object Key {
     const val POST_LIMIT = "post_limit"
     const val CACHE_MEMORY = "cache_memory"
     const val CACHE_DISK = "cache_disk"
+
+    const val ACTIVE_PROFILE = "active_profile"
 }
 
 object BoorusTable {
