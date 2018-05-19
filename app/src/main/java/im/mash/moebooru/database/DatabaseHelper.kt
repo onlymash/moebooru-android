@@ -29,11 +29,9 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
             return instance!!
         }
 
-        @JvmField
-        val DB_NAME = "database.db"
+        const val DB_NAME = "database.db"
 
-        @JvmField
-        val DB_VERSION = 1
+        const val DB_VERSION = 1
     }
     override fun onCreate(db: SQLiteDatabase?) {
         db?.createTable(
