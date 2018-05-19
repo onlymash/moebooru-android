@@ -14,6 +14,7 @@ package im.mash.moebooru.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import im.mash.moebooru.utils.BoorusTable
+import im.mash.moebooru.utils.SearchTagsTable
 import org.jetbrains.anko.db.*
 
 class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION) {
@@ -40,6 +41,12 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
                 BoorusTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
                 BoorusTable.NAME to TEXT,
                 BoorusTable.URL to TEXT)
+        db?.createTable(
+                SearchTagsTable.TABLE_NAME,
+                true,
+                SearchTagsTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
+                SearchTagsTable.NAME to TEXT,
+                SearchTagsTable.IS_SELECTED to INTEGER)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {

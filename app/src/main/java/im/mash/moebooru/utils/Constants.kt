@@ -40,3 +40,10 @@ object Net {
     const val HEADER_USER_AGENT_KEY = "User-Agent"
     const val HEADER_USER_AGENT_INFO = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36"
 }
+
+object SearchTagsTable {
+    const val TABLE_NAME = "search_tags"
+    const val ID = "_id"
+    const val NAME = "name"
+    const val IS_SELECTED = "is_selected"
+}
