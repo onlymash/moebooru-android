@@ -13,6 +13,7 @@ package im.mash.moebooru.ui
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.view.View
 import im.mash.moebooru.R
@@ -24,6 +25,7 @@ open class ToolbarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar = view.findViewById(R.id.toolbar)
+        view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.background))
         val activity = activity as MainActivity
         activity.drawer.setToolbar(activity, toolbar, true)
     }
