@@ -14,14 +14,20 @@ package im.mash.moebooru.ui
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.*
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
-import android.widget.ImageView
+
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
+import im.mash.moebooru.glide.GetUrl
+import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
 
 @SuppressLint("RtlHardcoded")
@@ -70,6 +76,13 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener(this)
         drawerToolbar.setOnClickListener(this)
+
+        val postsView: RecyclerView = view.findViewById(R.id.posts_list)
+        when (Settings.gridModeString) {
+            Key.GRID_MODE_GRID -> postsView.layoutManager = GridLayoutManager(this.requireContext(), 3, GridLayoutManager.VERTICAL, false)
+            else -> postsView.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+        }
+        postsView.adapter = PostAdapter()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -97,7 +110,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         return true
     }
 
-    fun setGridItem() {
+    private fun setGridItem() {
         when (Settings.gridModeString) {
             Key.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).setChecked(true)
             Key.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).setChecked(true)
@@ -126,5 +139,59 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             return true
         }
         return super.onBackPressed()
+    }
+
+    private class PostAdapter : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+
+        companion object {
+            private val items : List<String> = listOf(
+                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
+                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
+                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
+                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
+                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
+                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
+                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
+                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
+                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
+                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
+                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
+                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
+                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
+                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
+                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
+                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
+                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
+                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
+                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
+                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
+                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
+                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
+                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
+                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg"
+            )
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
+            val view: View = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.layout_post_item, parent, false)
+            return PostViewHolder(view)
+        }
+
+        override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
+            holder.fixedImageView.setWidthAndHeightWeight(150, 106)
+            GlideApp.with(holder.fixedImageView.context)
+                    .load(GetUrl(items[position]).glideUrl)
+                    .into(holder.fixedImageView)
+        }
+
+        override fun getItemCount(): Int {
+            return items.size
+        }
+
+        private class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val fixedImageView: FixedImageView = itemView.findViewById(R.id.post_item)
+        }
+
     }
 }
