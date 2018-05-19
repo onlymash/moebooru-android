@@ -43,7 +43,7 @@
 
         <ListPreference
             android:key="post_limit"
-            android:entries="@array/post_limit_values"
+            android:entries="@array/post_limit"
             android:entryValues="@array/post_limit_values"
             android:defaultValue="40"
             android:summary="%s"

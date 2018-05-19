@@ -55,31 +55,31 @@ object Settings {
         }
 
     var postLimitInt: Int
-        get() = sSharedPreferences.getInt(Key.POST_LIMIT, 30)
+        get() = sSharedPreferences.getString(Key.POST_LIMIT, "30").toInt()
         set(value) {
             sEditor = sSharedPreferences.edit()
-            sEditor.putInt(Key.POST_LIMIT, value)
+            sEditor.putString(Key.POST_LIMIT, value.toString())
             sEditor.apply()
         }
 
     var cacheMemoryInt: Int
-        get() = sSharedPreferences.getInt(Key.CACHE_MEMORY, 256)
+        get() = sSharedPreferences.getString(Key.CACHE_MEMORY, "256").toInt()
         set(value) {
             sEditor = sSharedPreferences.edit()
-            sEditor.putInt(Key.CACHE_MEMORY, value)
+            sEditor.putString(Key.CACHE_MEMORY, value.toString())
             sEditor.apply()
         }
 
     var cacheDiskInt: Int
-        get() = sSharedPreferences.getInt(Key.CACHE_DISK, 256)
+        get() = sSharedPreferences.getString(Key.CACHE_DISK, "256").toInt()
         set(value) {
             sEditor = sSharedPreferences.edit()
-            sEditor.putInt(Key.CACHE_DISK, value)
+            sEditor.putString(Key.CACHE_DISK, value.toString())
             sEditor.apply()
         }
 
     var activeProfile: Long
-        get() = sSharedPreferences.getLong(Key.ACTIVE_PROFILE, 0)
+        get() = sSharedPreferences.getLong(Key.ACTIVE_PROFILE, 0L)
         set(value) {
             sEditor = sSharedPreferences.edit()
             sEditor.putLong(Key.ACTIVE_PROFILE, value)
