@@ -12,6 +12,19 @@
 
 <resources>
 
+    <integer-array name="customizedColors">
+        <item>@color/blue</item>
+        <item>@color/purple</item>
+        <item>@color/green</item>
+        <item>@color/orange</item>
+        <item>@color/red</item>
+        <item>@color/darkBlue</item>
+        <item>@color/darkPurple</item>
+        <item>@color/darkGreen</item>
+        <item>@color/darkOrange</item>
+        <item>@color/darkRed</item>
+    </integer-array>
+
     <string-array name="night_modes">
         <item>@string/night_mode_system</item>
         <item>@string/night_mode_auto</item>

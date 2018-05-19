@@ -13,6 +13,7 @@ package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.graphics.Typeface
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -36,8 +37,10 @@ import im.mash.moebooru.Settings
 import im.mash.moebooru.database.DatabaseBoorusManager
 import im.mash.moebooru.database.database
 import im.mash.moebooru.models.Boorus
+import im.mash.moebooru.models.TextDrawable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import java.util.*
 
 @SuppressLint("RtlHardcoded")
 class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
@@ -46,6 +49,17 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         private const val DRAWER_POSTS = 0L
         private const val DRAWER_SETTINGS = 1L
         private const val DRAWER_ABOUT = 2L
+        private val builder = getTextDrawableBuilder()
+        private fun getTextDrawableBuilder(): TextDrawable.Builder {
+            val builder = TextDrawable.builder()
+            builder.beginConfig().width(50)
+            builder.beginConfig().height(50)
+            builder.beginConfig().fontSize(30)
+            builder.beginConfig().useFont(Typeface.create("sans", Typeface.NORMAL))
+            builder.beginConfig().withBorder(2)
+            builder.beginConfig().endConfig()
+            return builder as TextDrawable.Builder;
+        }
     }
 
     private val TAG = this.javaClass.simpleName
@@ -73,10 +87,11 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                     Log.i(TAG, boorus.size.toString())
                     var i = 0
                     boorus.forEach {
-                        val profileDrawerItem = ProfileDrawerItem()
+                        val icon = builder.buildRound(it.name!![0].toString(), getCustomizedColor())
+                        val profileDrawerItem: ProfileDrawerItem = ProfileDrawerItem()
                                 .withName(it.name)
                                 .withEmail(it.url)
-                                .withIcon(R.mipmap.ic_launcher_round)
+                                .withIcon(icon)
                         profileDrawerItem.withIdentifier(i.toLong())
                         header.addProfile(profileDrawerItem, i)
                         i += 1
@@ -90,6 +105,11 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
             }
         }
+    }
+
+    private fun getCustomizedColor(): Int {
+        val customizedColors = resources.getIntArray(R.array.customizedColors)
+        return customizedColors[Random().nextInt(customizedColors.size)]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
