@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">@color/material_primary_800</color>
+    <color name="colorPrimaryDark">@color/material_primary_900</color>
     <color name="colorAccent">#FF4081</color>
 
     <color name="background">@color/md_light_background</color>
@@ -28,5 +28,10 @@
     <color name="darkGreen" type="color">#FF669900</color>
     <color name="darkOrange" type="color">#FFFF8800</color>
     <color name="darkRed" type="color">#FFCC0000</color>
+
+    <color name="material_primary_800">@color/material_blue_grey_800</color>
+    <color name="material_primary_900">@color/material_blue_grey_900</color>
+
+    <color name="post_toolbar">#11ffffff</color>
 
 </resources>

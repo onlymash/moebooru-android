@@ -12,7 +12,9 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -20,6 +22,8 @@ import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.*
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
+import android.util.Log
+import android.util.TypedValue
 
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
@@ -48,8 +52,12 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.colorPrimaryDark))
+
         toolbar.setTitle(R.string.posts)
         toolbar.inflateMenu(R.menu.menu_main)
+        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.post_toolbar))
         toolbar.setOnMenuItemClickListener(this)
         setGridItem()
 
@@ -65,9 +73,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 .withRootView(R.id.fragment_main)
                 .withCustomView(drawerView)
                 .withSavedInstance(savedInstanceState)
-                .withActionBarDrawerToggle(true)
-                .withActionBarDrawerToggleAnimated(true)
                 .withDrawerWidthPx((width*0.75F).toInt())
+                .withActionBarDrawerToggle(false)
                 .buildForFragment()
         drawerLayout = drawer.drawerLayout
 
@@ -82,7 +89,12 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             Key.GRID_MODE_GRID -> postsView.layoutManager = GridLayoutManager(this.requireContext(), 3, GridLayoutManager.VERTICAL, false)
             else -> postsView.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
         }
-        postsView.adapter = PostAdapter()
+        val tv = TypedValue()
+        var toolbarHeight = 0
+        if (activity.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+        }
+        postsView.adapter = PostAdapter(toolbarHeight, this.requireContext())
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -141,7 +153,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         return super.onBackPressed()
     }
 
-    private class PostAdapter : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+    private class PostAdapter(private val toolbarHeight: Int, private val context: Context) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
         companion object {
             private val items : List<String> = listOf(
@@ -170,6 +182,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                     "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
                     "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg"
             )
+
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -180,6 +193,11 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
             holder.fixedImageView.setWidthAndHeightWeight(150, 106)
+            if (position in 0..2) {
+                val padding = context.resources.getDimension(R.dimen.item_padding)
+                holder.itemView.setPadding(padding.toInt(), padding.toInt() + toolbarHeight, padding.toInt(), padding.toInt())
+                Log.i(this.context.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
+            }
             GlideApp.with(holder.fixedImageView.context)
                     .load(GetUrl(items[position]).glideUrl)
                     .into(holder.fixedImageView)

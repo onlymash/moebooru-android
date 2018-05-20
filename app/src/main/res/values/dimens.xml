@@ -10,19 +10,6 @@
   ~
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/item_padding"
-    android:orientation="vertical"
-    tools:ignore="RtlHardcoded,RtlSymmetry">
-
-    <im.mash.moebooru.ui.widget.FixedImageView
-        android:id="@+id/post_item"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="fitCenter"
-        android:contentDescription="@null" />
-
-</LinearLayout>
+<resources>
+    <dimen name="item_padding">3dp</dimen>
+</resources>
