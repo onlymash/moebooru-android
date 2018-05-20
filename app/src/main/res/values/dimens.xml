@@ -12,5 +12,5 @@
 
 <resources>
     <dimen name="item_padding">3dp</dimen>
-    <dimen name="item_width">120dp</dimen>
+    <dimen name="item_width">126dp</dimen>
 </resources>
