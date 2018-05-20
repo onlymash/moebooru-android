@@ -59,7 +59,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         toolbar.inflateMenu(R.menu.menu_main)
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.post_toolbar))
         toolbar.setOnMenuItemClickListener(this)
-        setGridItem()
+        setGridItemOption()
 
         val activity = activity!!
         activity.windowManager.defaultDisplay.getMetrics(metric)
@@ -106,11 +106,11 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         when (item?.itemId) {
             R.id.action_grid -> {
                 Settings.gridModeString = Key.GRID_MODE_GRID
-                setGridItem()
+                setGridItemOption()
             }
             R.id.action_staggered_grid -> {
                 Settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
-                setGridItem()
+                setGridItemOption()
             }
             R.id.action_search_open -> {
                 drawer.openDrawer()
@@ -122,10 +122,10 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         return true
     }
 
-    private fun setGridItem() {
+    private fun setGridItemOption() {
         when (Settings.gridModeString) {
-            Key.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).setChecked(true)
-            Key.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).setChecked(true)
+            Key.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).isChecked = true
+            Key.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
         }
     }
 
