@@ -53,7 +53,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.colorPrimaryDark))
+        view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
 
         toolbar.setTitle(R.string.posts)
         toolbar.inflateMenu(R.menu.menu_main)
@@ -84,10 +84,12 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         drawerToolbar.setOnMenuItemClickListener(this)
         drawerToolbar.setOnClickListener(this)
 
+        val spanCount: Int = width/this.requireContext().resources.getDimension(R.dimen.item_width).toInt()
+        Settings.spanCountInt = spanCount
         val postsView: RecyclerView = view.findViewById(R.id.posts_list)
         when (Settings.gridModeString) {
-            Key.GRID_MODE_GRID -> postsView.layoutManager = GridLayoutManager(this.requireContext(), 3, GridLayoutManager.VERTICAL, false)
-            else -> postsView.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
+            Key.GRID_MODE_GRID -> postsView.layoutManager = GridLayoutManager(this.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
+            else -> postsView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
         }
         val tv = TypedValue()
         var toolbarHeight = 0
@@ -192,14 +194,15 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
 
         override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-            holder.fixedImageView.setWidthAndHeightWeight(150, 106)
-            if (position in 0..2) {
+            holder.fixedImageView.setWidthAndHeightWeight(150, 100)
+            if (position in 0..(Settings.spanCountInt-1)) {
                 val padding = context.resources.getDimension(R.dimen.item_padding)
                 holder.itemView.setPadding(padding.toInt(), padding.toInt() + toolbarHeight, padding.toInt(), padding.toInt())
                 Log.i(this.context.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
             }
             GlideApp.with(holder.fixedImageView.context)
                     .load(GetUrl(items[position]).glideUrl)
+                    .centerCrop()
                     .into(holder.fixedImageView)
         }
 

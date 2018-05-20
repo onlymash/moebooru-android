@@ -27,6 +27,8 @@ object Key {
     const val CACHE_DISK = "cache_disk"
 
     const val ACTIVE_PROFILE = "active_profile"
+
+    const val SPAN_COUNT = "span_count"
 }
 
 object BoorusTable {

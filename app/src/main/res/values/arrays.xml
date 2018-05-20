@@ -18,11 +18,11 @@
         <item>@color/green</item>
         <item>@color/orange</item>
         <item>@color/red</item>
-        <item>@color/darkBlue</item>
-        <item>@color/darkPurple</item>
-        <item>@color/darkGreen</item>
-        <item>@color/darkOrange</item>
-        <item>@color/darkRed</item>
+        <item>@color/dark_blue</item>
+        <item>@color/dark_purple</item>
+        <item>@color/dark_green</item>
+        <item>@color/dark_orange</item>
+        <item>@color/dark_red</item>
     </integer-array>
 
     <string-array name="night_modes">

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/material_primary_800</color>
-    <color name="colorPrimaryDark">@color/material_primary_900</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="primary">@color/material_primary_800</color>
+    <color name="primary_dark">@color/material_primary_900</color>
+    <color name="accent">#FF4081</color>
 
     <color name="background">@color/md_light_background</color>
     <color name="primary_icon">@color/md_grey_600</color>
@@ -23,15 +23,15 @@
     <color name="green" type="color">#FF99CC00</color>
     <color name="orange" type="color">#FFFFBB33</color>
     <color name="red" type="color">#FFFF4444</color>
-    <color name="darkBlue" type="color">#FF0099CC</color>
-    <color name="darkPurple" type="color">#FF9933CC</color>
-    <color name="darkGreen" type="color">#FF669900</color>
-    <color name="darkOrange" type="color">#FFFF8800</color>
-    <color name="darkRed" type="color">#FFCC0000</color>
+    <color name="dark_blue" type="color">#FF0099CC</color>
+    <color name="dark_purple" type="color">#FF9933CC</color>
+    <color name="dark_green" type="color">#FF669900</color>
+    <color name="dark_orange" type="color">#FFFF8800</color>
+    <color name="dark_red" type="color">#FFCC0000</color>
 
     <color name="material_primary_800">@color/material_blue_grey_800</color>
     <color name="material_primary_900">@color/material_blue_grey_900</color>
 
-    <color name="post_toolbar">#11ffffff</color>
+    <color name="post_toolbar">#11000000</color>
 
 </resources>

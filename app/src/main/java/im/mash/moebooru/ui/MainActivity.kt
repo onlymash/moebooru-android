@@ -213,7 +213,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
     private val customTabsIntent by lazy {
         CustomTabsIntent.Builder()
-                .setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary))
+                .setToolbarColor(ContextCompat.getColor(this, R.color.primary))
                 .build()
     }
 

@@ -85,4 +85,12 @@ object Settings {
             sEditor.putLong(Key.ACTIVE_PROFILE, value)
             sEditor.apply()
         }
+
+    var spanCountInt: Int
+        get() = sSharedPreferences.getInt(Key.SPAN_COUNT, 3)
+        set(value) {
+            sEditor = sSharedPreferences.edit()
+            sEditor.putInt(Key.SPAN_COUNT, value)
+            sEditor.apply()
+        }
 }
