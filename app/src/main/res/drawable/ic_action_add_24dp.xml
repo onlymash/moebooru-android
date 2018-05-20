@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (C) 2018 by onlymash <im@mash.im>, All rights reserved
   ~
@@ -10,22 +9,12 @@
   ~
   -->
 
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <item
-        android:id="@+id/action_add"
-        android:title="@string/add"
-        android:icon="@drawable/ic_action_add_24dp"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction" />
-    <item
-        android:id="@+id/action_search"
-        android:title="@string/search"
-        android:icon="@drawable/ic_action_search_24dp"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction" />
-
-</menu>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24.0"
+    android:viewportHeight="24.0">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M19,13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+</vector>
