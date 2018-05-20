@@ -12,18 +12,17 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.StaggeredGridLayoutManager
+import android.support.v7.widget.*
 import android.view.*
-import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
+import android.view.animation.AnimationUtils
 
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
@@ -35,15 +34,24 @@ import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
 
 @SuppressLint("RtlHardcoded")
-class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
+class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
+        View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private val TAG = this.javaClass.simpleName
 
     private lateinit var drawer: Drawer
     private lateinit var drawerView: View
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerToolbar: Toolbar
+    private lateinit var postsView: RecyclerView
+    private lateinit var postAdapter: PostAdapter
+
+    private var currentGridMode: String = Key.GRID_MODE_STAGGERED_GRID
 
     private var metric: DisplayMetrics = DisplayMetrics()
     private var width: Int = 0
+    private var spanCount: Int = 1
+    private var itemPadding: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         drawerView = inflater.inflate(R.layout.layout_drawer_posts, container, false)
@@ -65,6 +73,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         activity.windowManager.defaultDisplay.getMetrics(metric)
         width = metric.widthPixels
 
+        itemPadding = activity.resources.getDimension(R.dimen.item_padding).toInt()
+
         drawer = DrawerBuilder()
                 .withActivity(activity)
                 .withToolbar(toolbar)
@@ -76,27 +86,61 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 .withDrawerWidthPx((width*0.75F).toInt())
                 .withActionBarDrawerToggle(false)
                 .buildForFragment()
-        drawerLayout = drawer.drawerLayout
 
+        drawerLayout = drawer.drawerLayout
         drawerToolbar = drawerView.findViewById(R.id.toolbar_drawer_posts)
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener(this)
         drawerToolbar.setOnClickListener(this)
 
-        val spanCount: Int = width/this.requireContext().resources.getDimension(R.dimen.item_width).toInt()
-        Settings.spanCountInt = spanCount
-        val postsView: RecyclerView = view.findViewById(R.id.posts_list)
-        when (Settings.gridModeString) {
-            Key.GRID_MODE_GRID -> postsView.layoutManager = GridLayoutManager(this.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
-            else -> postsView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
-        }
+        //init Adapter
         val tv = TypedValue()
         var toolbarHeight = 0
         if (activity.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
         }
-        postsView.adapter = PostAdapter(toolbarHeight, this.requireContext())
+        postAdapter = PostAdapter(toolbarHeight, itemPadding)
+
+        //init RecyclerView
+        postsView = view.findViewById(R.id.posts_list)
+        spanCount = width/this.requireContext().resources.getDimension(R.dimen.item_width).toInt()
+        Settings.spanCountInt = spanCount
+        currentGridMode = Settings.gridModeString
+        setupGridMode()
+        postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
+        postsView.itemAnimator = DefaultItemAnimator()
+        postsView.adapter = postAdapter
+
+        if (savedInstanceState == null) {
+            Log.i(TAG, "savedInstanceState == null")
+        }
+
+        val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
+        sp.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    private fun setupGridMode() {
+        when (currentGridMode) {
+            Key.GRID_MODE_GRID -> {
+                postsView.layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                postsView.setHasFixedSize(true)
+            }
+            else -> {
+                currentGridMode = Key.GRID_MODE_STAGGERED_GRID
+                postsView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                postsView.setHasFixedSize(false)
+            }
+        }
+    }
+
+    private fun reSetupGridMode() {
+        if (Settings.gridModeString != currentGridMode) {
+            currentGridMode = Settings.gridModeString
+            setupGridMode()
+            postsView.adapter = null
+            postsView.adapter = postAdapter
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -106,22 +150,21 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.action_grid -> {
-                Settings.gridModeString = Key.GRID_MODE_GRID
-                setGridItemOption()
-            }
-            R.id.action_staggered_grid -> {
-                Settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
-                setGridItemOption()
-            }
-            R.id.action_search_open -> {
-                drawer.openDrawer()
-            }
-            R.id.action_search -> {
-                drawer.closeDrawer()
-            }
+            R.id.action_grid -> Settings.gridModeString = Key.GRID_MODE_GRID
+            R.id.action_staggered_grid -> Settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
+            R.id.action_search_open -> drawer.openDrawer()
+            R.id.action_search -> drawer.closeDrawer()
         }
         return true
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            Key.GRID_MODE -> {
+                setGridItemOption()
+                reSetupGridMode()
+            }
+        }
     }
 
     private fun setGridItemOption() {
@@ -147,6 +190,11 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         drawer.closeDrawer()
     }
 
+    override fun onResume() {
+        super.onResume()
+        reSetupGridMode()
+    }
+
     override fun onBackPressed(): Boolean {
         if (drawer.isDrawerOpen) {
             drawer.closeDrawer()
@@ -155,7 +203,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         return super.onBackPressed()
     }
 
-    private class PostAdapter(private val toolbarHeight: Int, private val context: Context) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+    private class PostAdapter(private val toolbarHeight: Int, private val itemPadding: Int) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
         companion object {
             private val items : List<String> = listOf(
@@ -194,11 +242,17 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
 
         override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-            holder.fixedImageView.setWidthAndHeightWeight(150, 100)
-            if (position in 0..(Settings.spanCountInt-1)) {
-                val padding = context.resources.getDimension(R.dimen.item_padding)
-                holder.itemView.setPadding(padding.toInt(), padding.toInt() + toolbarHeight, padding.toInt(), padding.toInt())
-                Log.i(this.context.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
+            when (Settings.gridModeString) {
+                Key.GRID_MODE_STAGGERED_GRID -> {
+                    holder.fixedImageView.setWidthAndHeightWeight(150, 100)
+                }
+                else -> {
+                    holder.fixedImageView.setWidthAndHeightWeight(1,1)
+                }
+            }
+            if (position in 0..(Settings.spanCountInt - 1)) {
+                holder.itemView.setPadding(itemPadding, itemPadding + toolbarHeight, itemPadding, itemPadding)
+                Log.i(this.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
             }
             GlideApp.with(holder.fixedImageView.context)
                     .load(GetUrl(items[position]).glideUrl)

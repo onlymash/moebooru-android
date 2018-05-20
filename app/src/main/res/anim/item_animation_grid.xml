@@ -10,18 +10,16 @@
   ~
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/item_padding"
-    android:orientation="vertical"
-    tools:ignore="RtlHardcoded,RtlSymmetry">
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="@android:integer/config_longAnimTime">
 
-    <im.mash.moebooru.ui.widget.FixedImageView
-        android:id="@+id/post_item"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:contentDescription="@null" />
+    <translate
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator"
+        android:fromYDelta="50%p"
+        android:toYDelta="0" />
 
-</LinearLayout>
+    <alpha
+        android:fromAlpha="0"
+        android:toAlpha="1"
+        android:interpolator="@android:anim/accelerate_decelerate_interpolator" />
+</set>

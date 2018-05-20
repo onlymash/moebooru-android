@@ -10,18 +10,9 @@
   ~
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="@dimen/item_padding"
-    android:orientation="vertical"
-    tools:ignore="RtlHardcoded,RtlSymmetry">
-
-    <im.mash.moebooru.ui.widget.FixedImageView
-        android:id="@+id/post_item"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:contentDescription="@null" />
-
-</LinearLayout>
+<layoutAnimation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:animation="@anim/item_animation"
+    android:delay="10%"
+    android:animationOrder="normal"
+    android:direction="bottom_to_top|right_to_left"/>
