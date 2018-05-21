@@ -55,7 +55,7 @@ class MoeHttpClient private constructor(){
      * 发起get请求
      */
     @Throws(Exception::class)
-    operator fun get(url: String, requestParams: List<Pair<String, String>>,
+    fun get(url: String, requestParams: List<Pair<String, String>>?,
                      requestHeaders: List<Pair<String, String>>): MoeResponse? {
         return execute(Type.GET, url, requestParams, requestHeaders)
     }

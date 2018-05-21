@@ -11,7 +11,6 @@
 
 package im.mash.moebooru.utils
 
-import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import com.bumptech.glide.load.model.Headers

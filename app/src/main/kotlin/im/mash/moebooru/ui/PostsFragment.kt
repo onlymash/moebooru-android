@@ -34,9 +34,7 @@ import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.network.MoeHttpClient
 import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.widget.FixedImageView
-import im.mash.moebooru.utils.Key
-import im.mash.moebooru.utils.glideHeader
-import im.mash.moebooru.utils.okHttpHeader
+import im.mash.moebooru.utils.*
 
 @SuppressLint("RtlHardcoded")
 class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
@@ -124,14 +122,13 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
         sp.registerOnSharedPreferenceChangeListener(this)
 
         Thread(Runnable {
-            val response: MoeResponse? = MoeHttpClient.instance.post("https://konachan.com/post.json", null, okHttpHeader)
+            val url = MoeUrl().getUrl(app.boorusManager.getBooru(app.settings.activeProfile).url!!, "matthew_kyrielite", 1, 1)
+            val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
             val result: String? = response?.getResponseAsString()
             activity.runOnUiThread {
                 Log.i(TAG, result)
-                Log.i(TAG, okHttpHeader.toString())
             }
         }).start()
-
     }
 
     private fun setupGridMode() {
