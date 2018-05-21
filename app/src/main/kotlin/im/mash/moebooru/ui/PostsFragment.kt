@@ -23,15 +23,20 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import android.view.animation.AnimationUtils
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.Headers
 
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.glide.GetUrl
 import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.network.MoeHttpClient
+import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
+import im.mash.moebooru.utils.glideHeader
+import im.mash.moebooru.utils.okHttpHeader
 
 @SuppressLint("RtlHardcoded")
 class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
@@ -117,14 +122,16 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
 
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
-//
-//        Thread(Runnable {
-//            var response: MoeResponse? = MoeHttpClient.instance.post("https://konachan.com/post.json", null, null)
-//            val result: String? = response?.getResponseAsString()
-//            activity.runOnUiThread {
-//                Log.i(TAG, result)
-//            }
-//        }).start()
+
+        Thread(Runnable {
+            val response: MoeResponse? = MoeHttpClient.instance.post("https://konachan.com/post.json", null, okHttpHeader)
+            val result: String? = response?.getResponseAsString()
+            activity.runOnUiThread {
+                Log.i(TAG, result)
+                Log.i(TAG, okHttpHeader.toString())
+            }
+        }).start()
+
     }
 
     private fun setupGridMode() {
@@ -213,6 +220,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
     private class PostAdapter(private val toolbarHeight: Int, private val itemPadding: Int) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
         companion object {
+            private val header: Headers = glideHeader
             private val items : List<String> = listOf(
                     "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
                     "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
@@ -239,7 +247,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                     "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
                     "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg"
             )
-
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -262,7 +269,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                 Log.i(this.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
             }
             GlideApp.with(holder.fixedImageView.context)
-                    .load(GetUrl(items[position]).glideUrl)
+                    .load(GlideUrl(items[position], header))
                     .centerCrop()
                     .into(holder.fixedImageView)
         }

@@ -11,6 +11,9 @@
 
 package im.mash.moebooru.utils
 
+import android.webkit.WebView
+import im.mash.moebooru.App.Companion.app
+
 object Key {
     const val NIGHT_MODE = "night_mode"
     const val NIGHT_MODE_SYSTEM = "system"
@@ -39,8 +42,8 @@ object BoorusTable {
 }
 
 object Net {
-    const val HEADER_USER_AGENT_KEY = "User-Agent"
-    const val HEADER_USER_AGENT_INFO = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36"
+    const val USER_AGENT_KEY = "User-Agent"
+    var USER_AGENT_INFO: String = WebView(app).settings.userAgentString
 }
 
 object SearchTagsTable {

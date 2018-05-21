@@ -11,9 +11,11 @@
 
 package im.mash.moebooru.utils
 
+import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
-
+import com.bumptech.glide.load.model.Headers
+import com.bumptech.glide.load.model.LazyHeaders
 
 private val fieldChildFragmentManager by lazy {
     val field = Fragment::class.java.getDeclaredField("mChildFragmentManager")
@@ -24,3 +26,9 @@ private val fieldChildFragmentManager by lazy {
 var Fragment.childFragManager: FragmentManager?
     get() = childFragmentManager
     set(value) = fieldChildFragmentManager.set(this, value)
+
+val okHttpHeader: List<Pair<String, String>>
+    get() = listOf(Pair(Net.USER_AGENT_KEY, Net.USER_AGENT_INFO))
+
+val glideHeader: Headers
+    get() = LazyHeaders.Builder().addHeader(Net.USER_AGENT_KEY, Net.USER_AGENT_INFO).build()
