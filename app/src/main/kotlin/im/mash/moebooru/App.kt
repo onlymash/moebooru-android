@@ -14,13 +14,10 @@ package im.mash.moebooru
 import android.app.Application
 import android.content.Context
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.support.v7.app.AppCompatDelegate
 import com.google.firebase.FirebaseApp
 import im.mash.moebooru.database.DatabaseBoorusManager
 import im.mash.moebooru.database.DatabaseHelper
-import im.mash.moebooru.models.Booru
 import im.mash.moebooru.utils.DeviceContext
 
 class App : Application() {
@@ -29,21 +26,10 @@ class App : Application() {
         lateinit var app: App
     }
 
-    val settings: Settings by lazy {
-        Settings(this)
-    }
-
-    val database: DatabaseHelper by lazy {
-        DatabaseHelper.getInstance(this)
-    }
-
-    val boorusManager: DatabaseBoorusManager by lazy {
-        DatabaseBoorusManager.getInstance(database)
-    }
-
     val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
-    val handler: Handler by lazy { Handler(Looper.getMainLooper()) }
-    val activeBooru: Booru by lazy { boorusManager.getBooru(settings.activeProfile) }
+    val settings: Settings by lazy { Settings(this) }
+    val database: DatabaseHelper by lazy { DatabaseHelper.getInstance(this) }
+    val boorusManager: DatabaseBoorusManager by lazy { DatabaseBoorusManager.getInstance(database) }
 
     override fun onCreate() {
         super.onCreate()
