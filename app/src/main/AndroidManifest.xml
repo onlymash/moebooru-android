@@ -18,7 +18,6 @@
         android:theme="@style/AppTheme"
         android:supportsRtl="false"
         android:allowBackup="true"
-        android:backupAgent=".MyBackupAgent"
         android:fullBackupContent="@xml/backup_descriptor"
         android:fullBackupOnly="true"
         tools:ignore="GoogleAppIndexingWarning">

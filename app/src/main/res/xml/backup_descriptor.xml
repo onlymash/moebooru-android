@@ -12,4 +12,5 @@
 
 <full-backup-content>
     <include domain="sharedpref" path="im.mash.moebooru_preferences.xml"/>
+    <include domain="database" path="database.db"/>
 </full-backup-content>
