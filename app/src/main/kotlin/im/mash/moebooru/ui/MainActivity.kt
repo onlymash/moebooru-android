@@ -69,9 +69,6 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
     private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
     private var previousSelectedDrawer: Long = 0    // it's actually lateinit
 
-    private var metric: DisplayMetrics = DisplayMetrics()
-    private var width: Int = 0
-
     private val boorus: MutableList<Boorus.Booru> = mutableListOf()
     private fun loadAsync() {
         doAsync {
@@ -132,9 +129,6 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
         loadAsync()
 
-        windowManager.defaultDisplay.getMetrics(metric)
-        width = metric.widthPixels
-
         drawer = DrawerBuilder()
                 .withActivity(this)
                 .withTranslucentStatusBar(true)
@@ -164,7 +158,6 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 .withActionBarDrawerToggle(true)
                 .withActionBarDrawerToggleAnimated(true)
                 .withSavedInstance(savedInstanceState)
-                .withDrawerWidthPx((width*0.75F).toInt())
                 .build()
 
         previousSelectedDrawer = drawer.currentSelection

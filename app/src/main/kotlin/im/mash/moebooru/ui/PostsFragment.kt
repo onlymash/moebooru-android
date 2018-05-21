@@ -85,7 +85,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                 .withRootView(R.id.fragment_main)
                 .withCustomView(drawerView)
                 .withSavedInstance(savedInstanceState)
-                .withDrawerWidthPx((width*0.75F).toInt())
                 .withActionBarDrawerToggle(false)
                 .buildForFragment()
 
