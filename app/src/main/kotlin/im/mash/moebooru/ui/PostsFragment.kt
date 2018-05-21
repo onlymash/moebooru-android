@@ -30,6 +30,8 @@ import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.glide.GetUrl
 import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.network.MoeHttpClient
+import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
 
@@ -118,6 +120,14 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
 
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
+//
+//        Thread(Runnable {
+//            var response: MoeResponse? = MoeHttpClient.instance.post("https://konachan.com/post.json", null, null)
+//            val result: String? = response?.getResponseAsString()
+//            activity.runOnUiThread {
+//                Log.i(TAG, result)
+//            }
+//        }).start()
     }
 
     private fun setupGridMode() {
