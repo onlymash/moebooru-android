@@ -26,12 +26,10 @@ import android.view.animation.AnimationUtils
 
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.Settings
 import im.mash.moebooru.glide.GetUrl
 import im.mash.moebooru.glide.GlideApp
-import im.mash.moebooru.network.MoeHttpClient
-import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
 
@@ -106,8 +104,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
         //init RecyclerView
         postsView = view.findViewById(R.id.posts_list)
         spanCount = width/this.requireContext().resources.getDimension(R.dimen.item_width).toInt()
-        Settings.spanCountInt = spanCount
-        currentGridMode = Settings.gridModeString
+        app.settings.spanCountInt = spanCount
+        currentGridMode = app.settings.gridModeString
         setupGridMode()
         postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postsView.itemAnimator = DefaultItemAnimator()
@@ -144,8 +142,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
     }
 
     private fun reSetupGridMode() {
-        if (Settings.gridModeString != currentGridMode) {
-            currentGridMode = Settings.gridModeString
+        if (app.settings.gridModeString != currentGridMode) {
+            currentGridMode = app.settings.gridModeString
             setupGridMode()
             postsView.adapter = null
             postsView.adapter = postAdapter
@@ -159,8 +157,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.action_grid -> Settings.gridModeString = Key.GRID_MODE_GRID
-            R.id.action_staggered_grid -> Settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
+            R.id.action_grid -> app.settings.gridModeString = Key.GRID_MODE_GRID
+            R.id.action_staggered_grid -> app.settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
             R.id.action_search_open -> drawer.openDrawer()
             R.id.action_search -> drawer.closeDrawer()
         }
@@ -177,7 +175,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
     }
 
     private fun setGridItemOption() {
-        when (Settings.gridModeString) {
+        when (app.settings.gridModeString) {
             Key.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).isChecked = true
             Key.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
         }
@@ -251,7 +249,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
         }
 
         override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-            when (Settings.gridModeString) {
+            when (app.settings.gridModeString) {
                 Key.GRID_MODE_STAGGERED_GRID -> {
                     holder.fixedImageView.setWidthAndHeightWeight(150, 100)
                 }
@@ -259,7 +257,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
                     holder.fixedImageView.setWidthAndHeightWeight(1,1)
                 }
             }
-            if (position in 0..(Settings.spanCountInt - 1)) {
+            if (position in 0..(app.settings.spanCountInt - 1)) {
                 holder.itemView.setPadding(itemPadding, itemPadding + toolbarHeight, itemPadding, itemPadding)
                 Log.i(this.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
             }

@@ -11,32 +11,21 @@
 
 package im.mash.moebooru
 
-import android.annotation.SuppressLint
 import android.content.Context;
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatDelegate
 import im.mash.moebooru.utils.Key
 import moe.shizuku.preference.PreferenceManager
 
-@SuppressLint("StaticFieldLeak")
-object Settings {
+class Settings(ctx: Context) {
 
-    private lateinit var sContext:Context
-    private lateinit var sSharedPreferences: SharedPreferences
-    private lateinit var sEditor: SharedPreferences.Editor
+    private val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(ctx)
 
-    fun initialize(context: Context) {
-        sContext = context.applicationContext
-        sSharedPreferences = PreferenceManager.getDefaultSharedPreferences(sContext)
-    }
+    private val editor: SharedPreferences.Editor = sp.edit()
 
     var nightModeString: String
-        get() = sSharedPreferences.getString(Key.NIGHT_MODE, Key.NIGHT_MODE_SYSTEM)
-        set(value) {
-            sEditor = sSharedPreferences.edit()
-            sEditor.putString(Key.NIGHT_MODE, value)
-            sEditor.apply()
-        }
+        get() = sp.getString(Key.NIGHT_MODE, Key.NIGHT_MODE_SYSTEM)
+        set(value) = editor.putString(Key.NIGHT_MODE, value).apply()
 
     @AppCompatDelegate.NightMode
     val nightMode: Int get() = when (nightModeString) {
@@ -47,50 +36,26 @@ object Settings {
     }
 
     var gridModeString: String
-        get() = sSharedPreferences.getString(Key.GRID_MODE, Key.GRID_MODE_STAGGERED_GRID)
-        set(value) {
-            sEditor = sSharedPreferences.edit()
-            sEditor.putString(Key.GRID_MODE, value)
-            sEditor.apply()
-        }
+        get() = sp.getString(Key.GRID_MODE, Key.GRID_MODE_STAGGERED_GRID)
+        set(value) = editor.putString(Key.GRID_MODE, value).apply()
 
     var postLimitInt: Int
-        get() = sSharedPreferences.getString(Key.POST_LIMIT, "30").toInt()
-        set(value) {
-            sEditor = sSharedPreferences.edit()
-            sEditor.putString(Key.POST_LIMIT, value.toString())
-            sEditor.apply()
-        }
+        get() = sp.getString(Key.POST_LIMIT, "30").toInt()
+        set(value) = editor.putString(Key.POST_LIMIT, value.toString()).apply()
 
     var cacheMemoryInt: Int
-        get() = sSharedPreferences.getString(Key.CACHE_MEMORY, "256").toInt()
-        set(value) {
-            sEditor = sSharedPreferences.edit()
-            sEditor.putString(Key.CACHE_MEMORY, value.toString())
-            sEditor.apply()
-        }
+        get() = sp.getString(Key.CACHE_MEMORY, "256").toInt()
+        set(value) = editor.putString(Key.CACHE_MEMORY, value.toString()).apply()
 
     var cacheDiskInt: Int
-        get() = sSharedPreferences.getString(Key.CACHE_DISK, "256").toInt()
-        set(value) {
-            sEditor = sSharedPreferences.edit()
-            sEditor.putString(Key.CACHE_DISK, value.toString())
-            sEditor.apply()
-        }
+        get() = sp.getString(Key.CACHE_DISK, "256").toInt()
+        set(value) = editor.putString(Key.CACHE_DISK, value.toString()).apply()
 
     var activeProfile: Long
-        get() = sSharedPreferences.getLong(Key.ACTIVE_PROFILE, 0L)
-        set(value) {
-            sEditor = sSharedPreferences.edit()
-            sEditor.putLong(Key.ACTIVE_PROFILE, value)
-            sEditor.apply()
-        }
+        get() = sp.getLong(Key.ACTIVE_PROFILE, 0L)
+        set(value) = editor.putLong(Key.ACTIVE_PROFILE, value).apply()
 
     var spanCountInt: Int
-        get() = sSharedPreferences.getInt(Key.SPAN_COUNT, 3)
-        set(value) {
-            sEditor = sSharedPreferences.edit()
-            sEditor.putInt(Key.SPAN_COUNT, value)
-            sEditor.apply()
-        }
+        get() = sp.getInt(Key.SPAN_COUNT, 3)
+        set(value) = editor.putInt(Key.SPAN_COUNT, value).apply()
 }

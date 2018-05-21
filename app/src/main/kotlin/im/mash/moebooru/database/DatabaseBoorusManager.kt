@@ -11,16 +11,25 @@
 
 package im.mash.moebooru.database
 
-import im.mash.moebooru.models.Boorus
+import im.mash.moebooru.models.Booru
 import im.mash.moebooru.utils.BoorusTable
-import org.jetbrains.anko.db.MapRowParser
-import org.jetbrains.anko.db.delete
-import org.jetbrains.anko.db.insert
-import org.jetbrains.anko.db.select
+import org.jetbrains.anko.db.*
 
 class DatabaseBoorusManager(private var database: DatabaseHelper) : DatabaseBoorusSource {
 
-    override fun saveBooru(booru: Boorus.Booru) {
+    companion object {
+        private var instance: DatabaseBoorusManager? = null
+
+        @Synchronized
+        fun getInstance(database: DatabaseHelper): DatabaseBoorusManager {
+            if (instance == null) {
+                instance = DatabaseBoorusManager(database)
+            }
+            return instance!!
+        }
+    }
+
+    override fun saveBooru(booru: Booru) {
         database.use {
             insert(BoorusTable.TABLE_NAME,
                     BoorusTable.ID to booru.id,
@@ -29,33 +38,35 @@ class DatabaseBoorusManager(private var database: DatabaseHelper) : DatabaseBoor
         }
     }
 
-    override fun loadBoorus(): MutableList<Boorus.Booru> {
-        val boorus: MutableList<Boorus.Booru> = mutableListOf()
+    override fun loadBoorus(): MutableList<Booru> {
+        var boorus = mutableListOf<Booru>()
         database.use {
-            select(BoorusTable.TABLE_NAME).parseList(object : MapRowParser<MutableList<Boorus.Booru>> {
-                override fun parseRow(columns: Map<String, Any?>): MutableList<Boorus.Booru> {
-                    val id: Long = columns.getValue(BoorusTable.ID) as Long
-                    val name: String = columns.getValue(BoorusTable.NAME) as String
-                    val url: String = columns.getValue(BoorusTable.URL) as String
-                    val booru = Boorus.Booru(id, name, url)
-                    boorus.add(booru)
-                    return boorus
-                }
-            })
+            select(BoorusTable.TABLE_NAME).parseList(
+                    object : MapRowParser<MutableList<Booru>> {
+                        override fun parseRow(columns: Map<String, Any?>): MutableList<Booru> {
+                            val id: Long = columns.getValue(BoorusTable.ID) as Long
+                            val name: String = columns.getValue(BoorusTable.NAME) as String
+                            val url: String = columns.getValue(BoorusTable.URL) as String
+                            val booru = Booru(id, name, url)
+                            boorus.add(booru)
+                            return boorus
+                        }
+                    }
+            )
         }
         return boorus
     }
 
-    override fun getBooru(id: Long): Boorus.Booru {
-        var booru: Boorus.Booru? = null
+    override fun getBooru(id: Long): Booru {
+        var booru: Booru? = null
         database.use {
             select(BoorusTable.TABLE_NAME)
                     .whereSimple("${BoorusTable.ID} = ?", id.toString())
-                    .parseOpt(object : MapRowParser<Boorus.Booru> {
-                        override fun parseRow(columns: Map<String, Any?>): Boorus.Booru {
+                    .parseOpt(object : MapRowParser<Booru> {
+                        override fun parseRow(columns: Map<String, Any?>): Booru {
                             val name: String = columns.getValue(BoorusTable.NAME) as String
                             val url: String = columns.getValue(BoorusTable.URL) as String
-                            booru = Boorus.Booru(id, name, url)
+                            booru = Booru(id, name, url)
                             return booru!!
                         }
                     })
@@ -63,7 +74,7 @@ class DatabaseBoorusManager(private var database: DatabaseHelper) : DatabaseBoor
         return booru!!
     }
 
-    override fun deleteBooru(booru: Boorus.Booru) {
+    override fun deleteBooru(booru: Booru) {
         database.use {
             delete(BoorusTable.TABLE_NAME, "${BoorusTable.ID} = ${booru.id}")
         }

@@ -14,8 +14,8 @@ package im.mash.moebooru.ui
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v7.app.AppCompatDelegate
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.Settings
 import im.mash.moebooru.utils.Key
 import moe.shizuku.preference.PreferenceFragment;
 
@@ -29,7 +29,7 @@ class SettingsPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSha
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             Key.NIGHT_MODE -> {
-                AppCompatDelegate.setDefaultNightMode(Settings.nightMode)
+                AppCompatDelegate.setDefaultNightMode(app.settings.nightMode)
                 activity?.recreate()
             }
         }

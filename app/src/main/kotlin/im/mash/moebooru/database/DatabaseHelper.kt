@@ -53,5 +53,3 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
 
     }
 }
-val Context.database: DatabaseHelper
-    get() = DatabaseHelper.getInstance(applicationContext)

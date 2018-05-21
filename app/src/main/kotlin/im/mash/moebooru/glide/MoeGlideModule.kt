@@ -20,14 +20,13 @@ import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.bumptech.glide.load.engine.cache.LruResourceCache
 import com.bumptech.glide.module.AppGlideModule
 import com.bumptech.glide.request.RequestOptions
-
-import im.mash.moebooru.Settings
+import im.mash.moebooru.App.Companion.app
 
 @GlideModule
 class MoeGlideModule : AppGlideModule() {
     override fun applyOptions(context: Context, builder: GlideBuilder) {
-        val memoryCacheSizeBytes: Int = 1024 * 1024 * Settings.cacheMemoryInt
-        val diskCacheSizeBytes: Int = 1024 * 1024 * Settings.cacheDiskInt
+        val memoryCacheSizeBytes: Int = 1024 * 1024 * app.settings.cacheMemoryInt
+        val diskCacheSizeBytes: Int = 1024 * 1024 * app.settings.cacheDiskInt
         builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes.toLong()))
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
         builder.setDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))

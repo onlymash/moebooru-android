@@ -20,7 +20,6 @@ import android.os.Bundle
 import android.support.customtabs.CustomTabsIntent
 import android.support.v4.content.ContextCompat
 import android.support.v7.content.res.AppCompatResources
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -32,11 +31,9 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.Settings
-import im.mash.moebooru.database.DatabaseBoorusManager
-import im.mash.moebooru.database.database
-import im.mash.moebooru.models.Boorus
+import im.mash.moebooru.models.Booru
 import im.mash.moebooru.models.TextDrawable
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -69,15 +66,15 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
     private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
     private var previousSelectedDrawer: Long = 0    // it's actually lateinit
 
-    private val boorus: MutableList<Boorus.Booru> = mutableListOf()
+    private val boorus: MutableList<Booru> = mutableListOf()
     private fun loadAsync() {
         doAsync {
-            boorus.addAll(DatabaseBoorusManager(database).loadBoorus())
+            boorus.addAll(app.boorusManager.loadBoorus())
             if (boorus.isEmpty()) {
                 Log.i(TAG, "boorus.isEmpty()")
-                DatabaseBoorusManager(database).saveBooru(Boorus.Booru(0L, "Konachan", "https://konachan.com"))
-                DatabaseBoorusManager(database).saveBooru(Boorus.Booru(1L, "yande.re", "https://yande.re"))
-                boorus.addAll(DatabaseBoorusManager(database).loadBoorus())
+                app.boorusManager.saveBooru(Booru(0L, "Konachan", "https://konachan.com"))
+                app.boorusManager.saveBooru(Booru(1L, "yande.re", "https://yande.re"))
+                boorus.addAll(app.boorusManager.loadBoorus())
             }
             uiThread {
                 if (boorus.isNotEmpty()) {
@@ -98,7 +95,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                     header.addProfiles(profileSettingDrawerItem)
                 }
 
-                header.setActiveProfile(Settings.activeProfile)
+                header.setActiveProfile(app.settings.activeProfile)
 
             }
         }
@@ -111,6 +108,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
         profileSettingDrawerItem = ProfileSettingDrawerItem()
@@ -121,7 +119,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.background_header)
                 .withOnAccountHeaderListener { _, profile, _ ->
-                    Settings.activeProfile = profile.identifier
+                    app.settings.activeProfile = profile.identifier
                     Log.i(TAG, profile.identifier.toString())
                     false
                 }

@@ -9,15 +9,17 @@
  *
  */
 
-package im.mash.moebooru.models
+package im.mash.moebooru.utils
 
-class Boorus {
+import android.annotation.TargetApi
+import android.content.Context
+import android.content.ContextWrapper
 
-    var boorus: MutableList<Booru>? = null
-
-    class Booru(id: Long, name: String, url: String) {
-        var id: Long? = id
-        var name: String? = name
-        var url: String? = url
-    }
+@TargetApi(24)
+class DeviceContext(context: Context) : ContextWrapper(context.createDeviceProtectedStorageContext()) {
+    /**
+     * Thou shalt not get the REAL underlying application context which would no longer be operating under device
+     * protected storage.
+     */
+    override fun getApplicationContext(): Context = this
 }

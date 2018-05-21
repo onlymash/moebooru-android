@@ -11,15 +11,15 @@
 
 package im.mash.moebooru.database
 
-import im.mash.moebooru.models.Boorus
+import im.mash.moebooru.models.Booru
 
 interface DatabaseBoorusSource {
 
-    fun saveBooru(booru: Boorus.Booru)
+    fun saveBooru(booru: Booru)
 
-    fun loadBoorus(): MutableList<Boorus.Booru>
+    fun loadBoorus(): MutableList<Booru>
 
-    fun getBooru(id: Long): Boorus.Booru
+    fun getBooru(id: Long): Booru
 
-    fun deleteBooru(booru: Boorus.Booru)
+    fun deleteBooru(booru: Booru)
 }
