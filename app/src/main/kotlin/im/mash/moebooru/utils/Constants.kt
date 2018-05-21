@@ -34,13 +34,6 @@ object Key {
     const val SPAN_COUNT = "span_count"
 }
 
-object BoorusTable {
-    const val TABLE_NAME = "boorus"
-    const val ID = "_id"
-    const val NAME = "name"
-    const val URL = "url"
-}
-
 object Net {
     const val USER_AGENT_KEY = "User-Agent"
     var USER_AGENT_INFO: String = WebView(app).settings.userAgentString
@@ -48,7 +41,54 @@ object Net {
 
 object SearchTagsTable {
     const val TABLE_NAME = "search_tags"
-    const val ID = "_id"
+    const val ID_UNIQUE = "_id"
+    const val SITE = "id"
     const val NAME = "name"
     const val IS_SELECTED = "is_selected"
+}
+
+object BoorusTable {
+    const val TABLE_NAME = "boorus"
+    const val ID_UNIQUE = "_id"
+    const val ID = "id"
+    const val NAME = "name"
+    const val URL = "url"
+}
+
+object PostsTable {
+    const val TABLE_NAME = "posts"
+    const val ID_UNIQUE = "_id"
+    const val SITE = "site"
+    const val ID = "id"
+    const val TAGS = "tags"
+    const val CREATE_AT = "created_at"
+    const val CREATOR_ID = "creator_id"
+    const val AUTHOR = "author"
+    const val CHANGE = "change"
+    const val SOURCE = "source"
+    const val SCORE = "score"
+    const val MD5 = "md5"
+    const val FILE_SIZE = "file_size"
+    const val FILE_URL = "file_url"
+    const val IS_SHOWN_IN_INDEX = "is_shown_in_index"
+    const val PREVIEW_URL = "preview_url"
+    const val PREVIEW_WIDTH = "preview_width"
+    const val PREVIEW_HEIGHT = "preview_height"
+    const val ACTUAL_PREVIEW_WIDTH = "actual_preview_width"
+    const val ACTUAL_PREVIEW_HEIGHT = "actual_preview_height"
+    const val SAMPLE_URL = "sample_url"
+    const val SAMPLE_WIDTH = "sample_width"
+    const val SAMPLE_HEIGHT = "sample_height"
+    const val SAMPLE_FILE_SIZE = "sample_file_size"
+    const val JPEG_URL = "jpeg_url"
+    const val JPEG_WIDTH = "jpeg_width"
+    const val JPEG_HEIGHT = "jpeg_height"
+    const val JPEG_FILE_SIZE = "jpeg_file_size"
+    const val RATING = "rating"
+    const val HAS_CHILDRE = "has_childre"
+    const val PARENT_ID = "parent_id"
+    const val STATUS = "status"
+    const val WIDTH = "width"
+    const val HEIGHT = "height"
+    const val IS_HELD = "is_held"
 }

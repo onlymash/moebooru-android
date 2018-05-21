@@ -39,7 +39,7 @@ class DatabaseBoorusManager(private var database: DatabaseHelper) : DatabaseBoor
     }
 
     override fun loadBoorus(): MutableList<Booru> {
-        var boorus = mutableListOf<Booru>()
+        val boorus = mutableListOf<Booru>()
         database.use {
             select(BoorusTable.TABLE_NAME).parseList(
                     object : MapRowParser<MutableList<Booru>> {

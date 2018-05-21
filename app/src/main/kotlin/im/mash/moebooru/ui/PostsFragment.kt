@@ -17,6 +17,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.*
 import android.view.*
 import android.util.DisplayMetrics
@@ -25,20 +26,24 @@ import android.util.TypedValue
 import android.view.animation.AnimationUtils
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.Headers
+import com.google.gson.Gson
 
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.models.RawPost
 import im.mash.moebooru.network.MoeHttpClient
 import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 @SuppressLint("RtlHardcoded")
-class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
-        View.OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener {
+class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
     private val TAG = this.javaClass.simpleName
 
@@ -48,6 +53,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
     private lateinit var drawerToolbar: Toolbar
     private lateinit var postsView: RecyclerView
     private lateinit var postAdapter: PostAdapter
+    private lateinit var refresh: SwipeRefreshLayout
 
     private var currentGridMode: String = Key.GRID_MODE_STAGGERED_GRID
 
@@ -71,6 +77,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.post_toolbar))
         toolbar.setOnMenuItemClickListener(this)
         setGridItemOption()
+
+        refresh = view.findViewById(R.id.refresh)
 
         val activity = activity!!
         activity.windowManager.defaultDisplay.getMetrics(metric)
@@ -114,21 +122,17 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
         postsView.itemAnimator = DefaultItemAnimator()
         postsView.adapter = postAdapter
 
-        if (savedInstanceState == null) {
-            Log.i(TAG, "savedInstanceState == null")
-        }
-
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
 
-        Thread(Runnable {
-            val url = MoeUrl().getUrl(app.boorusManager.getBooru(app.settings.activeProfile).url!!, "matthew_kyrielite", 1, 1)
-            val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
-            val result: String? = response?.getResponseAsString()
-            activity.runOnUiThread {
-                Log.i(TAG, result)
-            }
-        }).start()
+        if (savedInstanceState == null) {
+            refresh.isRefreshing = true
+            loadData()
+            Log.i(TAG, "savedInstanceState == null")
+        }
+
+        refresh.setOnRefreshListener(this)
+
     }
 
     private fun setupGridMode() {
@@ -279,5 +283,25 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener,
             val fixedImageView: FixedImageView = itemView.findViewById(R.id.post_item)
         }
 
+    }
+
+    private fun loadData() {
+        doAsync {
+
+            val url = MoeUrl().getUrl(app.boorusManager.getBooru(app.settings.activeProfile).url, "yuri", 5, 1)
+            val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
+            val result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
+            app.postsManager.savePosts(result)
+//            val msg: String = app.postsManager.loadPosts(app.activeProfile)[0].preview_url.toString()
+
+            uiThread {
+                refresh.isRefreshing = false
+                Log.i(TAG, "URL: $url")
+            }
+        }
+    }
+
+    override fun onRefresh() {
+        loadData()
     }
 }

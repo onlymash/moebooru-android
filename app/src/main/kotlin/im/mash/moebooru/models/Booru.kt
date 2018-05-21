@@ -14,9 +14,9 @@ package im.mash.moebooru.models
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Booru(var id: Long?, var name: String?, var url: String?) : Parcelable {
+data class Booru(val id: Long, val name: String, val url: String) : Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readValue(Long::class.java.classLoader) as? Long,
+            parcel.readValue(Long::class.java.classLoader) as Long,
             parcel.readString(),
             parcel.readString())
 

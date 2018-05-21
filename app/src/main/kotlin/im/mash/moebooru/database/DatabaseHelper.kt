@@ -14,6 +14,7 @@ package im.mash.moebooru.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import im.mash.moebooru.utils.BoorusTable
+import im.mash.moebooru.utils.PostsTable
 import im.mash.moebooru.utils.SearchTagsTable
 import org.jetbrains.anko.db.*
 
@@ -38,18 +39,61 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
         db?.createTable(
                 BoorusTable.TABLE_NAME,
                 true,
-                BoorusTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
+                BoorusTable.ID_UNIQUE to INTEGER + PRIMARY_KEY + UNIQUE,
+                BoorusTable.ID to INTEGER + UNIQUE,
                 BoorusTable.NAME to TEXT,
                 BoorusTable.URL to TEXT)
         db?.createTable(
                 SearchTagsTable.TABLE_NAME,
                 true,
-                SearchTagsTable.ID to INTEGER + PRIMARY_KEY + UNIQUE,
+                SearchTagsTable.ID_UNIQUE to INTEGER + PRIMARY_KEY + UNIQUE,
+                SearchTagsTable.SITE to INTEGER,
                 SearchTagsTable.NAME to TEXT,
-                SearchTagsTable.IS_SELECTED to INTEGER)
+                SearchTagsTable.IS_SELECTED to INTEGER
+        )
+        db?.createTable(
+                PostsTable.TABLE_NAME,
+                true,
+                PostsTable.ID_UNIQUE to INTEGER + PRIMARY_KEY + UNIQUE,
+                PostsTable.SITE to INTEGER,
+                PostsTable.ID to INTEGER,
+                PostsTable.TAGS to TEXT,
+                PostsTable.CREATE_AT to INTEGER,
+                PostsTable.CREATOR_ID to INTEGER,
+                PostsTable.AUTHOR to TEXT,
+                PostsTable.CHANGE to INTEGER,
+                PostsTable.SOURCE to TEXT,
+                PostsTable.SCORE to INTEGER,
+                PostsTable.MD5 to TEXT,
+                PostsTable.FILE_SIZE to INTEGER,
+                PostsTable.FILE_URL to TEXT,
+                PostsTable.IS_SHOWN_IN_INDEX to INTEGER,
+                PostsTable.PREVIEW_URL to TEXT,
+                PostsTable.PREVIEW_WIDTH to INTEGER,
+                PostsTable.PREVIEW_HEIGHT to INTEGER,
+                PostsTable.ACTUAL_PREVIEW_WIDTH to INTEGER,
+                PostsTable.ACTUAL_PREVIEW_HEIGHT to INTEGER,
+                PostsTable.SAMPLE_URL to TEXT,
+                PostsTable.SAMPLE_WIDTH to INTEGER,
+                PostsTable.SAMPLE_HEIGHT to INTEGER,
+                PostsTable.SAMPLE_FILE_SIZE to INTEGER,
+                PostsTable.JPEG_URL to TEXT,
+                PostsTable.JPEG_WIDTH to INTEGER,
+                PostsTable.JPEG_HEIGHT to INTEGER,
+                PostsTable.JPEG_FILE_SIZE to INTEGER,
+                PostsTable.RATING to TEXT,
+                PostsTable.HAS_CHILDRE to INTEGER,
+                PostsTable.PARENT_ID to INTEGER,
+                PostsTable.STATUS to TEXT,
+                PostsTable.WIDTH to INTEGER,
+                PostsTable.HEIGHT to INTEGER,
+                PostsTable.IS_HELD to INTEGER
+        )
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-
+        db?.dropTable(BoorusTable.TABLE_NAME, true)
+        db?.dropTable(SearchTagsTable.TABLE_NAME, true)
+        db?.dropTable(PostsTable.TABLE_NAME, true)
     }
 }

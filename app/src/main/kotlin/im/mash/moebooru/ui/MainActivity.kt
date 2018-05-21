@@ -79,16 +79,14 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
             uiThread {
                 if (boorus.isNotEmpty()) {
                     Log.i(TAG, boorus.size.toString())
-                    var i = 0
                     boorus.forEach {
-                        val icon = builder.buildRound(it.name!![0].toString(), getCustomizedColor())
+                        val icon = builder.buildRound(it.name[0].toString(), getCustomizedColor())
                         val profileDrawerItem: ProfileDrawerItem = ProfileDrawerItem()
                                 .withName(it.name)
                                 .withEmail(it.url)
                                 .withIcon(icon)
-                        profileDrawerItem.withIdentifier(i.toLong())
-                        header.addProfile(profileDrawerItem, i)
-                        i += 1
+                        profileDrawerItem.withIdentifier(it.id)
+                        header.addProfile(profileDrawerItem, it.id.toInt())
                     }
                     header.addProfile(profileSettingDrawerItem, boorus.size)
                 } else {
@@ -120,7 +118,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 .withHeaderBackground(R.drawable.background_header)
                 .withOnAccountHeaderListener { _, profile, _ ->
                     app.settings.activeProfile = profile.identifier
-                    Log.i(TAG, profile.identifier.toString())
+                    Log.i(TAG, "activeProfile: " + app.settings.activeProfile)
                     false
                 }
                 .build()
@@ -152,6 +150,8 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                                 .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_action_copyright_24dp))
                                 .withIconTintingEnabled(true)
                 )
+                .withStickyFooterDivider(true)
+                .withStickyFooterShadow(false)
                 .withOnDrawerItemClickListener(this)
                 .withActionBarDrawerToggle(true)
                 .withActionBarDrawerToggleAnimated(true)

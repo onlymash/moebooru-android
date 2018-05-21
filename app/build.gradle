@@ -79,6 +79,7 @@ dependencies {
     kapt "com.github.bumptech.glide:compiler:$glide_version"
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'com.squareup.okio:okio:1.14.0'
+    implementation 'com.google.code.gson:gson:2.8.4'
     testImplementation 'junit:junit:4.12'
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

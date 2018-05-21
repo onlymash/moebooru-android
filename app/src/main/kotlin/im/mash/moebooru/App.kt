@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatDelegate
 import com.google.firebase.FirebaseApp
 import im.mash.moebooru.database.DatabaseBoorusManager
 import im.mash.moebooru.database.DatabaseHelper
+import im.mash.moebooru.database.DatabasePostsManager
 import im.mash.moebooru.utils.DeviceContext
 
 class App : Application() {
@@ -26,10 +27,11 @@ class App : Application() {
         lateinit var app: App
     }
 
-    val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
+    private val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
     val settings: Settings by lazy { Settings(this) }
-    val database: DatabaseHelper by lazy { DatabaseHelper.getInstance(this) }
+    private val database: DatabaseHelper by lazy { DatabaseHelper.getInstance(this) }
     val boorusManager: DatabaseBoorusManager by lazy { DatabaseBoorusManager.getInstance(database) }
+    val postsManager: DatabasePostsManager by lazy { DatabasePostsManager.getInstance(database) }
 
     override fun onCreate() {
         super.onCreate()
