@@ -245,7 +245,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
 
         override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-            if (items !== null && items?.size != 0) {
+            if (items !== null && items!!.size > 0) {
                 when (app.settings.gridModeString) {
                     Key.GRID_MODE_STAGGERED_GRID -> {
                         holder.fixedImageView.setWidthAndHeightWeight(150, 100)
