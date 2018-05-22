@@ -121,13 +121,13 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         setupGridMode()
         postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postsView.itemAnimator = DefaultItemAnimator()
+        postsView.adapter = postAdapter
 
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
 
         if (savedInstanceState == null) {
-            postsView.adapter = postAdapter
-            loadCacheData()
+            postAdapter.loadData()
             Log.i(TAG, "savedInstanceState == null, loadCacheData()")
         }
 
@@ -270,10 +270,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             val fixedImageView: FixedImageView = itemView.findViewById(R.id.post_item)
         }
 
-    }
-
-    private fun loadCacheData() {
-        postAdapter.loadData()
     }
 
     private fun loadMoreData() {
