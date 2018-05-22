@@ -33,6 +33,7 @@ import com.mikepenz.materialdrawer.DrawerBuilder
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.models.ParamGet
 import im.mash.moebooru.models.RawPost
 import im.mash.moebooru.network.MoeHttpClient
 import im.mash.moebooru.network.MoeResponse
@@ -62,6 +63,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private var spanCount: Int = 1
     private var itemPadding: Int = 0
     private var toolbarHeight = 0
+    private var page = 1
+    private var result: MutableList<RawPost> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         drawerView = inflater.inflate(R.layout.layout_drawer_posts, container, false)
@@ -227,11 +230,22 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         companion object {
             private val header: Headers = glideHeader
+            private var tagItems: MutableList<MutableList<String>> = mutableListOf()
         }
 
         fun loadData() {
             doAsync {
-                items = app.postsManager.loadPosts()
+                items = app.postsManager.loadPosts(app.settings.activeProfile)
+                tagItems.clear()
+                if (items != null) {
+                    items?.forEach {
+                        val list: List<String>? = it.tags?.split(" ")
+                        val tags: MutableList<String>? = list?.toMutableList()
+                        if (tags != null) {
+                            tagItems.add(tags)
+                        }
+                    }
+                }
                 uiThread {
                     notifyDataSetChanged()
                     Log.i(this.javaClass.simpleName, "loadData() finished!!")
@@ -282,19 +296,47 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     }
 
     private fun loadMoreData() {
-
+        page = postAdapter.itemCount/app.settings.postLimitInt + 1
     }
 
     private fun refreshData() {
+        page = 1
         doAsync {
-            val url = MoeUrl().getUrl(app.boorusManager.getBooru(app.settings.activeProfile).url, "yuri", 20, 1)
+            val siteUrl = app.boorusManager.getBooru(app.settings.activeProfile).url
+            Log.i(TAG, "siteUrl: $siteUrl")
+            val limit = app.settings.postLimitInt
+            val url = ParamGet(siteUrl, page.toString(), limit.toString(), null,
+                    null, null, null, null).makeGetUrl()
+            Log.i(TAG, "url: $url")
             val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
-            val result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
-            app.postsManager.savePosts(result)
+            val data: MutableList<RawPost> = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
+            result = data
             uiThread {
                 refresh.isRefreshing = false
+                if (result.size > 0) {
+                    Log.i(TAG, "Refresh data finished!")
+                    deleteData()
+                }
+            }
+        }
+    }
+
+    private fun deleteData() {
+        doAsync {
+            app.postsManager.deletePosts(app.settings.activeProfile)
+            uiThread {
+                Log.i(TAG, "Delete data finished!")
+                saveData()
+            }
+        }
+    }
+
+    private fun saveData() {
+        doAsync {
+            app.postsManager.savePosts(result, app.settings.activeProfile)
+            uiThread {
+                Log.i(TAG, "Save data finished!")
                 postAdapter.loadData()
-                Log.i(TAG, "Refresh finished!!")
             }
         }
     }

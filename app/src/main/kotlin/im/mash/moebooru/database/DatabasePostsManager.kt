@@ -12,10 +12,10 @@
 package im.mash.moebooru.database
 
 import android.util.Log
-import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.models.RawPost
 import im.mash.moebooru.utils.PostsTable
 import org.jetbrains.anko.db.MapRowParser
+import org.jetbrains.anko.db.delete
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 
@@ -34,8 +34,7 @@ class DatabasePostsManager(private val database: DatabaseHelper) {
 
     }
 
-    fun savePosts(posts: MutableList<RawPost>) {
-        val site = app.settings.activeProfile
+    fun savePosts(posts: MutableList<RawPost>, site: Long) {
         posts.forEach {
             database.use {
                 insert(PostsTable.TABLE_NAME,
@@ -76,8 +75,7 @@ class DatabasePostsManager(private val database: DatabaseHelper) {
         }
     }
 
-    fun getPost(): RawPost? {
-        val site: Long = app.settings.activeProfile
+    fun getPost(site: Long): RawPost? {
         val post: RawPost? = null
         database.use {
             select(PostsTable.TABLE_NAME)
@@ -86,8 +84,7 @@ class DatabasePostsManager(private val database: DatabaseHelper) {
         return post
     }
 
-    fun loadPosts(): MutableList<RawPost> {
-        val site: Long = app.settings.activeProfile
+    fun loadPosts(site: Long): MutableList<RawPost> {
         val posts: MutableList<RawPost> = mutableListOf()
         Log.i(this.javaClass.simpleName, "site: $site")
         database.use {
@@ -141,5 +138,11 @@ class DatabasePostsManager(private val database: DatabaseHelper) {
                     })
         }
         return posts
+    }
+
+    fun deletePosts(site: Long) {
+        database.use {
+            delete(PostsTable.TABLE_NAME, "${PostsTable.SITE} = $site")
+        }
     }
 }
