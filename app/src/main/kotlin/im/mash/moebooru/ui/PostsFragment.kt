@@ -38,6 +38,7 @@ import im.mash.moebooru.models.ParamGet
 import im.mash.moebooru.models.RawPost
 import im.mash.moebooru.network.MoeHttpClient
 import im.mash.moebooru.network.MoeResponse
+import im.mash.moebooru.ui.listener.LastItemListener
 import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.*
 import org.jetbrains.anko.doAsync
@@ -56,6 +57,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private lateinit var postsView: RecyclerView
     private lateinit var postAdapter: PostAdapter
     private lateinit var refresh: SwipeRefreshLayout
+    private lateinit var lastItemListener: LastItemListener
 
     private var currentGridMode: String = Key.GRID_MODE_STAGGERED_GRID
 
@@ -116,6 +118,16 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
         postAdapter = PostAdapter(toolbarHeight, itemPadding, null)
 
+        //init RecyclerView listener
+        lastItemListener = object : LastItemListener() {
+            override fun onLastItemVisible() {
+                if (!refresh.isRefreshing) {
+                    refresh.isRefreshing = true
+                    loadMoreData()
+                }
+            }
+        }
+
         //init RecyclerView
         postsView = view.findViewById(R.id.posts_list)
         spanCount = width/this.requireContext().resources.getDimension(R.dimen.item_width).toInt()
@@ -125,6 +137,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postsView.itemAnimator = DefaultItemAnimator()
         postsView.adapter = postAdapter
+        postsView.addOnScrollListener(lastItemListener)
 
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
@@ -229,6 +242,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                               private var items: MutableList<RawPost>?) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
         companion object {
+            private val TAG = this::class.java.simpleName
             private val header: Headers = glideHeader
             private var tagItems: MutableList<MutableList<String>> = mutableListOf()
         }
@@ -246,9 +260,10 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                         }
                     }
                 }
+                Log.i(TAG, "Item[0] tags size: ${tagItems[0].size}")
                 uiThread {
                     notifyDataSetChanged()
-                    Log.i(this.javaClass.simpleName, "loadData() finished!!")
+                    Log.i(TAG, "loadData() finished!!")
                 }
             }
         }
@@ -297,18 +312,44 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     private fun loadMoreData() {
         page = postAdapter.itemCount/app.settings.postLimitInt + 1
+        doAsync {
+            val response: MoeResponse? = getResponseData()
+            var result: MutableList<RawPost>? = null
+            try {
+                result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
+            } catch (e: JsonParseException) {
+                Log.i(TAG, "Gson exception!")
+            }
+            if (result != null && result.size > 0) {
+                app.postsManager.savePosts(result, app.settings.activeProfile)
+            }
+            uiThread {
+                refresh.isRefreshing = false
+                Log.i(TAG, "Load more data finished!")
+                if (result != null) {
+                    postAdapter.loadData()
+                } else {
+                    Log.i(TAG, "Not data")
+                }
+            }
+        }
+        Log.i(TAG, "Loading more data...")
+    }
+
+    private fun getResponseData(): MoeResponse? {
+        val siteUrl = app.boorusManager.getBooru(app.settings.activeProfile).url
+        Log.i(TAG, "siteUrl: $siteUrl")
+        val limit = app.settings.postLimitInt
+        val url = ParamGet(siteUrl, page.toString(), limit.toString(), null,
+                null, null, null, null).makeGetUrl()
+        Log.i(TAG, "url: $url")
+        return MoeHttpClient.instance.get(url, null, okHttpHeader)
     }
 
     private fun refreshData() {
         page = 1
         doAsync {
-            val siteUrl = app.boorusManager.getBooru(app.settings.activeProfile).url
-            Log.i(TAG, "siteUrl: $siteUrl")
-            val limit = app.settings.postLimitInt
-            val url = ParamGet(siteUrl, page.toString(), limit.toString(), null,
-                    null, null, null, null).makeGetUrl()
-            Log.i(TAG, "url: $url")
-            val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
+            val response: MoeResponse? = getResponseData()
             var result: MutableList<RawPost>? = null
             try {
                 result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
