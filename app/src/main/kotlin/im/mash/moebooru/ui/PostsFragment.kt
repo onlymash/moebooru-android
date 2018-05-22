@@ -179,6 +179,9 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 setGridItemOption()
                 reSetupGridMode()
             }
+            Key.ACTIVE_PROFILE -> {
+                postAdapter.loadData()
+            }
         }
     }
 
