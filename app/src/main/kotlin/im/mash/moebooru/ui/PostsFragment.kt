@@ -211,6 +211,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     override fun onResume() {
         super.onResume()
         reSetupGridMode()
+        postAdapter.loadData()
     }
 
     override fun onBackPressed(): Boolean {
@@ -246,22 +247,27 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
             if (items !== null && items!!.size > 0) {
+                if (position in 0..(app.settings.spanCountInt - 1)) {
+                    holder.itemView.setPadding(itemPadding, itemPadding + toolbarHeight, itemPadding, itemPadding)
+                } else {
+                    holder.itemView.setPadding(itemPadding, itemPadding, itemPadding, itemPadding)
+                }
                 when (app.settings.gridModeString) {
                     Key.GRID_MODE_STAGGERED_GRID -> {
-                        holder.fixedImageView.setWidthAndHeightWeight(150, 100)
+                        holder.fixedImageView.setWidthAndHeightWeight(items!![position].width!!.toInt(), items!![position].height!!.toInt())
+                        GlideApp.with(holder.fixedImageView.context)
+                                .load(GlideUrl(items!![position].preview_url, header))
+                                .fitCenter()
+                                .into(holder.fixedImageView)
                     }
                     else -> {
                         holder.fixedImageView.setWidthAndHeightWeight(1,1)
+                        GlideApp.with(holder.fixedImageView.context)
+                                .load(GlideUrl(items!![position].preview_url, header))
+                                .centerCrop()
+                                .into(holder.fixedImageView)
                     }
                 }
-                if (position in 0..(app.settings.spanCountInt - 1)) {
-                    holder.itemView.setPadding(itemPadding, itemPadding + toolbarHeight, itemPadding, itemPadding)
-                    Log.i(this.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
-                }
-                GlideApp.with(holder.fixedImageView.context)
-                        .load(GlideUrl(items!![position].preview_url, header))
-                        .centerCrop()
-                        .into(holder.fixedImageView)
             }
         }
 
