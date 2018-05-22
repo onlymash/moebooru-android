@@ -61,6 +61,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private var width: Int = 0
     private var spanCount: Int = 1
     private var itemPadding: Int = 0
+    private var toolbarHeight = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         drawerView = inflater.inflate(R.layout.layout_drawer_posts, container, false)
@@ -107,11 +108,10 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         //init Adapter
         val tv = TypedValue()
-        var toolbarHeight = 0
         if (activity.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
         }
-        postAdapter = PostAdapter(toolbarHeight, itemPadding)
+        postAdapter = PostAdapter(toolbarHeight, itemPadding, null)
 
         //init RecyclerView
         postsView = view.findViewById(R.id.posts_list)
@@ -121,15 +121,14 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         setupGridMode()
         postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postsView.itemAnimator = DefaultItemAnimator()
-        postsView.adapter = postAdapter
 
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
 
         if (savedInstanceState == null) {
-            refresh.isRefreshing = true
-            loadData()
-            Log.i(TAG, "savedInstanceState == null")
+            postsView.adapter = postAdapter
+            loadCacheData()
+            Log.i(TAG, "savedInstanceState == null, loadCacheData()")
         }
 
         refresh.setOnRefreshListener(this)
@@ -219,36 +218,21 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         return super.onBackPressed()
     }
 
-    private class PostAdapter(private val toolbarHeight: Int, private val itemPadding: Int) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+    private class PostAdapter(private val toolbarHeight: Int, private val itemPadding: Int,
+                              private var items: MutableList<RawPost>?) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
         companion object {
             private val header: Headers = glideHeader
-            private val items : List<String> = listOf(
-                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
-                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
-                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
-                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
-                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
-                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
-                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
-                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
-                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
-                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
-                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
-                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
-                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
-                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
-                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
-                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
-                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
-                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
-                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
-                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
-                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg",
-                    "https://konachan.com/data/preview/e3/f1/e3f18776471c84b2fda5dc5552b07ce3.jpg",
-                    "https://konachan.com/data/preview/34/69/346942d8a914f7821adf3560ee39f9ae.jpg",
-                    "https://konachan.com/data/preview/fa/e6/fae61185bf4814bd06f06d0c4d5ae081.jpg"
-            )
+        }
+
+        fun loadData() {
+            doAsync {
+                items = app.postsManager.loadPosts()
+                uiThread {
+                    notifyDataSetChanged()
+                    Log.i(this.javaClass.simpleName, "loadData() finished!!")
+                }
+            }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -258,26 +242,28 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
 
         override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-            when (app.settings.gridModeString) {
-                Key.GRID_MODE_STAGGERED_GRID -> {
-                    holder.fixedImageView.setWidthAndHeightWeight(150, 100)
+            if (items !== null) {
+                when (app.settings.gridModeString) {
+                    Key.GRID_MODE_STAGGERED_GRID -> {
+                        holder.fixedImageView.setWidthAndHeightWeight(150, 100)
+                    }
+                    else -> {
+                        holder.fixedImageView.setWidthAndHeightWeight(1,1)
+                    }
                 }
-                else -> {
-                    holder.fixedImageView.setWidthAndHeightWeight(1,1)
+                if (position in 0..(app.settings.spanCountInt - 1)) {
+                    holder.itemView.setPadding(itemPadding, itemPadding + toolbarHeight, itemPadding, itemPadding)
+                    Log.i(this.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
                 }
+                GlideApp.with(holder.fixedImageView.context)
+                        .load(GlideUrl(items!![position].preview_url, header))
+                        .centerCrop()
+                        .into(holder.fixedImageView)
             }
-            if (position in 0..(app.settings.spanCountInt - 1)) {
-                holder.itemView.setPadding(itemPadding, itemPadding + toolbarHeight, itemPadding, itemPadding)
-                Log.i(this.javaClass.simpleName, "toolbarHeight = $toolbarHeight")
-            }
-            GlideApp.with(holder.fixedImageView.context)
-                    .load(GlideUrl(items[position], header))
-                    .centerCrop()
-                    .into(holder.fixedImageView)
         }
 
         override fun getItemCount(): Int {
-            return items.size
+            return if (items == null) 0 else items!!.size
         }
 
         private class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -286,25 +272,31 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     }
 
-    private fun loadData() {
+    private fun loadCacheData() {
+        postAdapter.loadData()
+    }
+
+    private fun loadMoreData() {
+
+    }
+
+    private fun refreshData() {
         doAsync {
-
-//            val url = MoeUrl().getUrl(app.boorusManager.getBooru(app.settings.activeProfile).url, "yuri", 5, 1)
-//            val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
-//            val result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
-//            app.postsManager.savePosts(result)
-//            val msg = result[0].preview_url
-
-            val msg = app.postsManager.loadPosts()[0].preview_url.toString()
-
+            val url = MoeUrl().getUrl(app.boorusManager.getBooru(app.settings.activeProfile).url, "yuri", 20, 1)
+            val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
+            val result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
+            app.postsManager.savePosts(result)
             uiThread {
                 refresh.isRefreshing = false
-                Log.i(TAG, "URL: $msg")
+                postAdapter.loadData()
+                Log.i(TAG, "Refresh finished!!")
             }
         }
     }
 
     override fun onRefresh() {
-        loadData()
+        Log.i(TAG, "Refreshing!!")
+        refresh.isRefreshing = true
+        refreshData()
     }
 }
