@@ -42,7 +42,6 @@ import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import java.io.IOException
 
 @SuppressLint("RtlHardcoded")
 class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener,
