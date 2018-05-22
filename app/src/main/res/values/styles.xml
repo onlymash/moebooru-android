@@ -36,7 +36,7 @@
 
     <style name="AppTheme.PreferenceTheme" parent="PreferenceThemeOverlay">
         <!-- Only need this on pre-Lollipop -->
-        <item name="accentColorCompat">@color/colorAccent</item>
+        <item name="accentColorCompat">@color/accent</item>
         <item name="backgroundCompat">?android:attr/selectableItemBackground</item>
 
         <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>

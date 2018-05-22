@@ -2,7 +2,7 @@
 <resources>
     <color name="primary">@color/material_primary_800</color>
     <color name="primary_dark">@color/material_primary_900</color>
-    <color name="accent">#FF4081</color>
+    <color name="accent">@color/md_blue_400</color>
 
     <color name="background">@color/md_light_background</color>
     <color name="primary_icon">@color/md_grey_600</color>
@@ -15,7 +15,7 @@
     <color name="drawer_hint_text">@color/material_drawer_hint_text</color>
     <color name="drawer_divider">@color/material_drawer_divider</color>
     <color name="drawer_selected">@color/material_drawer_selected</color>
-    <color name="drawer_selected_text">@color/colorAccent</color>
+    <color name="drawer_selected_text">@color/accent</color>
     <color name="drawer_header_selection_text">@color/material_drawer_header_selection_text</color>
 
     <color name="blue" type="color">#FF33B5E5</color>
