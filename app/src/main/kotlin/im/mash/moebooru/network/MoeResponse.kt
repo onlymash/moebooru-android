@@ -17,8 +17,7 @@ import java.nio.charset.Charset
 
 @Keep
 open class MoeResponse {
-    var statusCode: Int = 0
-        private set
+    private var statusCode: Int = 0
     private var responseAsString: String? = null
     private var responseAsBytes: ByteArray? = null
     private var headers: MutableMap<String, MutableList<String>>? = null

@@ -99,6 +99,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         drawerLayout = drawer.drawerLayout
         drawerToolbar = drawerView.findViewById(R.id.toolbar_drawer_posts)
+        drawerToolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener(this)
@@ -288,15 +289,17 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private fun loadData() {
         doAsync {
 
-            val url = MoeUrl().getUrl(app.boorusManager.getBooru(app.settings.activeProfile).url, "yuri", 5, 1)
-            val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
-            val result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
-            app.postsManager.savePosts(result)
-//            val msg: String = app.postsManager.loadPosts(app.activeProfile)[0].preview_url.toString()
+//            val url = MoeUrl().getUrl(app.boorusManager.getBooru(app.settings.activeProfile).url, "yuri", 5, 1)
+//            val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
+//            val result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
+//            app.postsManager.savePosts(result)
+//            val msg = result[0].preview_url
+
+            val msg = app.postsManager.loadPosts()[0].preview_url.toString()
 
             uiThread {
                 refresh.isRefreshing = false
-                Log.i(TAG, "URL: $url")
+                Log.i(TAG, "URL: $msg")
             }
         }
     }

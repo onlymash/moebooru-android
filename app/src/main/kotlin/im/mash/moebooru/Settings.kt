@@ -11,7 +11,7 @@
 
 package im.mash.moebooru
 
-import android.content.Context;
+import android.content.Context
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatDelegate
 import im.mash.moebooru.utils.Key

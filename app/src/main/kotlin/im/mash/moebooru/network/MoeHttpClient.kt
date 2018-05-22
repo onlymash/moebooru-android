@@ -153,7 +153,7 @@ class MoeHttpClient private constructor(){
             val builder = Request.Builder()
             builder.url(mUrl!!)
             builder.header("Connection", "Close")
-            if (mRequestHeaders?.isNotEmpty() ?: false) {
+            if (mRequestHeaders?.isNotEmpty() == true) {
                 for (header in mRequestHeaders!!) {
                     builder.addHeader(header.first, header.second)
                 }
@@ -161,7 +161,7 @@ class MoeHttpClient private constructor(){
             if (mType == Type.GET) {
                 builder.get()
             } else {
-                if (mFilePath?.isNotEmpty() ?: false) {//设置上传文件
+                if (mFilePath?.isNotEmpty() == true) {//设置上传文件
                     val bodyBuilder = MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
                     val file = File(mFilePath)
@@ -210,7 +210,7 @@ class MoeHttpClient private constructor(){
         val headers: MutableMap<String, MutableList<String>>?
             get() {
                 var headers: MutableMap<String, MutableList<String>>? = null
-                if (response != null && response.headers() != null) {
+                if (response?.headers() != null) {
                     try {
                         headers = response.headers().toMultimap()
                     } catch (e: Exception) {
@@ -229,7 +229,7 @@ class MoeHttpClient private constructor(){
     /**
      * 证书验证
      */
-    private inner class AccountHostnameVerifier : HostnameVerifier {
+    private inner class MoeHostnameVerifier : HostnameVerifier {
         override fun verify(hostname: String, session: SSLSession): Boolean {
             var result = false
             try {

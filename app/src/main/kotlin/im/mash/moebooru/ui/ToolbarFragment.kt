@@ -25,6 +25,7 @@ open class ToolbarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar = view.findViewById(R.id.toolbar)
+        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.background))
         val activity = activity as MainActivity
         activity.drawer.setToolbar(activity, toolbar, true)

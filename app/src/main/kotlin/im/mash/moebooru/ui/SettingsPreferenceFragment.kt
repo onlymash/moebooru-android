@@ -17,7 +17,7 @@ import android.support.v7.app.AppCompatDelegate
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.utils.Key
-import moe.shizuku.preference.PreferenceFragment;
+import moe.shizuku.preference.PreferenceFragment
 
 class SettingsPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 

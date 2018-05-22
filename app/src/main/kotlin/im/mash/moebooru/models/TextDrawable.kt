@@ -114,12 +114,10 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         val rect = RectF(bounds)
         rect.inset((borderThickness / 2).toFloat(), (borderThickness / 2).toFloat())
 
-        if (shape is OvalShape) {
-            canvas.drawOval(rect, borderPaint)
-        } else if (shape is RoundRectShape) {
-            canvas.drawRoundRect(rect, radius, radius, borderPaint)
-        } else {
-            canvas.drawRect(rect, borderPaint)
+        when (shape) {
+            is OvalShape -> canvas.drawOval(rect, borderPaint)
+            is RoundRectShape -> canvas.drawRoundRect(rect, radius, radius, borderPaint)
+            else -> canvas.drawRect(rect, borderPaint)
         }
     }
 

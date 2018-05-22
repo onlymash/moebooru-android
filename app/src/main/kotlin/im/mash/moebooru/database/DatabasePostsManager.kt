@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.database
 
+import android.util.Log
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.models.RawPost
 import im.mash.moebooru.utils.PostsTable
@@ -18,7 +19,7 @@ import org.jetbrains.anko.db.MapRowParser
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 
-class DatabasePostsManager(private var database: DatabaseHelper) {
+class DatabasePostsManager(private val database: DatabaseHelper) {
 
     companion object {
         private var instance: DatabasePostsManager? = null
@@ -75,47 +76,65 @@ class DatabasePostsManager(private var database: DatabaseHelper) {
         }
     }
 
-    fun loadPosts(): MutableList<RawPost> {
-        val site = app.settings.activeProfile
-        val posts = mutableListOf<RawPost>()
+    fun getPost(): RawPost? {
+        val site: Long = app.settings.activeProfile
+        val post: RawPost? = null
         database.use {
             select(PostsTable.TABLE_NAME)
                     .whereSimple("${PostsTable.SITE} = ?", site.toString())
-                    .parseOpt(object : MapRowParser<MutableList<RawPost>> {
+        }
+        return post
+    }
+
+    fun loadPosts(): MutableList<RawPost> {
+        val site: Long = app.settings.activeProfile
+        val posts: MutableList<RawPost> = mutableListOf()
+        Log.i(this.javaClass.simpleName, "site: $site")
+        database.use {
+            select(PostsTable.TABLE_NAME)
+                    .whereSimple("${PostsTable.SITE} = ?", site.toString())
+                    .parseList(object : MapRowParser<MutableList<RawPost>> {
                         override fun parseRow(columns: Map<String, Any?>): MutableList<RawPost> {
-                            val id: Long = columns.getValue(PostsTable.ID) as Long
-                            val tags: String = columns.getValue(PostsTable.TAGS) as String
-                            val created_at: Long = columns.getValue(PostsTable.CREATE_AT) as Long
-                            val creator_id: Long = columns.getValue(PostsTable.CREATOR_ID) as Long
-                            val author: String = columns.getValue(PostsTable.AUTHOR) as String
-                            val change: Long = columns.getValue(PostsTable.CHANGE) as Long
-                            val source: String = columns.getValue(PostsTable.SOURCE) as String
-                            val score: Int = columns.getValue(PostsTable.SCORE) as Int
-                            val md5: String = columns.getValue(PostsTable.MD5) as String
-                            val file_size: Int = columns.getValue(PostsTable.FILE_SIZE) as Int
-                            val file_url: String = columns.getValue(PostsTable.FILE_URL) as String
-                            val is_shown_in_index: Boolean = columns.getValue(PostsTable.IS_SHOWN_IN_INDEX) as Boolean
-                            val preview_url: String = columns.getValue(PostsTable.PREVIEW_URL) as String
-                            val preview_width: Int = columns.getValue(PostsTable.PREVIEW_WIDTH) as Int
-                            val preview_height: Int = columns.getValue(PostsTable.PREVIEW_HEIGHT) as Int
-                            val actual_preview_width: Int = columns.getValue(PostsTable.ACTUAL_PREVIEW_WIDTH) as Int
-                            val actual_preview_height: Int = columns.getValue(PostsTable.ACTUAL_PREVIEW_HEIGHT) as Int
-                            val sample_url: String = columns.getValue(PostsTable.SAMPLE_URL) as String
-                            val sample_width: Int = columns.getValue(PostsTable.SAMPLE_WIDTH) as Int
-                            val sample_height: Int = columns.getValue(PostsTable.SAMPLE_HEIGHT) as Int
-                            val sample_file_size: Int = columns.getValue(PostsTable.SAMPLE_FILE_SIZE) as Int
-                            val jpeg_url: String = columns.getValue(PostsTable.JPEG_URL) as String
-                            val jpeg_width: Int = columns.getValue(PostsTable.JPEG_WIDTH) as Int
-                            val jpeg_height: Int = columns.getValue(PostsTable.JPEG_HEIGHT) as Int
-                            val jpeg_file_size: Int = columns.getValue(PostsTable.JPEG_FILE_SIZE) as Int
-                            val rating: String = columns.getValue(PostsTable.RATING) as String
-                            val has_children: Boolean = columns.getValue(PostsTable.HAS_CHILDRE) as Boolean
-                            val parent_id: Long = columns.getValue(PostsTable.PARENT_ID) as Long
-                            val status: String = columns.getValue(PostsTable.STATUS) as String
-                            val width: Int = columns.getValue(PostsTable.WIDTH) as Int
-                            val height: Int = columns.getValue(PostsTable.HEIGHT) as Int
-                            val is_held: Boolean = columns.getValue(PostsTable.IS_HELD) as Boolean
-                            val post = RawPost(id, tags, created_at, creator_id, author, change, source, score, md5, file_size, file_url, is_shown_in_index, preview_url, preview_width, preview_height, actual_preview_width, actual_preview_height, sample_url, sample_width, sample_height, sample_file_size, jpeg_url, jpeg_width, jpeg_height, jpeg_file_size, rating, has_children, parent_id, status, width, height, is_held)
+                            val id: Long? = columns.getValue(PostsTable.ID) as? Long
+                            val tags: String? = columns.getValue(PostsTable.TAGS) as? String
+                            val createdAt: Long? = columns.getValue(PostsTable.CREATE_AT) as? Long
+                            val creatorId: Long? = columns.getValue(PostsTable.CREATOR_ID) as? Long
+                            val author: String? = columns.getValue(PostsTable.AUTHOR) as? String
+                            val change: Long? = columns.getValue(PostsTable.CHANGE) as? Long
+                            val source: String? = columns.getValue(PostsTable.SOURCE) as? String
+                            val score: Long? = columns.getValue(PostsTable.SCORE) as? Long
+                            val md5: String? = columns.getValue(PostsTable.MD5) as? String
+                            val fileSize: Long? = columns.getValue(PostsTable.FILE_SIZE) as? Long
+                            val fileUrl: String? = columns.getValue(PostsTable.FILE_URL) as? String
+                            var isShownInIndex: Boolean? = false
+                            if (columns.getValue(PostsTable.IS_SHOWN_IN_INDEX) as? Long == 1L) { isShownInIndex = true }
+                            val previewUrl: String? = columns.getValue(PostsTable.PREVIEW_URL) as? String
+                            val previewWidth: Long? = columns.getValue(PostsTable.PREVIEW_WIDTH) as? Long
+                            val previewHeight: Long? = columns.getValue(PostsTable.PREVIEW_HEIGHT) as? Long
+                            val actualPreviewWidth: Long? = columns.getValue(PostsTable.ACTUAL_PREVIEW_WIDTH) as? Long
+                            val actualPreviewHeight: Long? = columns.getValue(PostsTable.ACTUAL_PREVIEW_HEIGHT) as? Long
+                            val sampleUrl: String? = columns.getValue(PostsTable.SAMPLE_URL) as? String
+                            val sampleWidth: Long? = columns.getValue(PostsTable.SAMPLE_WIDTH) as? Long
+                            val sampleHeight: Long? = columns.getValue(PostsTable.SAMPLE_HEIGHT) as? Long
+                            val sampleFileSize: Long? = columns.getValue(PostsTable.SAMPLE_FILE_SIZE) as? Long
+                            val jpegUrl: String? = columns.getValue(PostsTable.JPEG_URL) as? String
+                            val jpegWidth: Long? = columns.getValue(PostsTable.JPEG_WIDTH) as? Long
+                            val jpegHeight: Long? = columns.getValue(PostsTable.JPEG_HEIGHT) as? Long
+                            val jpegFileSize: Long? = columns.getValue(PostsTable.JPEG_FILE_SIZE) as? Long
+                            val rating: String? = columns.getValue(PostsTable.RATING) as? String
+                            var hasChildren: Boolean? = false
+                            if (columns.getValue(PostsTable.HAS_CHILDRE) as? Long == 1L) { hasChildren = true }
+                            val parentId: Long? = columns.getValue(PostsTable.PARENT_ID) as? Long
+                            val status: String? = columns.getValue(PostsTable.STATUS) as? String
+                            val width: Long? = columns.getValue(PostsTable.WIDTH) as? Long
+                            val height: Long? = columns.getValue(PostsTable.HEIGHT) as? Long
+                            var isHeld: Boolean? = false
+                            if (columns.getValue(PostsTable.IS_HELD) as? Long == 1L) { isHeld = true }
+                            val post = RawPost(id, tags, createdAt, creatorId, author, change, source, score,
+                                    md5, fileSize, fileUrl, isShownInIndex, previewUrl, previewWidth, previewHeight,
+                                    actualPreviewWidth, actualPreviewHeight, sampleUrl, sampleWidth, sampleHeight, sampleFileSize,
+                                    jpegUrl, jpegWidth, jpegHeight, jpegFileSize, rating, hasChildren, parentId, status,
+                                    width, height, isHeld)
                             posts.add(post)
                             return posts
                         }

@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
             builder.beginConfig().useFont(Typeface.create("sans", Typeface.NORMAL))
             builder.beginConfig().withBorder(2)
             builder.beginConfig().endConfig()
-            return builder as TextDrawable.Builder;
+            return builder as TextDrawable.Builder
         }
     }
 

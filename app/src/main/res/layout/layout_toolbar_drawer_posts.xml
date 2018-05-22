@@ -15,7 +15,6 @@
     android:id="@+id/toolbar_drawer_posts"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/actionBarSize"
-    android:background="?android:attr/colorPrimary"
     android:elevation="4dp"
     android:touchscreenBlocksFocus="false"
     android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
