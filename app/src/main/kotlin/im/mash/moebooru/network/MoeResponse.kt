@@ -12,6 +12,8 @@
 package im.mash.moebooru.network
 
 import android.support.annotation.Keep
+import android.widget.Toast
+import im.mash.moebooru.App.Companion.app
 import java.io.IOException
 import java.nio.charset.Charset
 
@@ -53,6 +55,7 @@ open class MoeResponse {
         if (null != getResponseAsString()) {
             return responseAsString?: ""
         }
+        Toast.makeText(app, "status code: $statusCode", Toast.LENGTH_SHORT).show()
         return "Response{" +
                 "statusCode=" + statusCode +
                 ", responseString='" + responseAsString +
