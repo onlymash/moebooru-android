@@ -27,6 +27,7 @@ import android.view.animation.AnimationUtils
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.Headers
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 
 import com.mikepenz.materialdrawer.Drawer
 import com.mikepenz.materialdrawer.DrawerBuilder
@@ -41,6 +42,7 @@ import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import java.io.IOException
 
 @SuppressLint("RtlHardcoded")
 class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener,
@@ -64,7 +66,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private var itemPadding: Int = 0
     private var toolbarHeight = 0
     private var page = 1
-    private var result: MutableList<RawPost> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         drawerView = inflater.inflate(R.layout.layout_drawer_posts, container, false)
@@ -309,34 +310,26 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                     null, null, null, null).makeGetUrl()
             Log.i(TAG, "url: $url")
             val response: MoeResponse? = MoeHttpClient.instance.get(url, null, okHttpHeader)
-            val data: MutableList<RawPost> = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
-            result = data
-            uiThread {
-                refresh.isRefreshing = false
+            var result: MutableList<RawPost>? = null
+            try {
+                result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
+            } catch (e: JsonParseException) {
+                Log.i(TAG, "Gson exception!")
+            }
+            if (result != null) {
+                app.postsManager.deletePosts(app.settings.activeProfile)
                 if (result.size > 0) {
-                    Log.i(TAG, "Refresh data finished!")
-                    deleteData()
+                    app.postsManager.savePosts(result, app.settings.activeProfile)
                 }
             }
-        }
-    }
-
-    private fun deleteData() {
-        doAsync {
-            app.postsManager.deletePosts(app.settings.activeProfile)
             uiThread {
-                Log.i(TAG, "Delete data finished!")
-                saveData()
-            }
-        }
-    }
-
-    private fun saveData() {
-        doAsync {
-            app.postsManager.savePosts(result, app.settings.activeProfile)
-            uiThread {
-                Log.i(TAG, "Save data finished!")
-                postAdapter.loadData()
+                refresh.isRefreshing = false
+                Log.i(TAG, "Refresh data finished!")
+                if (result != null) {
+                    postAdapter.loadData()
+                } else {
+                    Log.i(TAG, "Not data")
+                }
             }
         }
     }
