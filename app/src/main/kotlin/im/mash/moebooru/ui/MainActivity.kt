@@ -13,12 +13,15 @@ package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.customtabs.CustomTabsIntent
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatDelegate
 import android.support.v7.content.res.AppCompatResources
 import android.util.Log
 import android.view.Gravity
@@ -35,17 +38,19 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.models.Booru
 import im.mash.moebooru.models.TextDrawable
+import im.mash.moebooru.utils.Key
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*
 
 @SuppressLint("RtlHardcoded")
-class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
+class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
+        SharedPreferences.OnSharedPreferenceChangeListener {
 
     companion object {
-        private const val DRAWER_POSTS = 0L
-        private const val DRAWER_SETTINGS = 1L
-        private const val DRAWER_ABOUT = 2L
+        private const val DRAWER_ITEM_POSTS = 0L
+        private const val DRAWER_ITEM_SETTINGS = 1L
+        private const val DRAWER_ITEM_ABOUT = 2L
         private val builder = getTextDrawableBuilder()
         private fun getTextDrawableBuilder(): TextDrawable.Builder {
             val builder = TextDrawable.builder()
@@ -111,7 +116,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
 
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
-                .withIcon(R.drawable.ic_action_settings_24dp)
+                .withIcon(R.drawable.ic_drawer_settings_24dp)
 
         header = AccountHeaderBuilder()
                 .withActivity(this)
@@ -132,22 +137,22 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 .withAccountHeader(header)
                 .addDrawerItems(
                         PrimaryDrawerItem()
-                                .withIdentifier(DRAWER_POSTS)
+                                .withIdentifier(DRAWER_ITEM_POSTS)
                                 .withName(R.string.posts)
-                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_action_posts_24dp))
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_posts_24dp))
                                 .withIconTintingEnabled(true),
                         PrimaryDrawerItem()
-                                .withIdentifier(DRAWER_SETTINGS)
+                                .withIdentifier(DRAWER_ITEM_SETTINGS)
                                 .withName(R.string.settings)
-                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_action_settings_24dp))
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_settings_24dp))
                                 .withIconTintingEnabled(true)
 
                 )
                 .addStickyDrawerItems(
                         PrimaryDrawerItem()
-                                .withIdentifier(DRAWER_ABOUT)
+                                .withIdentifier(DRAWER_ITEM_ABOUT)
                                 .withName(R.string.about)
-                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_action_copyright_24dp))
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_copyright_24dp))
                                 .withIconTintingEnabled(true)
                 )
                 .withStickyFooterDivider(true)
@@ -156,12 +161,33 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 .withActionBarDrawerToggle(true)
                 .withActionBarDrawerToggleAnimated(true)
                 .withSavedInstance(savedInstanceState)
+                .withDrawerWidthDp(300)
                 .build()
+
+        drawer.drawerLayout.setStatusBarBackgroundColor(ContextCompat.getColor(this, R.color.primary))
 
         previousSelectedDrawer = drawer.currentSelection
 
         if (savedInstanceState == null) {
             displayFragment(PostsFragment())
+        } else {
+            if (app.settings.isChangedNightMode) {
+                drawer.setSelection(DRAWER_ITEM_SETTINGS)
+                app.settings.isChangedNightMode = false
+            }
+        }
+
+        val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        sp.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            Key.NIGHT_MODE -> {
+                AppCompatDelegate.setDefaultNightMode(app.settings.nightMode)
+                app.settings.isChangedNightMode = true
+                recreate()
+            }
         }
     }
 
@@ -172,9 +198,9 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         } else {
             previousSelectedDrawer = id
             when (id) {
-                DRAWER_POSTS -> displayFragment(PostsFragment())
-                DRAWER_SETTINGS -> displayFragment(SettingsFragment())
-                DRAWER_ABOUT -> displayFragment(AboutFragment())
+                DRAWER_ITEM_POSTS -> displayFragment(PostsFragment())
+                DRAWER_ITEM_SETTINGS -> displayFragment(SettingsFragment())
+                DRAWER_ITEM_ABOUT -> displayFragment(AboutFragment())
             }
         }
         return true
@@ -196,7 +222,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
                 if (currentFragment is PostsFragment) {
                     super.onBackPressed()
                 } else {
-                    drawer.setSelection(DRAWER_POSTS)
+                    drawer.setSelection(DRAWER_ITEM_POSTS)
                 }
             }
         }
@@ -212,4 +238,5 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener {
         customTabsIntent.launchUrl(this, uri)
     } catch (_: ActivityNotFoundException) { }  // ignore
     fun launchUrl(uri: String) = launchUrl(Uri.parse(uri))
+
 }

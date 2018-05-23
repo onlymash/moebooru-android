@@ -11,38 +11,14 @@
 
 package im.mash.moebooru.ui
 
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.support.v7.app.AppCompatDelegate
-import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.utils.Key
 import moe.shizuku.preference.PreferenceFragment
 
-class SettingsPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingsPreferenceFragment : PreferenceFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, null)
-        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when (key) {
-            Key.NIGHT_MODE -> {
-                AppCompatDelegate.setDefaultNightMode(app.settings.nightMode)
-                activity?.recreate()
-            }
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onCreateItemDecoration(): DividerDecoration {

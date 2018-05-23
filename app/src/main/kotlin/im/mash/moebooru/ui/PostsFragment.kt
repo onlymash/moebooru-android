@@ -15,6 +15,7 @@ import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.SwipeRefreshLayout
@@ -24,13 +25,13 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import android.view.animation.AnimationUtils
+import android.widget.CheckBox
+import android.widget.ImageView
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.load.model.Headers
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 
-import com.mikepenz.materialdrawer.Drawer
-import com.mikepenz.materialdrawer.DrawerBuilder
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
@@ -46,14 +47,16 @@ import org.jetbrains.anko.uiThread
 
 @SuppressLint("RtlHardcoded")
 class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener,
-        SharedPreferences.OnSharedPreferenceChangeListener, SwipeRefreshLayout.OnRefreshListener {
+        SharedPreferences.OnSharedPreferenceChangeListener, SwipeRefreshLayout.OnRefreshListener,
+        DrawerLayout.DrawerListener {
 
     private val TAG = this.javaClass.simpleName
 
-    private lateinit var drawer: Drawer
-    private lateinit var drawerView: View
+    private lateinit var drawer: NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerToolbar: Toolbar
+    private lateinit var drawerAdapter: DrawerAdapter
+    private lateinit var drawerTagsView: RecyclerView
     private lateinit var postsView: RecyclerView
     private lateinit var postAdapter: PostAdapter
     private lateinit var refresh: SwipeRefreshLayout
@@ -69,7 +72,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private var page = 1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        drawerView = inflater.inflate(R.layout.layout_drawer_posts, container, false)
         return inflater.inflate(R.layout.layout_posts, container, false)
     }
 
@@ -80,32 +82,22 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         toolbar.setTitle(R.string.posts)
         toolbar.inflateMenu(R.menu.menu_main)
-        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.post_toolbar))
+        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
         toolbar.setOnMenuItemClickListener(this)
         setGridItemOption()
 
         refresh = view.findViewById(R.id.refresh)
 
-        val activity = activity!!
+        val activity = activity as MainActivity
         activity.windowManager.defaultDisplay.getMetrics(metric)
         width = metric.widthPixels
 
         itemPadding = activity.resources.getDimension(R.dimen.item_padding).toInt()
 
-        drawer = DrawerBuilder()
-                .withActivity(activity)
-                .withToolbar(toolbar)
-                .withDrawerGravity(Gravity.RIGHT)
-                .withDisplayBelowStatusBar(true)
-                .withRootView(R.id.fragment_main)
-                .withCustomView(drawerView)
-                .withSavedInstance(savedInstanceState)
-                .withActionBarDrawerToggle(false)
-                .buildForFragment()
-
-        drawerLayout = drawer.drawerLayout
-        drawerToolbar = drawerView.findViewById(R.id.toolbar_drawer_posts)
-        drawerToolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
+        drawerLayout = view.findViewById(R.id.drawer_layout_posts)
+        drawer = drawerLayout.findViewById(R.id.tags_drawer_view)
+        drawerToolbar = drawerLayout.findViewById(R.id.toolbar_drawer_tags)
+        drawerToolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar))
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener(this)
@@ -119,9 +111,10 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         postAdapter = PostAdapter(toolbarHeight, itemPadding, null)
 
         //init RecyclerView listener
+        app.settings.isNotMoreData = false
         lastItemListener = object : LastItemListener() {
             override fun onLastItemVisible() {
-                if (!refresh.isRefreshing) {
+                if (!refresh.isRefreshing && !app.settings.isNotMoreData) {
                     refresh.isRefreshing = true
                     loadMoreData()
                 }
@@ -139,6 +132,20 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         postsView.adapter = postAdapter
         postsView.addOnScrollListener(lastItemListener)
 
+        val itemsTags = mutableListOf(
+                "item1",
+                "item2",
+                "item3",
+                "item4",
+                "item5",
+                "item6",
+                "item7",
+                "item8"
+        )
+        drawerAdapter = DrawerAdapter(itemsTags)
+        drawerTagsView = drawer.findViewById(R.id.search_tags_list)
+        drawerTagsView.adapter = drawerAdapter
+
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
 
@@ -149,6 +156,23 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         refresh.setOnRefreshListener(this)
 
+        activity.drawer.drawerLayout.addDrawerListener(this)
+    }
+
+    override fun onDrawerOpened(drawerView: View) {
+
+    }
+
+    override fun onDrawerClosed(drawerView: View) {
+
+    }
+
+    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+
+    }
+
+    override fun onDrawerStateChanged(newState: Int) {
+        closeRightDrawer()
     }
 
     private fun setupGridMode() {
@@ -183,10 +207,16 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         when (item?.itemId) {
             R.id.action_grid -> app.settings.gridModeString = Key.GRID_MODE_GRID
             R.id.action_staggered_grid -> app.settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
-            R.id.action_search_open -> drawer.openDrawer()
-            R.id.action_search -> drawer.closeDrawer()
+            R.id.action_search_open -> closeRightDrawer()
+            R.id.action_search -> closeRightDrawer()
         }
         return true
+    }
+
+    private fun closeRightDrawer() {
+        if (drawerLayout.isDrawerOpen(Gravity.RIGHT)) {
+            drawerLayout.closeDrawer(Gravity.RIGHT)
+        }
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -196,6 +226,9 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 reSetupGridMode()
             }
             Key.ACTIVE_PROFILE -> {
+                closeRightDrawer()
+                app.settings.isNotMoreData = false
+                postAdapter.clearItems()
                 postAdapter.loadData()
             }
         }
@@ -210,18 +243,18 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     override fun onClick(v: View?) {
         when (v) {
-            drawerToolbar -> drawer.closeDrawer()
+            drawerToolbar -> closeRightDrawer()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        drawer.closeDrawer()
+        closeRightDrawer()
     }
 
     override fun onPause() {
         super.onPause()
-        drawer.closeDrawer()
+        closeRightDrawer()
     }
 
     override fun onResume() {
@@ -231,8 +264,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     }
 
     override fun onBackPressed(): Boolean {
-        if (drawer.isDrawerOpen) {
-            drawer.closeDrawer()
+        if (drawerLayout.isDrawerOpen(Gravity.RIGHT)) {
+            drawerLayout.closeDrawer(Gravity.RIGHT)
             return true
         }
         return super.onBackPressed()
@@ -247,22 +280,40 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             private var tagItems: MutableList<MutableList<String>> = mutableListOf()
         }
 
+        fun clearItems() {
+            items = null
+            tagItems.clear()
+        }
+
         fun loadData() {
             doAsync {
+                val countBefore = itemCount
+                var countAfter = 0
                 items = app.postsManager.loadPosts(app.settings.activeProfile)
-                tagItems.clear()
                 if (items != null) {
-                    items?.forEach {
-                        val list: List<String>? = it.tags?.split(" ")
-                        val tags: MutableList<String>? = list?.toMutableList()
-                        if (tags != null) {
-                            tagItems.add(tags)
+                    countAfter = items!!.size
+                    if (countAfter > countBefore) {
+                        tagItems.clear()
+                        items!!.forEach {
+                            val list: List<String>? = it.tags?.split(" ")
+                            val tags: MutableList<String>? = list?.toMutableList()
+                            if (tags != null) {
+                                tagItems.add(tags)
+                            }
                         }
                     }
                 }
-                Log.i(TAG, "Item[0] tags size: ${tagItems[0].size}")
                 uiThread {
-                    notifyDataSetChanged()
+                    if (countBefore in 1..(countAfter - 1)) {
+                        notifyItemRangeInserted(countBefore, countAfter)
+                        Log.i(TAG, "Have new data!! countBefore = $countBefore")
+                    } else if (countBefore < 1 && countAfter > countBefore) {
+                        notifyDataSetChanged()
+                        Log.i(TAG, "Have new data!! countBefore = $countBefore")
+                    } else {
+                        app.settings.isNotMoreData = true
+                        Log.i(TAG, "Not more data!!")
+                    }
                     Log.i(TAG, "loadData() finished!!")
                 }
             }
@@ -281,12 +332,18 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 } else {
                     holder.itemView.setPadding(itemPadding, itemPadding, itemPadding, itemPadding)
                 }
+                val placeHolderId = when (items!![position].rating) {
+                    "q" -> R.drawable.background_rating_q
+                    "e" -> R.drawable.background_rating_e
+                    else -> R.drawable.background_rating_s
+                }
                 when (app.settings.gridModeString) {
                     Key.GRID_MODE_STAGGERED_GRID -> {
                         holder.fixedImageView.setWidthAndHeightWeight(items!![position].width!!.toInt(), items!![position].height!!.toInt())
                         GlideApp.with(holder.fixedImageView.context)
                                 .load(GlideUrl(items!![position].preview_url, header))
                                 .fitCenter()
+                                .placeholder(placeHolderId)
                                 .into(holder.fixedImageView)
                     }
                     else -> {
@@ -294,6 +351,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                         GlideApp.with(holder.fixedImageView.context)
                                 .load(GlideUrl(items!![position].preview_url, header))
                                 .centerCrop()
+                                .placeholder(placeHolderId)
                                 .into(holder.fixedImageView)
                     }
                 }
@@ -377,6 +435,28 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     override fun onRefresh() {
         Log.i(TAG, "Refreshing!!")
         refresh.isRefreshing = true
+        app.settings.isNotMoreData = false
         refreshData()
     }
+
+    private class DrawerAdapter(private var items: MutableList<String>): RecyclerView.Adapter<DrawerAdapter.DrawerViewHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrawerViewHolder {
+            val view: View = LayoutInflater.from(parent.context).inflate(R.layout.layout_drawer_tags_item, parent, false)
+            return DrawerViewHolder(view)
+        }
+
+        override fun getItemCount(): Int {
+            return items.size
+        }
+
+        override fun onBindViewHolder(holder: DrawerViewHolder, position: Int) {
+            holder.checkTag.text = items[position]
+        }
+        private class DrawerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val checkTag = itemView.findViewById<CheckBox>(R.id.select_tag)
+            val moreOptions = itemView.findViewById<ImageView>(R.id.more_options)
+        }
+    }
+
 }

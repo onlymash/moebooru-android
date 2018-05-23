@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.utils
 
+import android.content.res.Resources
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import com.bumptech.glide.load.model.Headers
@@ -31,3 +32,17 @@ val okHttpHeader: List<Pair<String, String>>
 
 val glideHeader: Headers
     get() = LazyHeaders.Builder().addHeader(Net.USER_AGENT_KEY, Net.USER_AGENT_INFO).build()
+
+val statusBarHeight: Int
+    get() {
+        val res = Resources.getSystem()
+        val resId = res.getIdentifier("status_bar_height", "dimen", "android")
+        return if (resId > 0) res.getDimensionPixelSize(resId) else 0
+    }
+
+val navBarHeight: Int
+    get() {
+        val res = Resources.getSystem()
+        val resId = res.getIdentifier("navigation_bar_height", "dimen", "android")
+        return if (resId > 0) res.getDimensionPixelSize(resId) else 0
+    }

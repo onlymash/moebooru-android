@@ -32,6 +32,9 @@ object Key {
     const val ACTIVE_PROFILE = "active_profile"
 
     const val SPAN_COUNT = "span_count"
+    const val IS_NOT_MORE_DATA = "not_more_data"
+    const val IS_CHANGED_NIGHT_MODE = "changed_night_mode"
+
 }
 
 object Net {

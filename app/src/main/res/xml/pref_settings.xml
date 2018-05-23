@@ -23,7 +23,7 @@
             android:defaultValue="system"
             android:summary="%s"
             android:title="@string/night_mode"
-            android:icon="@drawable/ic_action_time_24dp"
+            android:icon="@drawable/ic_settings_time_24dp"
             app:iconSpaceReserved="true"/>
 
         <SimpleMenuPreference
@@ -33,7 +33,7 @@
             android:defaultValue="staggered_grid"
             android:summary="%s"
             android:title="@string/grid_mode"
-            android:icon="@drawable/ic_action_grid_24dp"
+            android:icon="@drawable/ic_settings_grid_24dp"
             app:iconSpaceReserved="true"/>
 
     </PreferenceCategory>
@@ -48,7 +48,7 @@
             android:defaultValue="40"
             android:summary="%s"
             android:title="@string/post_limit"
-            android:icon="@drawable/ic_action_item_numbered_24dp"
+            android:icon="@drawable/ic_settings_item_numbered_24dp"
             app:iconSpaceReserved="true"/>
 
     </PreferenceCategory>
@@ -63,7 +63,7 @@
             android:defaultValue="256"
             android:summary="%s"
             android:title="@string/cache_memory"
-            android:icon="@drawable/ic_action_storage_24dp"
+            android:icon="@drawable/ic_settings_storage_24dp"
             app:iconSpaceReserved="true"/>
 
         <ListPreference
@@ -73,7 +73,7 @@
             android:defaultValue="256"
             android:summary="%s"
             android:title="@string/cache_disk"
-            android:icon="@drawable/ic_action_sd_storage_24dp"
+            android:icon="@drawable/ic_settings_sd_storage_24dp"
             app:iconSpaceReserved="true"/>
 
     </PreferenceCategory>

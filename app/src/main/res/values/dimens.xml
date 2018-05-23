@@ -13,4 +13,5 @@
 <resources>
     <dimen name="item_padding">3dp</dimen>
     <dimen name="item_width">126dp</dimen>
+    <dimen name="drawer_width">300dp</dimen>
 </resources>

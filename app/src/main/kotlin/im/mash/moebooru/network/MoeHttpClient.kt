@@ -32,9 +32,9 @@ class MoeHttpClient private constructor(){
     }
 
     companion object {
-        private var CONNECTION_TIME_OUT: Long = 30 * 1000L
-        private var READ_TIME_OUT: Long = 30 * 1000L
-        private var WRITE_TIME_OUT: Long = 30 * 1000L
+        private var CONNECTION_TIME_OUT: Long = 20 * 1000L
+        private var READ_TIME_OUT: Long = 20 * 1000L
+        private var WRITE_TIME_OUT: Long = 20 * 1000L
         val instance: MoeHttpClient by lazy { Holder.INSTANCE }
     }
 

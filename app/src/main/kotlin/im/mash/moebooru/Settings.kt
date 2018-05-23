@@ -28,7 +28,8 @@ class Settings(ctx: Context) {
         set(value) = editor.putString(Key.NIGHT_MODE, value).apply()
 
     @AppCompatDelegate.NightMode
-    val nightMode: Int get() = when (nightModeString) {
+    val nightMode: Int
+        get() = when (nightModeString) {
         Key.NIGHT_MODE_AUTO -> AppCompatDelegate.MODE_NIGHT_AUTO
         Key.NIGHT_MODE_OFF -> AppCompatDelegate.MODE_NIGHT_NO
         Key.NIGHT_MODE_ON -> AppCompatDelegate.MODE_NIGHT_YES
@@ -58,4 +59,13 @@ class Settings(ctx: Context) {
     var spanCountInt: Int
         get() = sp.getInt(Key.SPAN_COUNT, 3)
         set(value) = editor.putInt(Key.SPAN_COUNT, value).apply()
+
+    var isNotMoreData: Boolean
+        get() = sp.getBoolean(Key.IS_NOT_MORE_DATA, true)
+        set(value) = editor.putBoolean(Key.IS_NOT_MORE_DATA, value).apply()
+
+    var isChangedNightMode: Boolean
+        get() = sp.getBoolean(Key.IS_CHANGED_NIGHT_MODE, false)
+        set(value) = editor.putBoolean(Key.IS_CHANGED_NIGHT_MODE, value).apply()
+
 }
