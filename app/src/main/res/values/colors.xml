@@ -10,7 +10,7 @@
 
     <color name="background">@color/md_light_background</color>
     <color name="window_background">@color/primary_dark</color>
-    <color name="primary_icon">@color/material_drawer_primary_icon</color>
+    <color name="primary_icon">@color/md_grey_600</color>
     <color name="settings_item_icon">@color/primary_1</color>
     <color name="toolbar_post">#33000000</color>
     <color name="toolbar">#FF151823</color>
@@ -23,8 +23,8 @@
     <color name="drawer_secondary_text">@color/material_drawer_secondary_text</color>
     <color name="drawer_hint_text">@color/material_drawer_hint_text</color>
     <color name="drawer_divider">@color/material_drawer_divider</color>
-    <color name="drawer_selected">@color/transparent</color>
-    <color name="drawer_selected_text">@color/primary</color>
+    <color name="drawer_selected">@color/material_drawer_selected</color>
+    <color name="drawer_selected_text">@color/accent</color>
     <color name="drawer_header_selection_text">@color/material_drawer_header_selection_text</color>
 
     <color name="transparent">#00000000</color>
