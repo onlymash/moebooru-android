@@ -28,9 +28,9 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
     //内部接口，定义点击方法以及长按方法
     interface OnItemClickListener {
 
-        fun onItemClick(view: View?, position: Int)
+        fun onItemClick(itemView: View?, position: Int)
 
-        fun onItemLongClick(view: View?, position: Int)
+        fun onItemLongClick(itemView: View?, position: Int)
 
     }
 

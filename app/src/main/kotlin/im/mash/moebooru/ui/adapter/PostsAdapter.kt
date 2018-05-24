@@ -25,8 +25,8 @@ import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader
 
-class PostAdapter(private val toolbarHeight: Int, private val itemPadding: Int,
-                  private var items: MutableList<RawPost>?) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+class PostsAdapter(private val toolbarHeight: Int, private val itemPadding: Int,
+                  private var items: MutableList<RawPost>?) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
     companion object {
         private val TAG = this::class.java.simpleName

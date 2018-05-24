@@ -49,7 +49,7 @@ class TagsDrawerItem : AbstractDrawerItem<TagsDrawerItem, TagsDrawerItem.TagsVie
     }
 
     class TagsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val selectTag = itemView.findViewById<CheckBox>(R.id.select_tag)
-        val moreOptions = itemView.findViewById<ImageView>(R.id.more_options)
+        val selectTag = itemView.findViewById<CheckBox>(R.id.select_tag)!!
+        val moreOptions = itemView.findViewById<ImageView>(R.id.more_options)!!
     }
 }

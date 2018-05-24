@@ -27,18 +27,21 @@ import android.util.TypedValue
 import android.view.animation.AnimationUtils
 import android.widget.CheckBox
 import android.widget.ImageView
+import com.bumptech.glide.load.model.GlideUrl
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.models.ParamGet
 import im.mash.moebooru.models.RawPost
 import im.mash.moebooru.network.MoeHttpClient
 import im.mash.moebooru.network.MoeResponse
-import im.mash.moebooru.ui.adapter.PostAdapter
+import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.ui.listener.LastItemListener
 import im.mash.moebooru.ui.listener.RecyclerViewClickListener
+import im.mash.moebooru.ui.widget.MoeImageView
 import im.mash.moebooru.utils.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -56,7 +59,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private lateinit var drawerAdapter: DrawerAdapter
     private lateinit var drawerTagsView: RecyclerView
     private lateinit var postsView: RecyclerView
-    private lateinit var postAdapter: PostAdapter
+    private lateinit var postsAdapter: PostsAdapter
     private lateinit var refresh: SwipeRefreshLayout
     private lateinit var lastItemListener: LastItemListener
 
@@ -78,7 +81,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
 
         //init toolbar
@@ -101,6 +103,15 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         //item 边距
         itemPadding = activity.resources.getDimension(R.dimen.item_padding).toInt()
 
+        //第一行 item 要加上 toolbar 的高度
+        val tv = TypedValue()
+        if (activity.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+        }
+
+        //监听 MainActivity 的左侧抽屉
+        activity.drawer.drawerLayout.addDrawerListener(this)
+
         //SwipeRefreshLayout
         refresh = view.findViewById(R.id.refresh)
         refresh.setOnRefreshListener(this)
@@ -109,18 +120,13 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         initRightDrawer(view)
 
         //init Adapter
-        val tv = TypedValue()
-        if (activity.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
-        }
-        postAdapter = PostAdapter(toolbarHeight, itemPadding, null)
+        postsAdapter = PostsAdapter(toolbarHeight, itemPadding, null)
 
         //init RecyclerView listener
         app.settings.isNotMoreData = false
         lastItemListener = object : LastItemListener() {
             override fun onLastItemVisible() {
                 if (!refresh.isRefreshing && !app.settings.isNotMoreData) {
-                    refresh.isRefreshing = true
                     loadMoreData()
                 }
             }
@@ -137,16 +143,17 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             loadData()
             Log.i(TAG, "savedInstanceState == null, loadCacheData()")
         }
-
-        //监听 MainActivity 的左侧抽屉
-        activity.drawer.drawerLayout.addDrawerListener(this)
     }
 
     private fun loadData() {
         doAsync {
             items = app.postsManager.loadPosts(app.settings.activeProfile)
             uiThread {
-                postAdapter.updateData(items)
+                if (items != null && items!!.size > 0) {
+                    postsAdapter.updateData(items)
+                } else {
+                    refreshData()
+                }
             }
         }
     }
@@ -185,18 +192,18 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postsView.itemAnimator = DefaultItemAnimator()
 
-        postsView.adapter = postAdapter
+        postsView.adapter = postsAdapter
 
         //监听是否滑动到最后一个 item
         postsView.addOnScrollListener(lastItemListener)
 
         //item 点击监听
         val postsItemClickListener = object : RecyclerViewClickListener.OnItemClickListener {
-            override fun onItemClick(view: View?, position: Int) {
+            override fun onItemClick(itemView: View?, position: Int) {
                 Log.i(TAG, "onItemClick: $position")
             }
 
-            override fun onItemLongClick(view: View?, position: Int) {
+            override fun onItemLongClick(itemView: View?, position: Int) {
                 Log.i(TAG, "onItemLongClick: $position")
             }
         }
@@ -241,7 +248,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private fun reSetupGridMode() {
         if (app.settings.gridModeString != currentGridMode) {
             setupGridMode()
-            postAdapter.updateData(items)
+            postsAdapter.updateData(items)
         }
     }
 
@@ -319,7 +326,9 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     }
 
     private fun loadMoreData() {
-        page = postAdapter.itemCount/app.settings.postLimitInt + 1
+        refresh.isRefreshing = true
+        page = postsAdapter.itemCount/app.settings.postLimitInt + 1
+        Log.i(TAG, "Loading more data...")
         doAsync {
             val response: MoeResponse? = getResponseData()
             var result: MutableList<RawPost>? = null
@@ -329,6 +338,9 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 Log.i(TAG, "Gson exception!")
             }
             if (result != null && result.size > 0) {
+                if (result.size < app.settings.postLimitInt) {
+                    app.settings.isNotMoreData = true
+                }
                 app.postsManager.savePosts(result, app.settings.activeProfile)
                 if (items == null) {
                     items = result
@@ -337,18 +349,19 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                         items!!.add(it)
                     }
                 }
+            } else {
+                app.settings.isNotMoreData = true
             }
             uiThread {
                 refresh.isRefreshing = false
                 Log.i(TAG, "Load more data finished!")
                 if (items != null) {
-                    postAdapter.addData(items)
+                    postsAdapter.addData(items)
                 } else {
                     Log.i(TAG, "Not data")
                 }
             }
         }
-        Log.i(TAG, "Loading more data...")
     }
 
     private fun getResponseData(): MoeResponse? {
@@ -362,6 +375,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     }
 
     private fun refreshData() {
+        refresh.isRefreshing = true
+        app.settings.isNotMoreData = false
         page = 1
         doAsync {
             val response: MoeResponse? = getResponseData()
@@ -380,7 +395,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 Log.i(TAG, "Refresh data finished!")
                 if (result != null) {
                     items = result
-                    postAdapter.updateData(items)
+                    postsAdapter.updateData(items)
                 } else {
                     Log.i(TAG, "Not data")
                 }
@@ -390,8 +405,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     override fun onRefresh() {
         Log.i(TAG, "Refreshing!!")
-        refresh.isRefreshing = true
-        app.settings.isNotMoreData = false
         refreshData()
     }
 
@@ -410,8 +423,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             holder.checkTag.text = items[position]
         }
         private class DrawerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val checkTag = itemView.findViewById<CheckBox>(R.id.select_tag)
-            val moreOptions = itemView.findViewById<ImageView>(R.id.more_options)
+            val checkTag = itemView.findViewById<CheckBox>(R.id.select_tag)!!
+            val moreOptions = itemView.findViewById<ImageView>(R.id.more_options)!!
         }
     }
 

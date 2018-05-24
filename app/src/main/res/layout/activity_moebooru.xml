@@ -10,30 +10,16 @@
   ~
   -->
 
-<android.support.design.widget.NavigationView
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/drawer_width"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="right"
-    android:orientation="vertical"
-    android:id="@+id/tags_drawer_view"
-    tools:ignore="RtlHardcoded">
+    android:id="@+id/moebooru_layout">
 
-    <LinearLayout
-        android:id="@+id/tags_layout"
+    <com.mikepenz.materialize.view.ScrimInsetsFrameLayout
+        android:id="@+id/fragment_moebooru"
+        android:background="?android:attr/windowBackground"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background"
-        android:orientation="vertical">
+        android:layout_height="match_parent" />
 
-        <include layout="@layout/layout_toolbar_drawer_tags"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/search_tags_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </LinearLayout>
-
-</android.support.design.widget.NavigationView>
+</android.support.constraint.ConstraintLayout>

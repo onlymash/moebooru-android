@@ -112,7 +112,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_moebooru)
 
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
@@ -208,7 +208,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
 
     private fun displayFragment(fragment: ToolbarFragment) {
         supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_main, fragment)
+                .replace(R.id.fragment_moebooru, fragment)
                 .commitAllowingStateLoss()
         drawer.closeDrawer()
     }
@@ -217,7 +217,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
         if (drawer.isDrawerOpen) {
             drawer.closeDrawer()
         } else {
-            val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_main) as ToolbarFragment
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_moebooru) as ToolbarFragment
             if (!currentFragment.onBackPressed()) {
                 if (currentFragment is PostsFragment) {
                     super.onBackPressed()

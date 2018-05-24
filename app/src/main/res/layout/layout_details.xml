@@ -10,18 +10,15 @@
   ~
   -->
 
-<android.support.constraint.ConstraintLayout
+<android.support.v4.view.ViewPager
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/detail_pager"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/root_layout"
-    tools:context=".ui.MainActivity">
+    android:layout_height="match_parent">
 
-    <com.mikepenz.materialize.view.ScrimInsetsFrameLayout
-        android:id="@+id/fragment_main"
-        android:background="?android:attr/windowBackground"
+    <im.mash.moebooru.ui.widget.MoeImageView
+        android:id="@+id/post_img"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</android.support.constraint.ConstraintLayout>
+</android.support.v4.view.ViewPager>
