@@ -27,20 +27,18 @@ import android.util.TypedValue
 import android.view.animation.AnimationUtils
 import android.widget.CheckBox
 import android.widget.ImageView
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.load.model.Headers
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.models.ParamGet
 import im.mash.moebooru.models.RawPost
 import im.mash.moebooru.network.MoeHttpClient
 import im.mash.moebooru.network.MoeResponse
+import im.mash.moebooru.ui.adapter.PostAdapter
 import im.mash.moebooru.ui.listener.LastItemListener
-import im.mash.moebooru.ui.widget.FixedImageView
+import im.mash.moebooru.ui.listener.RecyclerViewClickListener
 import im.mash.moebooru.utils.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -64,12 +62,15 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     private var currentGridMode: String = Key.GRID_MODE_STAGGERED_GRID
 
-    private var metric: DisplayMetrics = DisplayMetrics()
     private var width: Int = 0
     private var spanCount: Int = 1
     private var itemPadding: Int = 0
+    //工具栏高度
     private var toolbarHeight = 0
+    //当前页数
     private var page = 1
+    //items data
+    private var items: MutableList<RawPost>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_posts, container, false)
@@ -80,28 +81,32 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
 
+        //init toolbar
         toolbar.setTitle(R.string.posts)
         toolbar.inflateMenu(R.menu.menu_main)
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
         toolbar.setOnMenuItemClickListener(this)
-        setGridItemOption()
+        setToolbarGridOption()
 
-        refresh = view.findViewById(R.id.refresh)
-
+        //计算窗口宽度
         val activity = activity as MainActivity
+        val metric: DisplayMetrics = DisplayMetrics()
         activity.windowManager.defaultDisplay.getMetrics(metric)
         width = metric.widthPixels
 
+        //计算列数
+        spanCount = width/activity.resources.getDimension(R.dimen.item_width).toInt()
+        app.settings.spanCountInt = spanCount
+
+        //item 边距
         itemPadding = activity.resources.getDimension(R.dimen.item_padding).toInt()
 
-        drawerLayout = view.findViewById(R.id.drawer_layout_posts)
-        drawer = drawerLayout.findViewById(R.id.tags_drawer_view)
-        drawerToolbar = drawerLayout.findViewById(R.id.toolbar_drawer_tags)
-        drawerToolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar))
-        drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
-        drawerToolbar.inflateMenu(R.menu.menu_search)
-        drawerToolbar.setOnMenuItemClickListener(this)
-        drawerToolbar.setOnClickListener(this)
+        //SwipeRefreshLayout
+        refresh = view.findViewById(R.id.refresh)
+        refresh.setOnRefreshListener(this)
+
+        //右侧搜索抽屉
+        initRightDrawer(view)
 
         //init Adapter
         val tv = TypedValue()
@@ -122,15 +127,40 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
 
         //init RecyclerView
-        postsView = view.findViewById(R.id.posts_list)
-        spanCount = width/this.requireContext().resources.getDimension(R.dimen.item_width).toInt()
-        app.settings.spanCountInt = spanCount
-        currentGridMode = app.settings.gridModeString
-        setupGridMode()
-        postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
-        postsView.itemAnimator = DefaultItemAnimator()
-        postsView.adapter = postAdapter
-        postsView.addOnScrollListener(lastItemListener)
+        initPostsView(view)
+
+        //监听设置变化
+        val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
+        sp.registerOnSharedPreferenceChangeListener(this)
+
+        if (savedInstanceState == null) {
+            loadData()
+            Log.i(TAG, "savedInstanceState == null, loadCacheData()")
+        }
+
+        //监听 MainActivity 的左侧抽屉
+        activity.drawer.drawerLayout.addDrawerListener(this)
+    }
+
+    private fun loadData() {
+        doAsync {
+            items = app.postsManager.loadPosts(app.settings.activeProfile)
+            uiThread {
+                postAdapter.updateData(items)
+            }
+        }
+    }
+
+    //初始右侧化抽屉
+    private fun initRightDrawer(view: View) {
+        drawerLayout = view.findViewById(R.id.drawer_layout_posts)
+        drawer = drawerLayout.findViewById(R.id.tags_drawer_view)
+        drawerToolbar = drawerLayout.findViewById(R.id.toolbar_drawer_tags)
+        drawerToolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar))
+        drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
+        drawerToolbar.inflateMenu(R.menu.menu_search)
+        drawerToolbar.setOnMenuItemClickListener(this)
+        drawerToolbar.setOnClickListener(this)
 
         val itemsTags = mutableListOf(
                 "item1",
@@ -145,18 +175,33 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         drawerAdapter = DrawerAdapter(itemsTags)
         drawerTagsView = drawer.findViewById(R.id.search_tags_list)
         drawerTagsView.adapter = drawerAdapter
+    }
 
-        val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
-        sp.registerOnSharedPreferenceChangeListener(this)
+    //初始化 PostsView
+    private fun initPostsView(view: View) {
+        postsView = view.findViewById(R.id.posts_list)
+        setupGridMode()
+        //动画
+        postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
+        postsView.itemAnimator = DefaultItemAnimator()
 
-        if (savedInstanceState == null) {
-            postAdapter.loadData()
-            Log.i(TAG, "savedInstanceState == null, loadCacheData()")
+        postsView.adapter = postAdapter
+
+        //监听是否滑动到最后一个 item
+        postsView.addOnScrollListener(lastItemListener)
+
+        //item 点击监听
+        val postsItemClickListener = object : RecyclerViewClickListener.OnItemClickListener {
+            override fun onItemClick(view: View?, position: Int) {
+                Log.i(TAG, "onItemClick: $position")
+            }
+
+            override fun onItemLongClick(view: View?, position: Int) {
+                Log.i(TAG, "onItemLongClick: $position")
+            }
         }
-
-        refresh.setOnRefreshListener(this)
-
-        activity.drawer.drawerLayout.addDrawerListener(this)
+        val postsViewItemTouchListener = RecyclerViewClickListener(this.requireContext(), postsItemClickListener)
+        postsView.addOnItemTouchListener(postsViewItemTouchListener)
     }
 
     override fun onDrawerOpened(drawerView: View) {
@@ -172,10 +217,13 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     }
 
     override fun onDrawerStateChanged(newState: Int) {
+        //左侧抽屉状态变化时关闭右侧抽屉
         closeRightDrawer()
     }
 
+    // 设置 PostsView 网格模式
     private fun setupGridMode() {
+        currentGridMode = app.settings.gridModeString
         when (currentGridMode) {
             Key.GRID_MODE_GRID -> {
                 postsView.layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
@@ -189,12 +237,11 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
     }
 
+    // 设置变化 重新设置 PostsView 网格模式
     private fun reSetupGridMode() {
         if (app.settings.gridModeString != currentGridMode) {
-            currentGridMode = app.settings.gridModeString
             setupGridMode()
-            postsView.adapter = null
-            postsView.adapter = postAdapter
+            postAdapter.updateData(items)
         }
     }
 
@@ -222,19 +269,19 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             Key.GRID_MODE -> {
-                setGridItemOption()
+                setToolbarGridOption()
                 reSetupGridMode()
             }
             Key.ACTIVE_PROFILE -> {
                 closeRightDrawer()
                 app.settings.isNotMoreData = false
-                postAdapter.clearItems()
-                postAdapter.loadData()
+                loadData()
             }
         }
     }
 
-    private fun setGridItemOption() {
+    //设置 Toolbar 网格选项
+    private fun setToolbarGridOption() {
         when (app.settings.gridModeString) {
             Key.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).isChecked = true
             Key.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
@@ -260,7 +307,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     override fun onResume() {
         super.onResume()
         reSetupGridMode()
-        postAdapter.loadData()
+        loadData()
     }
 
     override fun onBackPressed(): Boolean {
@@ -269,103 +316,6 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             return true
         }
         return super.onBackPressed()
-    }
-
-    private class PostAdapter(private val toolbarHeight: Int, private val itemPadding: Int,
-                              private var items: MutableList<RawPost>?) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
-
-        companion object {
-            private val TAG = this::class.java.simpleName
-            private val header: Headers = glideHeader
-            private var tagItems: MutableList<MutableList<String>> = mutableListOf()
-        }
-
-        fun clearItems() {
-            items = null
-            tagItems.clear()
-        }
-
-        fun loadData() {
-            doAsync {
-                val countBefore = itemCount
-                var countAfter = 0
-                items = app.postsManager.loadPosts(app.settings.activeProfile)
-                if (items != null) {
-                    countAfter = items!!.size
-                    if (countAfter > countBefore) {
-                        tagItems.clear()
-                        items!!.forEach {
-                            val list: List<String>? = it.tags?.split(" ")
-                            val tags: MutableList<String>? = list?.toMutableList()
-                            if (tags != null) {
-                                tagItems.add(tags)
-                            }
-                        }
-                    }
-                }
-                uiThread {
-                    if (countBefore in 1..(countAfter - 1)) {
-                        notifyItemRangeInserted(countBefore, countAfter)
-                        Log.i(TAG, "Have new data!! countBefore = $countBefore")
-                    } else if (countBefore < 1 && countAfter > countBefore) {
-                        notifyDataSetChanged()
-                        Log.i(TAG, "Have new data!! countBefore = $countBefore")
-                    } else {
-                        app.settings.isNotMoreData = true
-                        Log.i(TAG, "Not more data!!")
-                    }
-                    Log.i(TAG, "loadData() finished!!")
-                }
-            }
-        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-            val view: View = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.layout_post_item, parent, false)
-            return PostViewHolder(view)
-        }
-
-        override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-            if (items !== null && items!!.size > 0) {
-                if (position in 0..(app.settings.spanCountInt - 1)) {
-                    holder.itemView.setPadding(itemPadding, itemPadding + toolbarHeight, itemPadding, itemPadding)
-                } else {
-                    holder.itemView.setPadding(itemPadding, itemPadding, itemPadding, itemPadding)
-                }
-                val placeHolderId = when (items!![position].rating) {
-                    "q" -> R.drawable.background_rating_q
-                    "e" -> R.drawable.background_rating_e
-                    else -> R.drawable.background_rating_s
-                }
-                when (app.settings.gridModeString) {
-                    Key.GRID_MODE_STAGGERED_GRID -> {
-                        holder.fixedImageView.setWidthAndHeightWeight(items!![position].width!!.toInt(), items!![position].height!!.toInt())
-                        GlideApp.with(holder.fixedImageView.context)
-                                .load(GlideUrl(items!![position].preview_url, header))
-                                .fitCenter()
-                                .placeholder(placeHolderId)
-                                .into(holder.fixedImageView)
-                    }
-                    else -> {
-                        holder.fixedImageView.setWidthAndHeightWeight(1,1)
-                        GlideApp.with(holder.fixedImageView.context)
-                                .load(GlideUrl(items!![position].preview_url, header))
-                                .centerCrop()
-                                .placeholder(placeHolderId)
-                                .into(holder.fixedImageView)
-                    }
-                }
-            }
-        }
-
-        override fun getItemCount(): Int {
-            return if (items == null) 0 else items!!.size
-        }
-
-        private class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val fixedImageView: FixedImageView = itemView.findViewById(R.id.post_item)
-        }
-
     }
 
     private fun loadMoreData() {
@@ -380,12 +330,19 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             }
             if (result != null && result.size > 0) {
                 app.postsManager.savePosts(result, app.settings.activeProfile)
+                if (items == null) {
+                    items = result
+                } else {
+                    result.forEach {
+                        items!!.add(it)
+                    }
+                }
             }
             uiThread {
                 refresh.isRefreshing = false
                 Log.i(TAG, "Load more data finished!")
-                if (result != null) {
-                    postAdapter.loadData()
+                if (items != null) {
+                    postAdapter.addData(items)
                 } else {
                     Log.i(TAG, "Not data")
                 }
@@ -416,15 +373,14 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             }
             if (result != null) {
                 app.postsManager.deletePosts(app.settings.activeProfile)
-                if (result.size > 0) {
-                    app.postsManager.savePosts(result, app.settings.activeProfile)
-                }
+                app.postsManager.savePosts(result, app.settings.activeProfile)
             }
             uiThread {
                 refresh.isRefreshing = false
                 Log.i(TAG, "Refresh data finished!")
                 if (result != null) {
-                    postAdapter.loadData()
+                    items = result
+                    postAdapter.updateData(items)
                 } else {
                     Log.i(TAG, "Not data")
                 }
