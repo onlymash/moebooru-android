@@ -35,6 +35,10 @@ object Key {
     const val IS_NOT_MORE_DATA = "not_more_data"
     const val IS_CHANGED_NIGHT_MODE = "changed_night_mode"
 
+    const val ITEMS_DATA = "items_data"
+    const val ITEM_POS = "item_position"
+    const val ITEM_ID = "item_id"
+    const val BUNDLE = "bundle"
 }
 
 object Net {

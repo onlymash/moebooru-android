@@ -10,15 +10,24 @@
   ~
   -->
 
-<android.support.v4.view.ViewPager
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/detail_pager"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <include layout="@layout/layout_toolbar"/>
 
     <im.mash.moebooru.ui.widget.MoeImageView
         android:id="@+id/post_img"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"/>
 
-</android.support.v4.view.ViewPager>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        style="@style/Widget.AppCompat.ProgressBar"/>
+
+</FrameLayout>

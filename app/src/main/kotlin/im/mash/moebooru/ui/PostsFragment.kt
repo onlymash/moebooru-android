@@ -12,6 +12,7 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -201,6 +202,13 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         val postsItemClickListener = object : RecyclerViewClickListener.OnItemClickListener {
             override fun onItemClick(itemView: View?, position: Int) {
                 Log.i(TAG, "onItemClick: $position")
+                val intent = Intent()
+                intent.action = "im.mash.moebooru.details"
+                val bundle = Bundle()
+                bundle.putInt(Key.ITEM_POS, position)
+                bundle.putInt(Key.ITEM_ID, items!![position].id!!.toInt())
+                intent.putExtra(Key.BUNDLE, bundle)
+                startActivity(intent)
             }
 
             override fun onItemLongClick(itemView: View?, position: Int) {
