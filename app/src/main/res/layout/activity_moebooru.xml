@@ -16,10 +16,6 @@
     android:layout_height="match_parent"
     android:id="@+id/moebooru_layout">
 
-    <com.mikepenz.materialize.view.ScrimInsetsFrameLayout
-        android:id="@+id/fragment_moebooru"
-        android:background="?android:attr/windowBackground"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <include layout="@layout/layout_moebooru"/>
 
 </android.support.constraint.ConstraintLayout>

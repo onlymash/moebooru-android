@@ -14,6 +14,7 @@ package im.mash.moebooru.ui
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
@@ -21,11 +22,15 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.customtabs.CustomTabsIntent
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatDelegate
 import android.support.v7.content.res.AppCompatResources
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowManager
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -39,6 +44,7 @@ import im.mash.moebooru.R
 import im.mash.moebooru.models.Booru
 import im.mash.moebooru.models.TextDrawable
 import im.mash.moebooru.utils.Key
+import im.mash.moebooru.utils.navBarHeight
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*
@@ -67,9 +73,10 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
     private val TAG = this.javaClass.simpleName
 
     internal lateinit var drawer: Drawer
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var header: AccountHeader
     private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
-    private var previousSelectedDrawer: Long = 0    // it's actually lateinit
+    private var previousSelectedDrawer: Long = 0L    // it's actually lateinit
 
     private val boorus: MutableList<Booru> = mutableListOf()
     private fun loadAsync() {
@@ -111,8 +118,10 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_moebooru)
+//        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
+//        window.statusBarColor = Color.TRANSPARENT
+//        window.navigationBarColor = Color.TRANSPARENT
 
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
@@ -130,9 +139,17 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
 
         loadAsync()
 
+        drawerLayout = DrawerLayout(this)
+
+        val aboutItem =  PrimaryDrawerItem()
+                .withIdentifier(DRAWER_ITEM_ABOUT)
+                .withName(R.string.about)
+                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_copyright_24dp))
+                .withIconTintingEnabled(true)
+
         drawer = DrawerBuilder()
                 .withActivity(this)
-                .withTranslucentStatusBar(true)
+                .withDrawerLayout(drawerLayout)
                 .withDrawerGravity(Gravity.LEFT)
                 .withAccountHeader(header)
                 .addDrawerItems(
@@ -149,11 +166,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
 
                 )
                 .addStickyDrawerItems(
-                        PrimaryDrawerItem()
-                                .withIdentifier(DRAWER_ITEM_ABOUT)
-                                .withName(R.string.about)
-                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_copyright_24dp))
-                                .withIconTintingEnabled(true)
+                        aboutItem
                 )
                 .withStickyFooterDivider(true)
                 .withStickyFooterShadow(false)
@@ -163,8 +176,6 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
                 .withSavedInstance(savedInstanceState)
                 .withDrawerWidthDp(300)
                 .build()
-
-        drawer.drawerLayout.setStatusBarBackgroundColor(ContextCompat.getColor(this, R.color.primary))
 
         previousSelectedDrawer = drawer.currentSelection
 

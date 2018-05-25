@@ -17,6 +17,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="right"
     android:orientation="vertical"
+    android:background="@color/transparent"
     android:id="@+id/tags_drawer_view"
     tools:ignore="RtlHardcoded">
 
@@ -27,7 +28,7 @@
         android:background="@color/background"
         android:orientation="vertical">
 
-        <include layout="@layout/layout_toolbar_drawer_tags"/>
+        <include layout="@layout/layout_toolbar_tags"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/search_tags_list"

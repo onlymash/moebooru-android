@@ -16,6 +16,7 @@
     <color name="primary_dark">@color/md_dark_background</color>
     <color name="accent">@color/md_grey_400</color>
     <color name="background">@color/md_dark_background</color>
+    <color name="window_background">@color/md_dark_background</color>
     <color name="primary_icon">@color/material_drawer_dark_primary_icon</color>
     <color name="settings_item_icon">@color/md_grey_400</color>
     <color name="toolbar">#FF1D1D1D</color>

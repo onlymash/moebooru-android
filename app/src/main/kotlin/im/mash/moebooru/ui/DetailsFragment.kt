@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import com.bm.library.PhotoView
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
@@ -30,16 +31,17 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.models.RawPost
-import im.mash.moebooru.ui.widget.MoeImageView
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-class DetailsFragment : ToolbarFragment() {
+class DetailsFragment : ToolbarFragment(), View.OnClickListener {
 
     private val TAG = this::class.java.simpleName
     private var post: RawPost? = null
+    private lateinit var photoView: PhotoView
+    private lateinit var bg: View
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_details, container, false)
@@ -50,8 +52,12 @@ class DetailsFragment : ToolbarFragment() {
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
 
-        val moeImageView = view.findViewById<MoeImageView>(R.id.post_img)
-        moeImageView.enable()
+
+        bg = view.findViewById(R.id.details_bg)
+        bg.visibility = View.GONE
+        photoView = view.findViewById(R.id.post_img)
+        photoView.enable()
+        photoView.setOnClickListener(this)
 
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
@@ -81,7 +87,7 @@ class DetailsFragment : ToolbarFragment() {
                                     }
 
                                 })
-                                .into(moeImageView)
+                                .into(photoView)
 
                     } else {
                         Log.i(TAG, "查寻大失败！ post == null")
@@ -89,5 +95,33 @@ class DetailsFragment : ToolbarFragment() {
                 }
             }
         }
+    }
+
+    override fun onClick(v: View?) {
+        when (v) {
+            photoView -> {
+                when (bg.visibility) {
+                    View.GONE -> {
+                        bg.visibility = View.VISIBLE
+                        toolbar.visibility = View.GONE
+                        hideBar()
+                    }
+                    else -> {
+                        bg.visibility = View.GONE
+                        toolbar.visibility = View.VISIBLE
+                        showBar()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun showBar() {
+        val uiFlags = View.SYSTEM_UI_FLAG_VISIBLE
+        activity!!.window.decorView.systemUiVisibility = uiFlags
+    }
+    private fun hideBar() {
+        val uiFlags = View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        activity!!.window.decorView.systemUiVisibility = uiFlags
     }
 }

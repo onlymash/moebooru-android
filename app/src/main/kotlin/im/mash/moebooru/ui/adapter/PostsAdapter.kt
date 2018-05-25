@@ -25,7 +25,7 @@ import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader
 
-class PostsAdapter(private val toolbarHeight: Int, private val itemPadding: Int,
+class PostsAdapter(private val itemPadding: Int, private val itemPaddingTop: Int,
                   private var items: MutableList<RawPost>?) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
     companion object {
@@ -63,7 +63,7 @@ class PostsAdapter(private val toolbarHeight: Int, private val itemPadding: Int,
         holder.itemView.tag = position
         if (itemCount > 0) {
             if (position in 0..(app.settings.spanCountInt - 1)) {
-                holder.itemView.setPadding(itemPadding, itemPadding + toolbarHeight, itemPadding, itemPadding)
+                holder.itemView.setPadding(itemPadding, itemPaddingTop, itemPadding, itemPadding)
             } else {
                 holder.itemView.setPadding(itemPadding, itemPadding, itemPadding, itemPadding)
             }
@@ -75,7 +75,7 @@ class PostsAdapter(private val toolbarHeight: Int, private val itemPadding: Int,
             when (app.settings.gridModeString) {
                 Key.GRID_MODE_STAGGERED_GRID -> {
                     holder.fixedImageView.setWidthAndHeightWeight(items!![position].width!!.toInt(), items!![position].height!!.toInt())
-                    GlideApp.with(holder.fixedImageView.context)
+                    GlideApp.with(app.applicationContext)
                             .load(GlideUrl(items!![position].preview_url, header))
                             .fitCenter()
                             .placeholder(placeHolderId)
@@ -83,7 +83,7 @@ class PostsAdapter(private val toolbarHeight: Int, private val itemPadding: Int,
                 }
                 else -> {
                     holder.fixedImageView.setWidthAndHeightWeight(1,1)
-                    GlideApp.with(holder.fixedImageView.context)
+                    GlideApp.with(app.applicationContext)
                             .load(GlideUrl(items!![position].preview_url, header))
                             .centerCrop()
                             .placeholder(placeHolderId)

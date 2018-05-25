@@ -15,6 +15,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatDelegate
 import im.mash.moebooru.utils.Key
+import im.mash.moebooru.utils.statusBarHeight
 import moe.shizuku.preference.PreferenceManager
 
 class Settings(ctx: Context) {
@@ -67,5 +68,9 @@ class Settings(ctx: Context) {
     var isChangedNightMode: Boolean
         get() = sp.getBoolean(Key.IS_CHANGED_NIGHT_MODE, false)
         set(value) = editor.putBoolean(Key.IS_CHANGED_NIGHT_MODE, value).apply()
+
+    var statusBarHeightInt: Int
+        get() = sp.getInt(Key.STATUS_BAR_HEIGHT, statusBarHeight)
+        set(value) = editor.putInt(Key.STATUS_BAR_HEIGHT, value).apply()
 
 }

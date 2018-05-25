@@ -18,6 +18,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.*
@@ -28,7 +29,6 @@ import android.util.TypedValue
 import android.view.animation.AnimationUtils
 import android.widget.CheckBox
 import android.widget.ImageView
-import com.bumptech.glide.load.model.GlideUrl
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 
@@ -42,7 +42,6 @@ import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.ui.listener.LastItemListener
 import im.mash.moebooru.ui.listener.RecyclerViewClickListener
-import im.mash.moebooru.ui.widget.MoeImageView
 import im.mash.moebooru.utils.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -121,7 +120,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         initRightDrawer(view)
 
         //init Adapter
-        postsAdapter = PostsAdapter(toolbarHeight, itemPadding, null)
+        postsAdapter = PostsAdapter(itemPadding, toolbarHeight + app.settings.statusBarHeightInt,null)
 
         //init RecyclerView listener
         app.settings.isNotMoreData = false
@@ -162,13 +161,17 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     //初始右侧化抽屉
     private fun initRightDrawer(view: View) {
         drawerLayout = view.findViewById(R.id.drawer_layout_posts)
-        drawer = drawerLayout.findViewById(R.id.tags_drawer_view)
-        drawerToolbar = drawerLayout.findViewById(R.id.toolbar_drawer_tags)
+        drawer = view.findViewById(R.id.tags_drawer_view)
+        drawerToolbar = view.findViewById(R.id.toolbar_tags)
         drawerToolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar))
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener(this)
         drawerToolbar.setOnClickListener(this)
+        ViewCompat.setOnApplyWindowInsetsListener(drawer) { _, insets ->
+            drawer.setPadding(0, insets.systemWindowInsetTop, 0, 0)
+            insets
+        }
 
         val itemsTags = mutableListOf(
                 "item1",
@@ -192,6 +195,10 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         //动画
         postsView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postsView.itemAnimator = DefaultItemAnimator()
+
+        postsView.setItemViewCacheSize(20)
+        postsView.isDrawingCacheEnabled = true
+        postsView.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
 
         postsView.adapter = postsAdapter
 
@@ -217,6 +224,27 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         }
         val postsViewItemTouchListener = RecyclerViewClickListener(this.requireContext(), postsItemClickListener)
         postsView.addOnItemTouchListener(postsViewItemTouchListener)
+
+        var isScrolling = false
+        val postsViewScrollListener = object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        if (isScrolling) {
+                            GlideApp.with(app.applicationContext).resumeRequests()
+                        }
+                        isScrolling = false
+                    }
+                    RecyclerView.SCROLL_STATE_SETTLING xor  RecyclerView.SCROLL_STATE_DRAGGING -> {
+                        isScrolling = true
+                        GlideApp.with(app.applicationContext).pauseAllRequests()
+                    }
+                }
+            }
+        }
+        postsView.addOnScrollListener(postsViewScrollListener)
+
     }
 
     override fun onDrawerOpened(drawerView: View) {
@@ -269,7 +297,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         when (item?.itemId) {
             R.id.action_grid -> app.settings.gridModeString = Key.GRID_MODE_GRID
             R.id.action_staggered_grid -> app.settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
-            R.id.action_search_open -> closeRightDrawer()
+            R.id.action_search_open -> openRightDrawer()
             R.id.action_search -> closeRightDrawer()
         }
         return true
@@ -278,6 +306,12 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private fun closeRightDrawer() {
         if (drawerLayout.isDrawerOpen(Gravity.RIGHT)) {
             drawerLayout.closeDrawer(Gravity.RIGHT)
+        }
+    }
+
+    private fun openRightDrawer() {
+        if (!drawerLayout.isDrawerOpen(Gravity.RIGHT)) {
+            drawerLayout.openDrawer(Gravity.RIGHT)
         }
     }
 
@@ -311,17 +345,17 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     override fun onDestroy() {
         super.onDestroy()
-        closeRightDrawer()
+//        closeRightDrawer()
     }
 
     override fun onPause() {
         super.onPause()
-        closeRightDrawer()
+//        closeRightDrawer()
     }
 
     override fun onResume() {
         super.onResume()
-        reSetupGridMode()
+//        reSetupGridMode()
         loadData()
     }
 
@@ -377,7 +411,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         Log.i(TAG, "siteUrl: $siteUrl")
         val limit = app.settings.postLimitInt
         val url = ParamGet(siteUrl, page.toString(), limit.toString(), null,
-                null, null, null, null).makeGetUrl()
+                "rating:safe", null, null, null).makeGetUrl()
         Log.i(TAG, "url: $url")
         return MoeHttpClient.instance.get(url, null, okHttpHeader)
     }

@@ -37,7 +37,6 @@ class App : Application() {
         super.onCreate()
         app = this
         AppCompatDelegate.setDefaultNightMode(settings.nightMode)
-        FirebaseApp.initializeApp(deviceContext)
     }
 
 }

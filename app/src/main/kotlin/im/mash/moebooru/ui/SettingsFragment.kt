@@ -11,10 +11,11 @@
 
 package im.mash.moebooru.ui
 
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
+import android.view.*
 import im.mash.moebooru.R
 import im.mash.moebooru.utils.childFragManager
 
@@ -25,8 +26,8 @@ class SettingsFragment : ToolbarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.window_background))
         toolbar.setTitle(R.string.settings)
-
         val fm = childFragmentManager
         fm.beginTransaction().replace(R.id.content, SettingsPreferenceFragment()).commit()
         fm.executePendingTransactions()
@@ -36,5 +37,4 @@ class SettingsFragment : ToolbarFragment() {
         super.onDetach()
         childFragManager = null
     }
-
 }

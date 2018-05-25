@@ -12,24 +12,43 @@
 package im.mash.moebooru.ui
 
 import android.os.Bundle
+import android.support.design.widget.CollapsingToolbarLayout
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
 import android.support.v7.widget.Toolbar
 import android.view.View
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 
 open class ToolbarFragment : Fragment() {
 
     protected lateinit var toolbar: Toolbar
+    private lateinit var toolbarLayout: CollapsingToolbarLayout
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         toolbar = view.findViewById(R.id.toolbar)
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar))
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.background))
+        toolbarLayout = view.findViewById(R.id.toolbar_layout)
         val activity = activity
         if (activity is MainActivity){
             activity.drawer.setToolbar(activity, toolbar, true)
+            ViewCompat.setOnApplyWindowInsetsListener(toolbarLayout) { _, insets ->
+                val statusBarSize = insets.systemWindowInsetTop
+                toolbarLayout.setPadding(0, statusBarSize, 0, 0)
+                if (this is PostsFragment) {
+                    activity.drawer.stickyFooter.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+                    app.settings.statusBarHeightInt = statusBarSize
+                }
+                insets
+            }
+        } else {
+            ViewCompat.setOnApplyWindowInsetsListener(toolbarLayout) { _, insets ->
+                toolbarLayout.setPadding(0, insets.systemWindowInsetTop, 0, 0)
+                insets
+            }
         }
     }
 

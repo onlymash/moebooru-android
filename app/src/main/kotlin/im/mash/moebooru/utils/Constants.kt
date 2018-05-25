@@ -39,6 +39,8 @@ object Key {
     const val ITEM_POS = "item_position"
     const val ITEM_ID = "item_id"
     const val BUNDLE = "bundle"
+
+    const val STATUS_BAR_HEIGHT = "status_bar_height"
 }
 
 object Net {

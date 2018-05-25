@@ -12,10 +12,16 @@
 package im.mash.moebooru.ui
 
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
+import android.view.View
 import im.mash.moebooru.R
 import moe.shizuku.preference.PreferenceFragment
 
 class SettingsPreferenceFragment : PreferenceFragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.background))
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_settings, null)

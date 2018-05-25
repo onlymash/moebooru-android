@@ -9,7 +9,7 @@
     <color name="accent">@color/primary_1</color>
 
     <color name="background">@color/md_light_background</color>
-    <color name="window_background">@color/primary_dark</color>
+    <color name="window_background">@color/primary</color>
     <color name="primary_icon">@color/md_grey_600</color>
     <color name="settings_item_icon">@color/primary_1</color>
     <color name="toolbar_post">#33000000</color>
@@ -27,6 +27,7 @@
     <color name="drawer_selected_text">@color/accent</color>
     <color name="drawer_header_selection_text">@color/material_drawer_header_selection_text</color>
 
+    <color name="black">#FF000000</color>
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue" type="color">#FF33B5E5</color>

@@ -12,15 +12,17 @@
 
 <android.support.design.widget.CollapsingToolbarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/toolbar_layout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar_layout_tags"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="?android:actionBarSize">
+    android:layout_height="wrap_content">
 
     <android.support.v7.widget.Toolbar
         android:elevation="3dp"
         android:touchscreenBlocksFocus="false"
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_tags"
+        app:contentInsetStart="0dp"
+        app:contentInsetEnd="0dp"
         style="@style/Toolbar"/>
 
 </android.support.design.widget.CollapsingToolbarLayout>

@@ -18,7 +18,7 @@
     android:id="@+id/drawer_layout_posts"
     tools:ignore="RtlHardcoded">
 
-    <FrameLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -31,13 +31,13 @@
                 android:id="@+id/posts_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"/>
+                android:scrollbars="vertical" />
 
         </android.support.v4.widget.SwipeRefreshLayout>
 
         <include layout="@layout/layout_toolbar" />
 
-    </FrameLayout>
+    </android.support.constraint.ConstraintLayout>
 
     <include layout="@layout/layout_drawer_tags"/>
 

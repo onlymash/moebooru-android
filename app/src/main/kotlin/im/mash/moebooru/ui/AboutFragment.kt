@@ -35,6 +35,7 @@ class AboutFragment : ToolbarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.window_background))
         toolbar.title = getString(R.string.about_title) + " " + BuildConfig.VERSION_NAME
         val web = view.findViewById<WebView>(R.id.web_view)
         web.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.background))

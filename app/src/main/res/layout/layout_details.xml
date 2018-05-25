@@ -10,24 +10,34 @@
   ~
   -->
 
-<FrameLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/layout_toolbar"/>
+    <View
+        android:id="@+id/details_bg"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:background="@color/black"/>
 
-    <im.mash.moebooru.ui.widget.MoeImageView
+    <com.bm.library.PhotoView
         android:id="@+id/post_img"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitCenter"/>
+        android:scaleType="centerInside" />
 
     <ProgressBar
         android:id="@+id/progress_bar"
+        style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        style="@style/Widget.AppCompat.ProgressBar"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</FrameLayout>
+    <include layout="@layout/layout_toolbar" />
+
+</android.support.constraint.ConstraintLayout>
