@@ -11,8 +11,9 @@
 
 package im.mash.moebooru.ui
 
+import android.graphics.Color
 import android.os.Bundle
-import android.support.design.widget.CollapsingToolbarLayout
+import android.support.design.widget.AppBarLayout
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
@@ -24,14 +25,15 @@ import im.mash.moebooru.R
 open class ToolbarFragment : Fragment() {
 
     protected lateinit var toolbar: Toolbar
-    private lateinit var toolbarLayout: CollapsingToolbarLayout
+    protected lateinit var toolbarLayout: AppBarLayout
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        toolbarLayout = view.findViewById(R.id.toolbar_layout)
+        toolbarLayout.setBackgroundColor(Color.TRANSPARENT)
         toolbar = view.findViewById(R.id.toolbar)
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar))
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.background))
-        toolbarLayout = view.findViewById(R.id.toolbar_layout)
         val activity = activity
         if (activity is MainActivity){
             activity.drawer.setToolbar(activity, toolbar, true)

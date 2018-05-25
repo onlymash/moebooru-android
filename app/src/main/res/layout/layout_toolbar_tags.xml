@@ -10,19 +10,20 @@
   ~
   -->
 
-<android.support.design.widget.CollapsingToolbarLayout
+<android.support.design.widget.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar_layout_tags"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:fadingEdge="none"
+    app:elevation="0dp">
 
     <android.support.v7.widget.Toolbar
-        android:elevation="3dp"
         android:touchscreenBlocksFocus="false"
         android:id="@+id/toolbar_tags"
         app:contentInsetStart="0dp"
         app:contentInsetEnd="0dp"
         style="@style/Toolbar"/>
 
-</android.support.design.widget.CollapsingToolbarLayout>
+</android.support.design.widget.AppBarLayout>
