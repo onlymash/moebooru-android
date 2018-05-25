@@ -41,7 +41,7 @@
     <PreferenceCategory
         android:title="@string/post">
 
-        <ListPreference
+        <SimpleMenuPreference
             android:key="post_limit"
             android:entries="@array/post_limit"
             android:entryValues="@array/post_limit_values"
@@ -49,14 +49,14 @@
             android:summary="%s"
             android:title="@string/post_limit"
             android:icon="@drawable/ic_settings_item_numbered_24dp"
-            app:iconSpaceReserved="true"/>
+            app:iconSpaceReserved="true" />
 
     </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/cache">
 
-        <ListPreference
+        <SimpleMenuPreference
             android:key="cache_memory"
             android:entries="@array/cache_memory"
             android:entryValues="@array/cache_memory_values"
@@ -66,7 +66,7 @@
             android:icon="@drawable/ic_settings_storage_24dp"
             app:iconSpaceReserved="true"/>
 
-        <ListPreference
+        <SimpleMenuPreference
             android:key="cache_disk"
             android:entries="@array/cache_disk"
             android:entryValues="@array/cache_disk_values"
