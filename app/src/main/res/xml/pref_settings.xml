@@ -86,7 +86,9 @@
             android:title="@string/enable_crash_report"
             android:defaultValue="true"
             android:summaryOn="@string/on"
-            android:summaryOff="@string/off"/>
+            android:summaryOff="@string/off"
+            android:icon="@drawable/ic_settings_bug_report_24dp"
+            app:iconSpaceReserved="true"/>
 
     </PreferenceCategory>
 
