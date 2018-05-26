@@ -14,7 +14,6 @@ package im.mash.moebooru.ui
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.support.v7.app.AppCompatActivity
@@ -29,8 +28,6 @@ import android.support.v7.content.res.AppCompatResources
 import android.util.Log
 import android.view.Gravity
 import android.view.View
-import android.view.WindowInsets
-import android.view.WindowManager
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -41,11 +38,9 @@ import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.models.Booru
-import im.mash.moebooru.models.TextDrawable
+import im.mash.moebooru.model.Booru
+import im.mash.moebooru.model.TextDrawable
 import im.mash.moebooru.utils.Key
-import im.mash.moebooru.utils.navBarHeight
-import im.mash.moebooru.utils.userAgent
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*

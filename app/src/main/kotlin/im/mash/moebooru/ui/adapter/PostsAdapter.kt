@@ -21,7 +21,7 @@ import com.bumptech.glide.load.model.Headers
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
-import im.mash.moebooru.models.RawPost
+import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader

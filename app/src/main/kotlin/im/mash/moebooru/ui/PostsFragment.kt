@@ -36,8 +36,8 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.BuildConfig
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
-import im.mash.moebooru.models.ParamGet
-import im.mash.moebooru.models.RawPost
+import im.mash.moebooru.model.ParamGet
+import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.network.MoeHttpClient
 import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.adapter.PostsAdapter

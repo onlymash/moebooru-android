@@ -11,7 +11,7 @@
 
 package im.mash.moebooru.database
 
-import im.mash.moebooru.models.Booru
+import im.mash.moebooru.model.Booru
 import im.mash.moebooru.utils.BoorusTable
 import org.jetbrains.anko.db.*
 

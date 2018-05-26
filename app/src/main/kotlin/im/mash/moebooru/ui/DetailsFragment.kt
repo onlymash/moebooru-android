@@ -30,7 +30,7 @@ import com.bumptech.glide.request.target.Target
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
-import im.mash.moebooru.models.RawPost
+import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader
 import org.jetbrains.anko.doAsync
@@ -50,8 +50,8 @@ class DetailsFragment : ToolbarFragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
+        toolbarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
-
 
         bg = view.findViewById(R.id.details_bg)
         bg.visibility = View.GONE
