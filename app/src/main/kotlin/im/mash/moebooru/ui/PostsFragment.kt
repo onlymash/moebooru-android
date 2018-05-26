@@ -12,12 +12,10 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.constraint.ConstraintLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
@@ -29,13 +27,13 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import android.view.animation.AnimationUtils
-import android.widget.CheckBox
-import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 
 import im.mash.moebooru.App.Companion.app
+import im.mash.moebooru.BuildConfig
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.models.ParamGet
@@ -125,7 +123,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         initRightDrawer(view)
 
         //init Adapter
-        postsAdapter = PostsAdapter(this.context!!, itemPadding, toolbarHeight + app.settings.statusBarHeightInt,null)
+        postsAdapter = PostsAdapter(this.requireContext(), itemPadding, toolbarHeight + app.settings.statusBarHeightInt,null)
 
         //init RecyclerView listener
         app.settings.isNotMoreData = false
@@ -152,7 +150,11 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     private fun loadData() {
         doAsync {
-            items = app.postsManager.loadPosts(app.settings.activeProfile)
+            items = try {
+                app.postsManager.loadPosts(app.settings.activeProfile)
+            } catch (e: Exception) {
+                null
+            }
             uiThread {
                 if (items != null && items!!.size > 0) {
                     postsAdapter.updateData(items)
@@ -237,7 +239,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             override fun onItemClick(itemView: View?, position: Int) {
                 Log.i(TAG, "onItemClick: $position")
                 val intent = Intent()
-                intent.action = "im.mash.moebooru.details"
+                intent.action = BuildConfig.APPLICATION_ID + ".details"
                 val bundle = Bundle()
                 bundle.putInt(Key.ITEM_POS, position)
                 bundle.putInt(Key.ITEM_ID, items!![position].id!!.toInt())
@@ -259,13 +261,13 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 when (newState) {
                     RecyclerView.SCROLL_STATE_IDLE -> {
                         if (isScrolling) {
-                            GlideApp.with(this@PostsFragment.context!!).resumeRequests()
+                            GlideApp.with(this@PostsFragment.requireContext()).resumeRequests()
                         }
                         isScrolling = false
                     }
                     RecyclerView.SCROLL_STATE_SETTLING xor  RecyclerView.SCROLL_STATE_DRAGGING -> {
                         isScrolling = true
-                        GlideApp.with(this@PostsFragment.context!!).pauseAllRequests()
+                        GlideApp.with(this@PostsFragment.requireContext()).pauseAllRequests()
                     }
                 }
             }
@@ -351,6 +353,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             Key.ACTIVE_PROFILE -> {
                 closeRightDrawer()
                 app.settings.isNotMoreData = false
+                postsAdapter.updateData(null)
                 loadData()
             }
         }
@@ -434,13 +437,22 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     }
 
     private fun getResponseData(): MoeResponse? {
-        val siteUrl = app.boorusManager.getBooru(app.settings.activeProfile).url
-        Log.i(TAG, "siteUrl: $siteUrl")
-        val limit = app.settings.postLimitInt
-        val url = ParamGet(siteUrl, page.toString(), limit.toString(), null,
-                null, null, null, null).makeGetUrl()
-        Log.i(TAG, "url: $url")
-        return MoeHttpClient.instance.get(url, null, okHttpHeader)
+        var siteUrl: String? = null
+        var response: MoeResponse? = null
+        siteUrl = try {
+            app.boorusManager.getBooru(app.settings.activeProfile).url
+        } catch (e: Exception) {
+            null
+        }
+        if (siteUrl != null) {
+            Log.i(TAG, "siteUrl: $siteUrl")
+            val limit = app.settings.postLimitInt
+            val url = ParamGet(siteUrl, page.toString(), limit.toString(), null,
+                    null, null, null, null).makeGetUrl()
+            Log.i(TAG, "url: $url")
+            response = MoeHttpClient.instance.get(url, null, okHttpHeader)
+        }
+        return response
     }
 
     private fun refreshData() {
@@ -450,15 +462,17 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         doAsync {
             val response: MoeResponse? = getResponseData()
             var result: MutableList<RawPost>? = null
-            try {
-                result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
-            } catch (e: JsonParseException) {
-                result = null
-                Log.i(TAG, "Gson exception! response == " + response?.getResponseAsString().toString())
-            } finally {
-                if (result != null) {
-                    app.postsManager.deletePosts(app.settings.activeProfile)
-                    app.postsManager.savePosts(result, app.settings.activeProfile)
+            if (response != null) {
+                try {
+                    result = Gson().fromJson<MutableList<RawPost>>(response.getResponseAsString().toString())
+                } catch (e: JsonParseException) {
+                    result = null
+                    Log.i(TAG, "Gson exception! response == " + response.getResponseAsString().toString())
+                } finally {
+                    if (result != null) {
+                        app.postsManager.deletePosts(app.settings.activeProfile)
+                        app.postsManager.savePosts(result, app.settings.activeProfile)
+                    }
                 }
             }
             uiThread {
@@ -467,7 +481,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                     items = result
                     postsAdapter.updateData(items)
                 } else {
-                    Log.i(TAG, "Not data")
+                    Toast.makeText(this@PostsFragment.requireContext(), "Not data.", Toast.LENGTH_SHORT).show()
                 }
             }
         }

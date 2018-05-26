@@ -73,7 +73,7 @@ class DetailsFragment : ToolbarFragment(), View.OnClickListener {
                     if (post != null) {
                         Log.i(TAG, "查寻成功！ URL： ${post!!.file_url}")
                         GlideApp.with(this@DetailsFragment)
-                                .load(GlideUrl(post!!.jpeg_url, glideHeader))
+                                .load(GlideUrl(post!!.sample_url, glideHeader))
                                 .fitCenter()
                                 .listener(object : RequestListener<Drawable> {
                                     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {

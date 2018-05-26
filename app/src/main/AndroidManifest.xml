@@ -36,7 +36,7 @@
         <activity
             android:name=".ui.DetailsActivity">
             <intent-filter>
-                <action android:name="im.mash.moebooru.details"/>
+                <action android:name="${applicationId}.details"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
