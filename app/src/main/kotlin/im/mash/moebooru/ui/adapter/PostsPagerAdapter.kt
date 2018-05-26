@@ -57,6 +57,9 @@ class PostsPagerAdapter(private val detailsFragment: DetailsFragment, private va
                 .inflate(R.layout.layout_post_img, null)
         val photoView = view.findViewById<PhotoView>(R.id.post_img)
         photoView.enable()
+        photoView.setOnClickListener {
+            detailsFragment.onClickPhotoView()
+        }
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
         container.addView(view, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
