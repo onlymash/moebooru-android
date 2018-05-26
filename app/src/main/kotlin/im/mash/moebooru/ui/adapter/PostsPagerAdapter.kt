@@ -11,24 +11,32 @@
 
 package im.mash.moebooru.ui.adapter
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.support.v4.view.PagerAdapter
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.widget.ProgressBar
 import com.bm.library.PhotoView
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.DetailsFragment
 import im.mash.moebooru.utils.glideHeader
-import kotlinx.android.synthetic.main.layout_details.*
 
 class PostsPagerAdapter(private val detailsFragment: DetailsFragment, private var items: MutableList<RawPost>?) : PagerAdapter() {
+
+    private val context: Context = detailsFragment.requireContext()
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view == `object`
@@ -43,37 +51,35 @@ class PostsPagerAdapter(private val detailsFragment: DetailsFragment, private va
         notifyDataSetChanged()
     }
 
+    @SuppressLint("InflateParams")
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
-        val photoView = PhotoView(detailsFragment.requireContext())
+        val view = LayoutInflater.from(container.context)
+                .inflate(R.layout.layout_post_img, null)
+        val photoView = view.findViewById<PhotoView>(R.id.post_img)
         photoView.enable()
-        detailsFragment.progress_bar.visibility = View.VISIBLE
-        photoView.setOnClickListener {
-            detailsFragment.onClickPhotoView()
-        }
-        GlideApp.with(detailsFragment.requireContext())
+        val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
+        progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
+        container.addView(view, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        GlideApp.with(context)
                 .load(GlideUrl(items?.get(position)?.sample_url, glideHeader))
                 .fitCenter()
                 .listener(object : RequestListener<Drawable> {
                     override fun onResourceReady(resource: Drawable?, model: Any?,
                                                  target: Target<Drawable>?, dataSource: DataSource?,
                                                  isFirstResource: Boolean): Boolean {
-
-                        detailsFragment.progress_bar.visibility = View.GONE
+                        progressBar.visibility = View.GONE
                         return false
                     }
 
                     override fun onLoadFailed(e: GlideException?, model: Any?,
                                               target: Target<Drawable>?,
                                               isFirstResource: Boolean): Boolean {
-
-                        detailsFragment.progress_bar.visibility = View.GONE
+                        progressBar.visibility = View.GONE
                         return false
                     }
-
                 })
                 .into(photoView)
-        container.addView(photoView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-        return photoView
+        return view
     }
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {

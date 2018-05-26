@@ -11,8 +11,6 @@
 
 package im.mash.moebooru.ui
 
-import android.graphics.Color
-import android.graphics.PorterDuff
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
@@ -20,7 +18,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
@@ -35,7 +32,6 @@ class DetailsFragment : ToolbarFragment() {
     private val TAG = this::class.java.simpleName
     private var post: RawPost? = null
     private lateinit var bg: View
-    private lateinit var progressBar: ProgressBar
     private lateinit var postsPager: ViewPager
     private lateinit var postsPagerAdapter: PostsPagerAdapter
 
@@ -52,9 +48,6 @@ class DetailsFragment : ToolbarFragment() {
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
         bg = view.findViewById(R.id.details_bg)
         bg.visibility = View.GONE
-        progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
-        progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
-        progressBar.visibility = View.GONE
         postsPager = view.findViewById(R.id.post_view_pager)
         val bundle = arguments
         if (bundle != null) {
