@@ -42,6 +42,8 @@ object Key {
 
     const val STATUS_BAR_HEIGHT = "status_bar_height"
     const val USER_AGENT_WEB_VIEW = "user_agent_web_view"
+
+    const val ENABLE_CRASH_REPORT = "enable_crash_report"
 }
 
 object Net {

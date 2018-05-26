@@ -77,4 +77,8 @@ class Settings(ctx: Context) {
     var userAgentWebView: String
         get() = sp.getString(Key.USER_AGENT_WEB_VIEW, userAgent)
         set(value) = editor.putString(Key.USER_AGENT_WEB_VIEW, value).apply()
+
+    var enabledCrashReport: Boolean
+        get() = sp.getBoolean(Key.ENABLE_CRASH_REPORT, true)
+        set(value) = editor.putBoolean(Key.ENABLE_CRASH_REPORT, value).apply()
 }

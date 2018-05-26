@@ -77,4 +77,17 @@
             app:iconSpaceReserved="true"/>
 
     </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/crash_report">
+
+        <SwitchPreference
+            android:key="enable_crash_report"
+            android:title="@string/enable_crash_report"
+            android:defaultValue="true"
+            android:summaryOn="@string/on"
+            android:summaryOff="@string/off"/>
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

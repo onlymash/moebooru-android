@@ -1,10 +1,8 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
 
 android {
     signingConfigs {
@@ -72,7 +70,7 @@ dependencies {
     implementation "moe.shizuku.preference:preference-switchcompat:$rikka_preference_version"
     implementation "moe.shizuku.preference:preference-dialog-android:$rikka_preference_version"
     implementation "com.google.firebase:firebase-core:$firebase_version"
-    implementation "com.google.firebase:firebase-crash:$firebase_version"
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.3'
     implementation 'org.jetbrains.anko:anko-sqlite:0.10.5'
     implementation "com.github.bumptech.glide:glide:$glide_version"
     implementation "com.github.bumptech.glide:okhttp3-integration:$glide_version"

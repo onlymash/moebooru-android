@@ -59,5 +59,5 @@
 -dontwarn org.jetbrains.anko.**
 
 # Application classes
--keep class model.** { *; }
+-keep class im.mash.moebooru.model.** { *; }
 -keep class im.mash.moebooru.database.** { *; }
