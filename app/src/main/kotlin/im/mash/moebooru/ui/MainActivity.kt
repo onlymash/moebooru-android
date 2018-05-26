@@ -45,6 +45,7 @@ import im.mash.moebooru.models.Booru
 import im.mash.moebooru.models.TextDrawable
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.navBarHeight
+import im.mash.moebooru.utils.userAgent
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.util.*
@@ -119,10 +120,6 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_moebooru)
-//        window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION)
-//        window.statusBarColor = Color.TRANSPARENT
-//        window.navigationBarColor = Color.TRANSPARENT
-
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
                 .withIcon(R.drawable.ic_drawer_settings_24dp)
@@ -176,6 +173,11 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
                 .withSavedInstance(savedInstanceState)
                 .withDrawerWidthDp(300)
                 .build()
+
+        ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, insets ->
+            drawer.stickyFooter.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            insets
+        }
 
         previousSelectedDrawer = drawer.currentSelection
 

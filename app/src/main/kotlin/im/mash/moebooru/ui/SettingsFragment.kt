@@ -26,7 +26,7 @@ class SettingsFragment : ToolbarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.window_background))
+        view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.window_background))
         toolbar.setTitle(R.string.settings)
         val fm = childFragmentManager
         fm.beginTransaction().replace(R.id.content, SettingsPreferenceFragment()).commit()

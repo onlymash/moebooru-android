@@ -13,6 +13,7 @@ package im.mash.moebooru.ui
 
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
 import android.view.View
 import im.mash.moebooru.R
 import moe.shizuku.preference.PreferenceFragment
@@ -20,7 +21,11 @@ import moe.shizuku.preference.PreferenceFragment
 class SettingsPreferenceFragment : PreferenceFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.background))
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
+            view.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            insets
+        }
+        view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.background))
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {

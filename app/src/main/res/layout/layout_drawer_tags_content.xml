@@ -10,19 +10,19 @@
   ~
   -->
 
-<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/toolbar_layout"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_search_tags_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:minHeight="?android:actionBarSize"
-    android:fadingEdge="none"
-    app:elevation="0dp">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
 
-    <android.support.v7.widget.Toolbar
-        android:touchscreenBlocksFocus="false"
-        android:background="@color/toolbar"
-        android:id="@+id/toolbar"
-        style="@style/Toolbar"/>
+    <include layout="@layout/layout_toolbar_tags"/>
 
-</android.support.design.widget.AppBarLayout>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/search_tags_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

@@ -71,7 +71,8 @@ dependencies {
     implementation "moe.shizuku.preference:preference-simplemenu:$rikka_preference_version"
     implementation "moe.shizuku.preference:preference-switchcompat:$rikka_preference_version"
     implementation "moe.shizuku.preference:preference-dialog-android:$rikka_preference_version"
-    implementation 'com.google.firebase:firebase-core:15.0.2'
+    implementation "com.google.firebase:firebase-core:$firebase_version"
+    implementation "com.google.firebase:firebase-crash:$firebase_version"
     implementation 'org.jetbrains.anko:anko-sqlite:0.10.5'
     implementation "com.github.bumptech.glide:glide:$glide_version"
     implementation "com.github.bumptech.glide:okhttp3-integration:$glide_version"

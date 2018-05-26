@@ -45,7 +45,6 @@ object Key {
 
 object Net {
     const val USER_AGENT_KEY = "User-Agent"
-    var USER_AGENT_INFO: String = WebView(app).settings.userAgentString
 }
 
 object SearchTagsTable {

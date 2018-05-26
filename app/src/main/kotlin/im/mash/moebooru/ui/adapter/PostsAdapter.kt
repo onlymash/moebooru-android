@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.ui.adapter
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -25,8 +26,8 @@ import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader
 
-class PostsAdapter(private val itemPadding: Int, private val itemPaddingTop: Int,
-                  private var items: MutableList<RawPost>?) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
+class PostsAdapter(private val context: Context, private val itemPadding: Int, private val itemPaddingTop: Int,
+                   private var items: MutableList<RawPost>?) : RecyclerView.Adapter<PostsAdapter.PostViewHolder>() {
 
     companion object {
         private val TAG = this::class.java.simpleName
@@ -75,7 +76,7 @@ class PostsAdapter(private val itemPadding: Int, private val itemPaddingTop: Int
             when (app.settings.gridModeString) {
                 Key.GRID_MODE_STAGGERED_GRID -> {
                     holder.fixedImageView.setWidthAndHeightWeight(items!![position].width!!.toInt(), items!![position].height!!.toInt())
-                    GlideApp.with(app.applicationContext)
+                    GlideApp.with(context)
                             .load(GlideUrl(items!![position].preview_url, header))
                             .fitCenter()
                             .placeholder(placeHolderId)
@@ -83,7 +84,7 @@ class PostsAdapter(private val itemPadding: Int, private val itemPaddingTop: Int
                 }
                 else -> {
                     holder.fixedImageView.setWidthAndHeightWeight(1,1)
-                    GlideApp.with(app.applicationContext)
+                    GlideApp.with(context)
                             .load(GlideUrl(items!![position].preview_url, header))
                             .centerCrop()
                             .placeholder(placeHolderId)

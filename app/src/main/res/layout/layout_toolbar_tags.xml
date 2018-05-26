@@ -17,10 +17,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:fadingEdge="none"
-    app:elevation="0dp">
+    android:background="@color/toolbar"
+    app:elevation="2dp">
 
     <android.support.v7.widget.Toolbar
         android:touchscreenBlocksFocus="false"
+        android:background="@color/transparent"
         android:id="@+id/toolbar_tags"
         app:contentInsetStart="0dp"
         app:contentInsetEnd="0dp"

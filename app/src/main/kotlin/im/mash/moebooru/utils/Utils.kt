@@ -27,11 +27,14 @@ var Fragment.childFragManager: FragmentManager?
     get() = childFragmentManager
     set(value) = fieldChildFragmentManager.set(this, value)
 
+val userAgent: String
+    get() = System.getProperty("http.agent")
+
 val okHttpHeader: List<Pair<String, String>>
-    get() = listOf(Pair(Net.USER_AGENT_KEY, Net.USER_AGENT_INFO))
+    get() = listOf(Pair(Net.USER_AGENT_KEY, userAgent))
 
 val glideHeader: Headers
-    get() = LazyHeaders.Builder().addHeader(Net.USER_AGENT_KEY, Net.USER_AGENT_INFO).build()
+    get() = LazyHeaders.Builder().addHeader(Net.USER_AGENT_KEY, userAgent).build()
 
 val statusBarHeight: Int
     get() {

@@ -12,10 +12,12 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.constraint.ConstraintLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
@@ -29,6 +31,7 @@ import android.util.TypedValue
 import android.view.animation.AnimationUtils
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.LinearLayout
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 
@@ -40,6 +43,7 @@ import im.mash.moebooru.models.RawPost
 import im.mash.moebooru.network.MoeHttpClient
 import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.adapter.PostsAdapter
+import im.mash.moebooru.ui.adapter.TagsDrawerAdapter
 import im.mash.moebooru.ui.listener.LastItemListener
 import im.mash.moebooru.ui.listener.RecyclerViewClickListener
 import im.mash.moebooru.utils.*
@@ -56,8 +60,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private lateinit var drawer: NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerToolbar: Toolbar
-    private lateinit var drawerAdapter: DrawerAdapter
-    private lateinit var drawerTagsView: RecyclerView
+    private lateinit var tagsDrawerAdapter: TagsDrawerAdapter
+    private lateinit var tagsDrawerView: RecyclerView
     private lateinit var postsView: RecyclerView
     private lateinit var postsAdapter: PostsAdapter
     private lateinit var refresh: SwipeRefreshLayout
@@ -84,9 +88,10 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
 
         //init toolbar
+        toolbarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
         toolbar.setTitle(R.string.posts)
         toolbar.inflateMenu(R.menu.menu_main)
-        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
+        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
         toolbar.setOnMenuItemClickListener(this)
         setToolbarGridOption()
 
@@ -120,7 +125,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         initRightDrawer(view)
 
         //init Adapter
-        postsAdapter = PostsAdapter(itemPadding, toolbarHeight + app.settings.statusBarHeightInt,null)
+        postsAdapter = PostsAdapter(this.context!!, itemPadding, toolbarHeight + app.settings.statusBarHeightInt,null)
 
         //init RecyclerView listener
         app.settings.isNotMoreData = false
@@ -173,7 +178,23 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             insets
         }
 
-        val itemsTags = mutableListOf(
+        val itemsTag = mutableListOf(
+                "item1",
+                "item2",
+                "item3",
+                "item4",
+                "item5",
+                "item6",
+                "item7",
+                "item8",
+                "item1",
+                "item2",
+                "item3",
+                "item4",
+                "item5",
+                "item6",
+                "item7",
+                "item8",
                 "item1",
                 "item2",
                 "item3",
@@ -183,9 +204,15 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 "item7",
                 "item8"
         )
-        drawerAdapter = DrawerAdapter(itemsTags)
-        drawerTagsView = drawer.findViewById(R.id.search_tags_list)
-        drawerTagsView.adapter = drawerAdapter
+        tagsDrawerAdapter = TagsDrawerAdapter(this.requireContext(), itemsTag)
+        tagsDrawerView = view.findViewById(R.id.search_tags_list)
+        tagsDrawerView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
+        tagsDrawerView.adapter = tagsDrawerAdapter
+        val tagsLayout: LinearLayout = view.findViewById(R.id.drawer_search_tags_layout)
+        ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, insets ->
+            tagsLayout.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            insets
+        }
     }
 
     //初始化 PostsView
@@ -232,13 +259,13 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 when (newState) {
                     RecyclerView.SCROLL_STATE_IDLE -> {
                         if (isScrolling) {
-                            GlideApp.with(app.applicationContext).resumeRequests()
+                            GlideApp.with(this@PostsFragment.context!!).resumeRequests()
                         }
                         isScrolling = false
                     }
                     RecyclerView.SCROLL_STATE_SETTLING xor  RecyclerView.SCROLL_STATE_DRAGGING -> {
                         isScrolling = true
-                        GlideApp.with(app.applicationContext).pauseAllRequests()
+                        GlideApp.with(this@PostsFragment.context!!).pauseAllRequests()
                     }
                 }
             }
@@ -449,25 +476,4 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         Log.i(TAG, "Refreshing!!")
         refreshData()
     }
-
-    private class DrawerAdapter(private var items: MutableList<String>): RecyclerView.Adapter<DrawerAdapter.DrawerViewHolder>() {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DrawerViewHolder {
-            val view: View = LayoutInflater.from(parent.context).inflate(R.layout.layout_drawer_tags_item, parent, false)
-            return DrawerViewHolder(view)
-        }
-
-        override fun getItemCount(): Int {
-            return items.size
-        }
-
-        override fun onBindViewHolder(holder: DrawerViewHolder, position: Int) {
-            holder.checkTag.text = items[position]
-        }
-        private class DrawerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val checkTag = itemView.findViewById<CheckBox>(R.id.select_tag)!!
-            val moreOptions = itemView.findViewById<ImageView>(R.id.more_options)!!
-        }
-    }
-
 }

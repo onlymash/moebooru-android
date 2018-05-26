@@ -41,7 +41,6 @@ open class ToolbarFragment : Fragment() {
                 val statusBarSize = insets.systemWindowInsetTop
                 toolbarLayout.setPadding(0, statusBarSize, 0, 0)
                 if (this is PostsFragment) {
-                    activity.drawer.stickyFooter.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
                     app.settings.statusBarHeightInt = statusBarSize
                 }
                 insets
