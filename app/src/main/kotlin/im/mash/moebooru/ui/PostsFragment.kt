@@ -117,6 +117,14 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
         //SwipeRefreshLayout
         refresh = view.findViewById(R.id.refresh)
+        refresh.setProgressViewOffset(true, toolbarHeight, toolbarHeight + 150)
+        refresh.setColorSchemeResources(
+                R.color.blue,
+                R.color.purple,
+                R.color.green,
+                R.color.orange,
+                R.color.red
+        )
         refresh.setOnRefreshListener(this)
 
         //右侧搜索抽屉
