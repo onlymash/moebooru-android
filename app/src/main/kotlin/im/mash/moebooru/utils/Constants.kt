@@ -41,6 +41,7 @@ object Key {
     const val BUNDLE = "bundle"
 
     const val STATUS_BAR_HEIGHT = "status_bar_height"
+    const val USER_AGENT_WEB_VIEW = "user_agent_web_view"
 }
 
 object Net {

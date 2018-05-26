@@ -15,6 +15,8 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.support.v7.app.AppCompatDelegate
+import android.util.Log
+import android.webkit.WebView
 import com.google.firebase.FirebaseApp
 import im.mash.moebooru.database.DatabaseBoorusManager
 import im.mash.moebooru.database.DatabaseHelper
@@ -25,6 +27,7 @@ class App : Application() {
 
     companion object {
         lateinit var app: App
+        private const val TAG = "MoebooruApp"
     }
 
     private val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
@@ -36,7 +39,13 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         app = this
+        FirebaseApp.initializeApp(deviceContext)
         AppCompatDelegate.setDefaultNightMode(settings.nightMode)
+        try {
+            val ua = WebView(this).settings.userAgentString
+            settings.userAgentWebView = ua
+        } catch (e: Exception) {
+            Log.i(TAG, "Get WebView User-Agent failed!!")
+        }
     }
-
 }

@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import com.bumptech.glide.load.model.Headers
 import com.bumptech.glide.load.model.LazyHeaders
+import im.mash.moebooru.App.Companion.app
 
 private val fieldChildFragmentManager by lazy {
     val field = Fragment::class.java.getDeclaredField("mChildFragmentManager")
@@ -30,11 +31,14 @@ var Fragment.childFragManager: FragmentManager?
 val userAgent: String
     get() = System.getProperty("http.agent")
 
+private val userAgentWebView: String
+    get() = app.settings.userAgentWebView
+
 val okHttpHeader: List<Pair<String, String>>
-    get() = listOf(Pair(Net.USER_AGENT_KEY, userAgent))
+    get() = listOf(Pair(Net.USER_AGENT_KEY, userAgentWebView))
 
 val glideHeader: Headers
-    get() = LazyHeaders.Builder().addHeader(Net.USER_AGENT_KEY, userAgent).build()
+    get() = LazyHeaders.Builder().addHeader(Net.USER_AGENT_KEY, userAgentWebView).build()
 
 val statusBarHeight: Int
     get() {

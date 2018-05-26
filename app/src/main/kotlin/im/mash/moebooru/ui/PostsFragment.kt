@@ -438,7 +438,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         Log.i(TAG, "siteUrl: $siteUrl")
         val limit = app.settings.postLimitInt
         val url = ParamGet(siteUrl, page.toString(), limit.toString(), null,
-                "rating:safe", null, null, null).makeGetUrl()
+                null, null, null, null).makeGetUrl()
         Log.i(TAG, "url: $url")
         return MoeHttpClient.instance.get(url, null, okHttpHeader)
     }
@@ -453,15 +453,16 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
             try {
                 result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
             } catch (e: JsonParseException) {
-                Log.i(TAG, "Gson exception!")
-            }
-            if (result != null) {
-                app.postsManager.deletePosts(app.settings.activeProfile)
-                app.postsManager.savePosts(result, app.settings.activeProfile)
+                result = null
+                Log.i(TAG, "Gson exception! response == " + response?.getResponseAsString().toString())
+            } finally {
+                if (result != null) {
+                    app.postsManager.deletePosts(app.settings.activeProfile)
+                    app.postsManager.savePosts(result, app.settings.activeProfile)
+                }
             }
             uiThread {
                 refresh.isRefreshing = false
-                Log.i(TAG, "Refresh data finished!")
                 if (result != null) {
                     items = result
                     postsAdapter.updateData(items)

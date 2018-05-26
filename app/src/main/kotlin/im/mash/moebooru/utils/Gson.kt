@@ -11,9 +11,11 @@
 
 package im.mash.moebooru.utils
 
+import android.support.annotation.Keep
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
+@Keep
 inline fun <reified T: Any> Gson.fromJson(json: String): T {
     return fromJson(json, object: TypeToken<T>() {}.type)
 }

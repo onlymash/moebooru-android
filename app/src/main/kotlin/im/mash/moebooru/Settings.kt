@@ -16,6 +16,7 @@ import android.content.SharedPreferences
 import android.support.v7.app.AppCompatDelegate
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.statusBarHeight
+import im.mash.moebooru.utils.userAgent
 import moe.shizuku.preference.PreferenceManager
 
 class Settings(ctx: Context) {
@@ -73,4 +74,7 @@ class Settings(ctx: Context) {
         get() = sp.getInt(Key.STATUS_BAR_HEIGHT, statusBarHeight)
         set(value) = editor.putInt(Key.STATUS_BAR_HEIGHT, value).apply()
 
+    var userAgentWebView: String
+        get() = sp.getString(Key.USER_AGENT_WEB_VIEW, userAgent)
+        set(value) = editor.putString(Key.USER_AGENT_WEB_VIEW, value).apply()
 }
