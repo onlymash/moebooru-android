@@ -20,7 +20,8 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import im.mash.moebooru.R
 
-class TagsDrawerAdapter(private val context: Context, private var itemsTag: MutableList<String>) : RecyclerView.Adapter<TagsDrawerAdapter.TagsDrawerViewHolder>() {
+class TagsDrawerAdapter(private val context: Context,
+                        private var itemsTag: MutableList<String>?) : RecyclerView.Adapter<TagsDrawerAdapter.TagsDrawerViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagsDrawerViewHolder {
         val itemView: View = LayoutInflater.from(context)
                 .inflate(R.layout.layout_drawer_tags_item, parent, false)
@@ -28,7 +29,7 @@ class TagsDrawerAdapter(private val context: Context, private var itemsTag: Muta
     }
 
     override fun getItemCount(): Int {
-       return itemsTag.size
+       return itemsTag?.size?:0
     }
 
     fun updateData(itemsTag: MutableList<String>) {
@@ -37,7 +38,7 @@ class TagsDrawerAdapter(private val context: Context, private var itemsTag: Muta
     }
 
     override fun onBindViewHolder(holder: TagsDrawerViewHolder, position: Int) {
-        holder.checkTag.text = itemsTag[position]
+        holder.checkTag.text = itemsTag?.get(position)!!
     }
 
     inner class TagsDrawerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

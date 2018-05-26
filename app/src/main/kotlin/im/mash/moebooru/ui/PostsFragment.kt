@@ -437,9 +437,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     }
 
     private fun getResponseData(): MoeResponse? {
-        var siteUrl: String? = null
         var response: MoeResponse? = null
-        siteUrl = try {
+        val siteUrl = try {
             app.boorusManager.getBooru(app.settings.activeProfile).url
         } catch (e: Exception) {
             null

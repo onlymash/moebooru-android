@@ -13,35 +13,33 @@ package im.mash.moebooru.ui
 
 import android.graphics.Color
 import android.graphics.PorterDuff
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import com.bm.library.PhotoView
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.load.model.GlideUrl
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
+import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.model.RawPost
+import im.mash.moebooru.ui.adapter.PostsPagerAdapter
 import im.mash.moebooru.utils.Key
-import im.mash.moebooru.utils.glideHeader
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-class DetailsFragment : ToolbarFragment(), View.OnClickListener {
+class DetailsFragment : ToolbarFragment() {
 
     private val TAG = this::class.java.simpleName
     private var post: RawPost? = null
-    private lateinit var photoView: PhotoView
     private lateinit var bg: View
+    private lateinit var progressBar: ProgressBar
+    private lateinit var postsPager: ViewPager
+    private lateinit var postsPagerAdapter: PostsPagerAdapter
+
+    private var items: MutableList<RawPost>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_details, container, false)
@@ -52,66 +50,48 @@ class DetailsFragment : ToolbarFragment(), View.OnClickListener {
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
         toolbarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
-
         bg = view.findViewById(R.id.details_bg)
         bg.visibility = View.GONE
-        photoView = view.findViewById(R.id.post_img)
-        photoView.enable()
-        photoView.setOnClickListener(this)
-
-        val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
+        progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
-
+        progressBar.visibility = View.GONE
+        postsPager = view.findViewById(R.id.post_view_pager)
         val bundle = arguments
         if (bundle != null) {
-            val pos = bundle.getInt(Key.BUNDLE, -2)
+            val pos = bundle.getInt(Key.ITEM_POS, 0)
             val id = bundle.getInt(Key.ITEM_ID)
             Log.i(TAG, "接收位置： $pos")
             doAsync {
-                post = app.postsManager.getPostFromId(app.settings.activeProfile, id)
+                items = try {
+                    app.postsManager.loadPosts(app.settings.activeProfile)
+                } catch (e: Exception) {
+                    null
+                }
                 uiThread {
-                    if (post != null) {
-                        Log.i(TAG, "查寻成功！ URL： ${post!!.file_url}")
-                        GlideApp.with(this@DetailsFragment)
-                                .load(GlideUrl(post!!.sample_url, glideHeader))
-                                .fitCenter()
-                                .listener(object : RequestListener<Drawable> {
-                                    override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean {
-                                        progressBar.visibility = View.GONE
-                                        return false
-                                    }
-
-                                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
-                                        progressBar.visibility = View.GONE
-                                        return false
-                                    }
-
-                                })
-                                .into(photoView)
-
+                    if (items != null && items!!.size > 0) {
+                        Log.i(TAG, "items?.size: ${items?.size}")
+                        postsPagerAdapter = PostsPagerAdapter(this@DetailsFragment, items)
+                        postsPager.adapter = postsPagerAdapter
+                        postsPager.currentItem = pos
                     } else {
-                        Log.i(TAG, "查寻大失败！ post == null")
+                        Toast.makeText(this@DetailsFragment.requireContext(), "Load failed!!", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
     }
 
-    override fun onClick(v: View?) {
-        when (v) {
-            photoView -> {
-                when (bg.visibility) {
-                    View.GONE -> {
-                        bg.visibility = View.VISIBLE
-                        toolbar.visibility = View.GONE
-                        hideBar()
-                    }
-                    else -> {
-                        bg.visibility = View.GONE
-                        toolbar.visibility = View.VISIBLE
-                        showBar()
-                    }
-                }
+    fun onClickPhotoView() {
+        when (bg.visibility) {
+            View.GONE -> {
+                bg.visibility = View.VISIBLE
+                toolbar.visibility = View.GONE
+                hideBar()
+            }
+            else -> {
+                bg.visibility = View.GONE
+                toolbar.visibility = View.VISIBLE
+                showBar()
             }
         }
     }

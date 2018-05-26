@@ -53,10 +53,7 @@ class PostsAdapter(private val context: Context, private val itemPadding: Int, p
     }
 
     override fun getItemCount(): Int {
-        if (items == null) {
-            return 0
-        }
-        return items!!.size
+        return items?.size?:0
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
