@@ -17,6 +17,9 @@
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeightSmall"
     android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     tools:ignore="RtlHardcoded,RtlSymmetry">
 
     <CheckBox
@@ -25,8 +28,10 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:gravity="center_vertical"
-        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-        android:background="?android:attr/selectableItemBackground"/>
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:paddingLeft="?android:attr/listPreferredItemPaddingLeft" />
 
     <ImageView
         android:id="@+id/more_options"

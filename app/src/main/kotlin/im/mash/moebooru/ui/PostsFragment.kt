@@ -33,7 +33,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonParseException
 
 import im.mash.moebooru.App.Companion.app
-import im.mash.moebooru.BuildConfig
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.model.ParamGet
@@ -246,8 +245,8 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         val postsItemClickListener = object : RecyclerViewClickListener.OnItemClickListener {
             override fun onItemClick(itemView: View?, position: Int) {
                 Log.i(TAG, "onItemClick: $position")
-                val intent = Intent()
-                intent.action = BuildConfig.APPLICATION_ID + ".details"
+                val intent = Intent(activity, DetailsActivity().javaClass)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
                 val bundle = Bundle()
                 bundle.putInt(Key.ITEM_POS, position)
                 bundle.putInt(Key.ITEM_ID, items!![position].id!!.toInt())

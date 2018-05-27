@@ -34,7 +34,15 @@
         <activity
             android:name=".ui.DetailsActivity">
             <intent-filter>
-                <action android:name="${applicationId}.details"/>
+                <action android:name="${applicationId}.action.SHOW_DETAILS"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.SearchActivity">
+            <intent-filter>
+                <action android:name="${applicationId}.action.SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>

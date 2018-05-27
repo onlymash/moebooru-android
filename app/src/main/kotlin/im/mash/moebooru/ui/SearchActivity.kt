@@ -11,23 +11,21 @@
 
 package im.mash.moebooru.ui
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v7.widget.Toolbar
-import android.view.MenuItem
+import android.support.v7.app.AppCompatActivity
 import im.mash.moebooru.R
-import im.mash.moebooru.utils.*
+import im.mash.moebooru.utils.Key
 
-class DetailsActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_moebooru)
         val bundle = intent.getBundleExtra(Key.BUNDLE)
-        val detailsFragment = DetailsFragment()
-        detailsFragment.arguments = bundle
+        val searchFragment = SearchFragment()
+        searchFragment.arguments = bundle
         if (savedInstanceState == null) {
-            displayFragment(detailsFragment)
+            displayFragment(searchFragment)
         }
     }
 
@@ -35,18 +33,5 @@ class DetailsActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_moebooru, fragment)
                 .commitAllowingStateLoss()
-    }
-
-    internal fun setActionBar(toolbar: Toolbar) {
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        supportActionBar!!.setDisplayShowHomeEnabled(true)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
-        }
-        return super.onOptionsItemSelected(item)
     }
 }

@@ -27,7 +27,7 @@ import im.mash.moebooru.utils.Key
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-class DetailsFragment : ToolbarFragment() {
+class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
 
     private val TAG = this::class.java.simpleName
     private var post: RawPost? = null
@@ -46,14 +46,18 @@ class DetailsFragment : ToolbarFragment() {
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
         toolbarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
+        toolbar.title = getString(R.string.post)
+        val activity = activity as DetailsActivity
+        activity.setActionBar(toolbar)
         bg = view.findViewById(R.id.details_bg)
         bg.visibility = View.GONE
         postsPager = view.findViewById(R.id.post_view_pager)
+        postsPager.addOnPageChangeListener(this)
         val bundle = arguments
         if (bundle != null) {
             val pos = bundle.getInt(Key.ITEM_POS, 0)
             val id = bundle.getInt(Key.ITEM_ID)
-            Log.i(TAG, "接收位置： $pos")
+            toolbar.title = "${getString(R.string.post)} $id"
             doAsync {
                 items = try {
                     app.postsManager.loadPosts(app.settings.activeProfile)
@@ -72,6 +76,18 @@ class DetailsFragment : ToolbarFragment() {
                 }
             }
         }
+    }
+
+    override fun onPageScrollStateChanged(state: Int) {
+
+    }
+
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        toolbar.title = "${getString(R.string.post)} ${items!![position].id}"
+    }
+
+    override fun onPageSelected(position: Int) {
+
     }
 
     fun onClickPhotoView() {
