@@ -31,6 +31,8 @@
         android:clickable="false"
         android:focusable="false"
         android:focusableInTouchMode="false"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/primary_icon"
         android:paddingLeft="?android:attr/listPreferredItemPaddingLeft" />
 
     <ImageView

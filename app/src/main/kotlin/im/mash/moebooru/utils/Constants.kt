@@ -52,10 +52,10 @@ object Net {
     const val USER_AGENT_KEY = "User-Agent"
 }
 
-object SearchTagsTable {
-    const val TABLE_NAME = "search_tags"
+object TagsTable {
+    const val TABLE_NAME = "tags"
     const val ID_UNIQUE = "_id"
-    const val SITE = "id"
+    const val SITE = "site"
     const val NAME = "name"
     const val IS_SELECTED = "is_selected"
 }

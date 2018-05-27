@@ -13,10 +13,7 @@ package im.mash.moebooru.database
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
-import im.mash.moebooru.utils.BoorusTable
-import im.mash.moebooru.utils.PostsTable
-import im.mash.moebooru.utils.SearchTable
-import im.mash.moebooru.utils.SearchTagsTable
+import im.mash.moebooru.utils.*
 import org.jetbrains.anko.db.*
 
 class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION) {
@@ -45,12 +42,12 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
                 BoorusTable.NAME to TEXT,
                 BoorusTable.URL to TEXT)
         db?.createTable(
-                SearchTagsTable.TABLE_NAME,
+                TagsTable.TABLE_NAME,
                 true,
-                SearchTagsTable.ID_UNIQUE to INTEGER + PRIMARY_KEY + UNIQUE,
-                SearchTagsTable.SITE to INTEGER,
-                SearchTagsTable.NAME to TEXT,
-                SearchTagsTable.IS_SELECTED to INTEGER
+                TagsTable.ID_UNIQUE to INTEGER + PRIMARY_KEY + UNIQUE,
+                TagsTable.SITE to INTEGER,
+                TagsTable.NAME to TEXT,
+                TagsTable.IS_SELECTED to INTEGER
         )
         createPostsTable(db)
         createPostsSearchTable(db)
@@ -141,7 +138,7 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         db?.dropTable(BoorusTable.TABLE_NAME, true)
-        db?.dropTable(SearchTagsTable.TABLE_NAME, true)
+        db?.dropTable(TagsTable.TABLE_NAME, true)
         db?.dropTable(PostsTable.TABLE_NAME, true)
         db?.dropTable(SearchTable.TABLE_NAME, true)
     }

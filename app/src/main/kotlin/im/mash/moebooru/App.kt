@@ -19,10 +19,7 @@ import android.util.Log
 import android.webkit.WebView
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
-import im.mash.moebooru.database.BoorusManager
-import im.mash.moebooru.database.DatabaseHelper
-import im.mash.moebooru.database.PostsManager
-import im.mash.moebooru.database.PostsSearchManager
+import im.mash.moebooru.database.*
 import im.mash.moebooru.utils.DeviceContext
 import io.fabric.sdk.android.Fabric
 
@@ -39,6 +36,7 @@ class App : Application() {
     internal val boorusManager: BoorusManager by lazy { BoorusManager.getInstance(database) }
     internal val postsManager: PostsManager by lazy { PostsManager.getInstance(database) }
     internal val searchManager: PostsSearchManager by lazy { PostsSearchManager.getInstance(database) }
+    internal val tagsManager: TagsManager by lazy { TagsManager.getInstance(database) }
 
     override fun onCreate() {
         super.onCreate()

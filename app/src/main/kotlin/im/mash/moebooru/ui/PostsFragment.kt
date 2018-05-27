@@ -12,24 +12,31 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
 import android.view.*
 import android.util.Log
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.Toast
 
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import im.mash.moebooru.model.Tag
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.ui.adapter.TagsDrawerAdapter
+import im.mash.moebooru.ui.listener.RecyclerViewClickListener
 import im.mash.moebooru.utils.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 @SuppressLint("RtlHardcoded")
 class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener,
@@ -44,6 +51,8 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
     private lateinit var appBarLayoutTags: AppBarLayout
     private lateinit var tagsDrawerAdapter: TagsDrawerAdapter
     private lateinit var tagsDrawerView: RecyclerView
+
+    private var itemsTag = mutableListOf<Tag>()
 
     private val mainActivity: MainActivity by lazy { activity as MainActivity }
 
@@ -109,36 +118,20 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
         drawerToolbar.setOnMenuItemClickListener(this)
         drawerToolbar.setOnClickListener(this)
 
-        val itemsTag = mutableListOf(
-                "item1",
-                "item2",
-                "item3",
-                "item4",
-                "item5",
-                "item6",
-                "item7",
-                "item8",
-                "item1",
-                "item2",
-                "item3",
-                "item4",
-                "item5",
-                "item6",
-                "item7",
-                "item8",
-                "item1",
-                "item2",
-                "item3",
-                "item4",
-                "item5",
-                "item6",
-                "item7",
-                "item8"
-        )
-        tagsDrawerAdapter = TagsDrawerAdapter(this.requireContext(), itemsTag)
         tagsDrawerView = view.findViewById(R.id.rv_tags_list)
         tagsDrawerView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
-        tagsDrawerView.adapter = tagsDrawerAdapter
+
+        doAsync {
+            try {
+                itemsTag = app.tagsManager.getTags(app.settings.activeProfile)
+            } catch (e: Exception) {
+                Log.i(TAG, "Get tags failed!!")
+            }
+            uiThread {
+                tagsDrawerAdapter = TagsDrawerAdapter(this@PostsFragment, itemsTag)
+                tagsDrawerView.adapter = tagsDrawerAdapter
+            }
+        }
         val tagsDrawerViewLayout = view.findViewById<LinearLayout>(R.id.rv_tags_list_layout)
         appBarLayoutTags = view.findViewById(R.id.appbar_layout_tags)
         appBarLayoutTags.addView(drawerToolbar)
@@ -182,12 +175,54 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
             R.id.action_staggered_grid -> app.settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
             R.id.action_search_open -> openRightDrawer()
             R.id.action_search -> {
-                val intent = Intent(activity, SearchActivity().javaClass)
-                val bundle = Bundle()
-                bundle.putString(Key.TAGS_SEARCH, "yuri")
-                intent.putExtra(Key.BUNDLE, bundle)
-                startActivity(intent)
-                closeRightDrawer()
+                var tag: String = ""
+                itemsTag.forEach {
+                    if (it.is_selected){
+                        tag = it.name + "+" + tag
+                    }
+                }
+                if (tag != "") {
+                    val intent = Intent(activity, SearchActivity().javaClass)
+                    val bundle = Bundle()
+                    bundle.putString(Key.TAGS_SEARCH, tag)
+                    intent.putExtra(Key.BUNDLE, bundle)
+                    startActivity(intent)
+                    closeRightDrawer()
+                } else {
+                    Toast.makeText(context, "Tag is null", Toast.LENGTH_SHORT).show()
+                }
+            }
+            R.id.action_add -> {
+                val editText = EditText(context)
+                editText.setSingleLine()
+                val container = FrameLayout(context)
+                val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                val margin = resources.getDimensionPixelSize(R.dimen.dialog_margin)
+                params.leftMargin = margin
+                params.rightMargin = margin
+                params.topMargin = margin
+                params.bottomMargin = margin
+                editText.layoutParams = params
+                container.addView(editText)
+                AlertDialog.Builder(context)
+                        .setTitle(getString(R.string.add_a_tag))
+                        .setView(container)
+                        .setPositiveButton(getString(R.string.ok), {_, _->
+                            val input = editText.text.toString()
+                            if (input.isEmpty() || input == "") {
+                                Toast.makeText(context, getString(R.string.tag_can_not_be_empty), Toast.LENGTH_SHORT).show()
+                            } else {
+                                val tag = Tag(app.settings.activeProfile, input, false)
+                                doAsync {
+                                    app.tagsManager.saveTag(tag)
+                                }
+                                itemsTag.add(tag)
+                                tagsDrawerAdapter.updateData(itemsTag)
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.cancel), null)
+                        .show()
+
             }
         }
         return true
@@ -215,6 +250,17 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
                 closeRightDrawer()
                 app.settings.isNotMoreData = false
                 postsAdapter.updateData(null)
+                itemsTag.clear()
+                doAsync {
+                    try {
+                        itemsTag = app.tagsManager.getTags(app.settings.activeProfile)
+                    } catch (e: Exception) {
+                        Log.i(TAG, "Get tags failed!!")
+                    }
+                    uiThread {
+                        tagsDrawerAdapter.updateData(itemsTag)
+                    }
+                }
                 loadData()
             }
         }
@@ -248,5 +294,18 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
             return true
         }
         return super.onBackPressed()
+    }
+
+    internal fun changeTagStatus(position: Int, isCecked: Boolean){
+        itemsTag[position].is_selected = isCecked
+    }
+    internal fun deleteTag(position: Int) {
+        itemsTag.removeAt(position)
+        tagsDrawerAdapter.updateData(itemsTag)
+    }
+    internal fun copyTag(position: Int) {
+        val cm: ClipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
+        val cd = ClipData.newPlainText("Tag:+ $position", itemsTag[position].name)
+        cm.primaryClip = cd
     }
 }

@@ -10,9 +10,11 @@
   ~
   -->
 
-<resources>
-    <dimen name="item_padding">3dp</dimen>
-    <dimen name="item_width">126dp</dimen>
-    <dimen name="drawer_width">300dp</dimen>
-    <dimen name="dialog_margin">20dp</dimen>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_remove"
+        android:title="@string/remove" />
+    <item
+        android:id="@+id/action_copy"
+        android:title="@string/copy" />
+</menu>

@@ -11,19 +11,26 @@
 
 package im.mash.moebooru.ui.adapter
 
-import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.PopupMenu
+import android.widget.Toast
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import im.mash.moebooru.model.Tag
+import im.mash.moebooru.ui.PostsFragment
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
-class TagsDrawerAdapter(private val context: Context,
-                        private var itemsTag: MutableList<String>?) : RecyclerView.Adapter<TagsDrawerAdapter.TagsDrawerViewHolder>() {
+class TagsDrawerAdapter(private val postsFragment: PostsFragment,
+                        private var itemsTag: MutableList<Tag>?) : RecyclerView.Adapter<TagsDrawerAdapter.TagsDrawerViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagsDrawerViewHolder {
-        val itemView: View = LayoutInflater.from(context)
+        val itemView: View = LayoutInflater.from(parent.context)
                 .inflate(R.layout.layout_drawer_tags_item, parent, false)
         return TagsDrawerViewHolder(itemView)
     }
@@ -32,13 +39,56 @@ class TagsDrawerAdapter(private val context: Context,
        return itemsTag?.size?:0
     }
 
-    fun updateData(itemsTag: MutableList<String>) {
+    fun updateData(itemsTag: MutableList<Tag>) {
         this.itemsTag = itemsTag
         notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: TagsDrawerViewHolder, position: Int) {
-        holder.checkTag.text = itemsTag?.get(position)!!
+        if (itemCount > 0) {
+            holder.checkTag.text = itemsTag!![position].name
+            if (itemsTag!![position].is_selected) {
+                holder.checkTag.isChecked = true
+            }
+            holder.itemView.setOnClickListener {
+                if (holder.checkTag.isChecked) {
+                    holder.checkTag.isChecked = false
+                    postsFragment.changeTagStatus(position, false)
+                    doAsync {
+                        app.tagsManager.updateTag(app.settings.activeProfile, itemsTag!![position].name, false)
+                    }
+                } else {
+                    holder.checkTag.isChecked = true
+                    postsFragment.changeTagStatus(position, true)
+                    doAsync {
+                        app.tagsManager.updateTag(app.settings.activeProfile, itemsTag!![position].name, true)
+                    }
+                }
+            }
+            holder.moreOptions.setOnClickListener {
+                var popupMenu: PopupMenu? = null
+                popupMenu = PopupMenu(postsFragment.context, holder.moreOptions)
+                popupMenu.inflate(R.menu.menu_tag_option)
+                popupMenu.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener { item: MenuItem? ->
+
+                    when (item!!.itemId) {
+                        R.id.action_remove -> {
+                            doAsync {
+                                app.tagsManager.deleteTag(app.settings.activeProfile, itemsTag!![position].name)
+                                uiThread {
+                                    postsFragment.deleteTag(position)
+                                }
+                            }
+                        }
+                        R.id.action_copy -> {
+                            postsFragment.copyTag(position)
+                        }
+                    }
+                    true
+                })
+                popupMenu.show()
+            }
+        }
     }
 
     inner class TagsDrawerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
