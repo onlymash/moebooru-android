@@ -156,6 +156,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         drawer = DrawerBuilder()
                 .withActivity(this)
                 .withDrawerLayout(drawerLayout)
+                .withTranslucentStatusBar(false)
                 .withDrawerGravity(Gravity.LEFT)
                 .withAccountHeader(header)
                 .addDrawerItems(

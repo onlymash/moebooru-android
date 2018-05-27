@@ -45,9 +45,7 @@ class SearchFragment : BasePostsFragment(), SharedPreferences.OnSharedPreference
         context = this.requireContext()
         type = TableType.SEARCH
         toolbar.setTitle(R.string.posts)
-        toolbar.inflateMenu(R.menu.menu_main_search)
         searchActivity.setActionBar(toolbar)
-        setToolbarGridOption()
         setInsetsListener(toolbar)
         val bundle = arguments
         if (bundle != null) {
@@ -80,18 +78,9 @@ class SearchFragment : BasePostsFragment(), SharedPreferences.OnSharedPreference
         loadData()
     }
 
-//    override fun onMenuItemClick(item: MenuItem?): Boolean {
-//        when (item?.itemId) {
-//            R.id.action_grid -> app.settings.gridModeString = Key.GRID_MODE_GRID
-//            R.id.action_staggered_grid -> app.settings.gridModeString = Key.GRID_MODE_STAGGERED_GRID
-//        }
-//        return true
-//    }
-
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             Key.GRID_MODE -> {
-                setToolbarGridOption()
                 reSetupGridMode()
             }
             Key.ACTIVE_PROFILE -> {
