@@ -15,15 +15,15 @@ import im.mash.moebooru.model.Booru
 import im.mash.moebooru.utils.BoorusTable
 import org.jetbrains.anko.db.*
 
-class DatabaseBoorusManager(private var database: DatabaseHelper) : DatabaseBoorusSource {
+class BoorusManager(private var database: DatabaseHelper) : BoorusSource {
 
     companion object {
-        private var instance: DatabaseBoorusManager? = null
+        private var instance: BoorusManager? = null
 
         @Synchronized
-        fun getInstance(database: DatabaseHelper): DatabaseBoorusManager {
+        fun getInstance(database: DatabaseHelper): BoorusManager {
             if (instance == null) {
-                instance = DatabaseBoorusManager(database)
+                instance = BoorusManager(database)
             }
             return instance!!
         }

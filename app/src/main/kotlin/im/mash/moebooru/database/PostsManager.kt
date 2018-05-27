@@ -19,15 +19,15 @@ import org.jetbrains.anko.db.delete
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 
-class DatabasePostsManager(private val database: DatabaseHelper) {
+class PostsManager(private val database: DatabaseHelper) {
 
     companion object {
-        private var instance: DatabasePostsManager? = null
+        private var instance: PostsManager? = null
 
         @Synchronized
-        fun getInstance(database: DatabaseHelper): DatabasePostsManager {
+        fun getInstance(database: DatabaseHelper): PostsManager {
             if (instance == null) {
-                instance = DatabasePostsManager(database)
+                instance = PostsManager(database)
             }
             return instance!!
         }
@@ -79,7 +79,7 @@ class DatabasePostsManager(private val database: DatabaseHelper) {
         val post: RawPost? = null
         database.use {
             select(PostsTable.TABLE_NAME)
-                    .whereSimple("${PostsTable.SITE} = $site")
+                    .whereSimple("${PostsTable.SITE} = ?", site.toString())
         }
         return post
     }
@@ -89,7 +89,7 @@ class DatabasePostsManager(private val database: DatabaseHelper) {
         if (id > -1) {
             database.use {
                 select(PostsTable.TABLE_NAME)
-                        .whereSimple("${PostsTable.SITE} = $site and ${PostsTable.ID} = $id")
+                        .whereSimple("(${PostsTable.SITE} = ?) and (${PostsTable.ID} = ?)", site.toString(), id.toString())
                         .parseOpt(object : MapRowParser<RawPost> {
                             override fun parseRow(columns: Map<String, Any?>): RawPost {
                                 post = makePost(columns)
@@ -103,10 +103,9 @@ class DatabasePostsManager(private val database: DatabaseHelper) {
 
     fun loadPosts(site: Long): MutableList<RawPost> {
         val posts: MutableList<RawPost> = mutableListOf()
-        Log.i(this.javaClass.simpleName, "site: $site")
         database.use {
             select(PostsTable.TABLE_NAME)
-                    .whereSimple("${PostsTable.SITE} = $site")
+                    .whereSimple("${PostsTable.SITE} = ?", site.toString())
                     .parseList(object : MapRowParser<MutableList<RawPost>> {
                         override fun parseRow(columns: Map<String, Any?>): MutableList<RawPost> {
                             posts.add(makePost(columns))
@@ -119,7 +118,7 @@ class DatabasePostsManager(private val database: DatabaseHelper) {
 
     fun deletePosts(site: Long) {
         database.use {
-            delete(PostsTable.TABLE_NAME, "${PostsTable.SITE} = $site")
+            execSQL("delete from ${PostsTable.TABLE_NAME} where ${PostsTable.SITE} = $site")
         }
     }
 

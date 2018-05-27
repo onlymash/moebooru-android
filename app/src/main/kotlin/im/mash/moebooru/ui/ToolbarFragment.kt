@@ -33,29 +33,39 @@ open class ToolbarFragment : Fragment() {
 
     open fun onBackPressed(): Boolean = false
 
-    open fun setInsetsListener(toolbar: Toolbar) {
+    internal fun setInsetsListener(toolbar: Toolbar) {
         val activity = activity
         appBarLayout.addView(toolbar)
-        if (activity is MainActivity){
-            activity.drawer.setToolbar(activity, toolbar, true)
-            ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
+        when (activity) {
+            is MainActivity -> {
+                activity.drawer.setToolbar(activity, toolbar, true)
+                ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
+                    val statusBarSize = insets.systemWindowInsetTop
+                    appBarLayout.minimumHeight = statusBarSize + activity.toolbarHeight
+                    toolbar.setPadding(0, statusBarSize, 0, 0)
+                    appBarLayout.removeView(toolbar)
+                    appBarLayout.addView(toolbar)
+                    if (this is PostsFragment) {
+                        app.settings.statusBarHeightInt = statusBarSize
+                    }
+                    insets
+                }
+            }
+            is DetailsActivity -> ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
                 val statusBarSize = insets.systemWindowInsetTop
                 appBarLayout.minimumHeight = statusBarSize + activity.toolbarHeight
                 toolbar.setPadding(0, statusBarSize, 0, 0)
                 appBarLayout.removeView(toolbar)
                 appBarLayout.addView(toolbar)
-                if (this is PostsFragment) {
-                    app.settings.statusBarHeightInt = statusBarSize
-                }
                 insets
             }
-        } else if (activity is DetailsActivity){
-            ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
+            is SearchActivity -> ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
                 val statusBarSize = insets.systemWindowInsetTop
                 appBarLayout.minimumHeight = statusBarSize + activity.toolbarHeight
                 toolbar.setPadding(0, statusBarSize, 0, 0)
                 appBarLayout.removeView(toolbar)
                 appBarLayout.addView(toolbar)
+                app.settings.statusBarHeightInt = statusBarSize
                 insets
             }
         }

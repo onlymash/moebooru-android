@@ -12,8 +12,10 @@
 package im.mash.moebooru.ui
 
 import android.os.Bundle
+import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.TypedValue
+import android.view.MenuItem
 import im.mash.moebooru.R
 import im.mash.moebooru.utils.Key
 
@@ -44,5 +46,18 @@ class SearchActivity : BaseActivity() {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_moebooru, fragment)
                 .commitAllowingStateLoss()
+    }
+
+    internal fun setActionBar(toolbar: Toolbar) {
+        setSupportActionBar(toolbar)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar!!.setDisplayShowHomeEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == android.R.id.home) {
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

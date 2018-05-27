@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
@@ -25,6 +26,7 @@ import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.adapter.PostsPagerAdapter
 import im.mash.moebooru.utils.Key
+import im.mash.moebooru.utils.TableType
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -35,11 +37,13 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
     private lateinit var bg: View
     private lateinit var postsPager: ViewPager
     private lateinit var postsPagerAdapter: PostsPagerAdapter
+    private lateinit var type: String
 
     private lateinit var toolbar: Toolbar
 
     private var items: MutableList<RawPost>? = null
 
+    @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         toolbar = inflater.inflate(R.layout.layout_toolbar, null) as Toolbar
         return inflater.inflate(R.layout.layout_details, container, false)
@@ -62,10 +66,18 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
         if (bundle != null) {
             val pos = bundle.getInt(Key.ITEM_POS, 0)
             val id = bundle.getInt(Key.ITEM_ID)
+            val type = bundle.getString(Key.TYPE)
+            var tags = ""
+            if (type == TableType.SEARCH) {
+                tags = bundle.getString(Key.TAGS_SEARCH)
+            }
             toolbar.title = "${getString(R.string.post)} $id"
             doAsync {
                 items = try {
-                    app.postsManager.loadPosts(app.settings.activeProfile)
+                    when (type) {
+                        TableType.SEARCH -> app.searchManager.loadPosts(app.settings.activeProfile, tags)
+                        else -> app.postsManager.loadPosts(app.settings.activeProfile)
+                    }
                 } catch (e: Exception) {
                     null
                 }
@@ -115,7 +127,9 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
         activity!!.window.decorView.systemUiVisibility = uiFlags
     }
     private fun hideBar() {
-        val uiFlags = View.SYSTEM_UI_FLAG_IMMERSIVE or View.SYSTEM_UI_FLAG_FULLSCREEN or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        val uiFlags = View.SYSTEM_UI_FLAG_IMMERSIVE or
+                View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         activity!!.window.decorView.systemUiVisibility = uiFlags
     }
 }

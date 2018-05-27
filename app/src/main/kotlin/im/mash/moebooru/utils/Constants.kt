@@ -39,6 +39,8 @@ object Key {
     const val ITEM_POS = "item_position"
     const val ITEM_ID = "item_id"
     const val BUNDLE = "bundle"
+    const val TYPE = "type"
+    const val TAGS_SEARCH = "tags_search"
 
     const val STATUS_BAR_HEIGHT = "status_bar_height"
     const val USER_AGENT_WEB_VIEW = "user_agent_web_view"
@@ -64,6 +66,16 @@ object BoorusTable {
     const val ID = "id"
     const val NAME = "name"
     const val URL = "url"
+}
+
+object TableType {
+    const val SEARCH = "search"
+    const val POSTS = "posts"
+}
+
+object SearchTable {
+    const val TABLE_NAME = "search"
+    const val KEY_WORD = "keyword"
 }
 
 object PostsTable {

@@ -13,7 +13,7 @@ package im.mash.moebooru.database
 
 import im.mash.moebooru.model.Booru
 
-interface DatabaseBoorusSource {
+interface BoorusSource {
 
     fun saveBooru(booru: Booru)
 

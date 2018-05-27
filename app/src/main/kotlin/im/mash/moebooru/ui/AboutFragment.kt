@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
@@ -27,6 +28,7 @@ class AboutFragment : ToolbarFragment() {
 
     private lateinit var toolbar: Toolbar
 
+    @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val configuration = resources.configuration
         toolbar = inflater.inflate(R.layout.layout_toolbar, null) as Toolbar

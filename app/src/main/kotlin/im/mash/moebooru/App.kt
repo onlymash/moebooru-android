@@ -19,9 +19,10 @@ import android.util.Log
 import android.webkit.WebView
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
-import im.mash.moebooru.database.DatabaseBoorusManager
+import im.mash.moebooru.database.BoorusManager
 import im.mash.moebooru.database.DatabaseHelper
-import im.mash.moebooru.database.DatabasePostsManager
+import im.mash.moebooru.database.PostsManager
+import im.mash.moebooru.database.PostsSearchManager
 import im.mash.moebooru.utils.DeviceContext
 import io.fabric.sdk.android.Fabric
 
@@ -35,8 +36,9 @@ class App : Application() {
     private val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
     internal val settings: Settings by lazy { Settings(this) }
     private val database: DatabaseHelper by lazy { DatabaseHelper.getInstance(this) }
-    internal val boorusManager: DatabaseBoorusManager by lazy { DatabaseBoorusManager.getInstance(database) }
-    internal val postsManager: DatabasePostsManager by lazy { DatabasePostsManager.getInstance(database) }
+    internal val boorusManager: BoorusManager by lazy { BoorusManager.getInstance(database) }
+    internal val postsManager: PostsManager by lazy { PostsManager.getInstance(database) }
+    internal val searchManager: PostsSearchManager by lazy { PostsSearchManager.getInstance(database) }
 
     override fun onCreate() {
         super.onCreate()
