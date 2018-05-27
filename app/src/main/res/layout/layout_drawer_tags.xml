@@ -17,9 +17,9 @@
     android:layout_height="match_parent"
     android:layout_gravity="right"
     android:orientation="vertical"
-    android:background="@color/transparent"
     android:id="@+id/tags_drawer_view"
-    tools:ignore="RtlHardcoded">
+    tools:ignore="RtlHardcoded"
+    style="@style/NavView">
 
     <include layout="@layout/layout_drawer_tags_content"/>
 

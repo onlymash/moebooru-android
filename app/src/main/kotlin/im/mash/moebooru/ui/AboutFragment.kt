@@ -13,6 +13,7 @@ package im.mash.moebooru.ui
 
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +25,11 @@ import im.mash.moebooru.R
 
 class AboutFragment : ToolbarFragment() {
 
+    private lateinit var toolbar: Toolbar
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val configuration = resources.configuration
+        toolbar = inflater.inflate(R.layout.layout_toolbar, null) as Toolbar
         val result = inflater.inflate(R.layout.layout_about, container, false)
         if (resources.configuration !== configuration) {
             activity?.recreate()
@@ -37,6 +41,7 @@ class AboutFragment : ToolbarFragment() {
         super.onViewCreated(view, savedInstanceState)
         view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.window_background))
         toolbar.title = getString(R.string.about_title) + " " + BuildConfig.VERSION_NAME
+        setInsetsListener(toolbar)
         val web = view.findViewById<WebView>(R.id.web_view)
         web.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.background))
         web.loadUrl(getString(R.string.about_url))

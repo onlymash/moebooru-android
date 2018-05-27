@@ -11,7 +11,6 @@
 
 package im.mash.moebooru.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.v4.app.Fragment
@@ -24,34 +23,41 @@ import im.mash.moebooru.R
 
 open class ToolbarFragment : Fragment() {
 
-    protected lateinit var toolbar: Toolbar
-    protected lateinit var toolbarLayout: AppBarLayout
+    protected lateinit var appBarLayout: AppBarLayout
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        toolbarLayout = view.findViewById(R.id.toolbar_layout)
-        toolbarLayout.setBackgroundColor(Color.TRANSPARENT)
-        toolbar = view.findViewById(R.id.toolbar)
-        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar))
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.background))
+        appBarLayout = view.findViewById(R.id.appbar_layout)
+    }
+
+    open fun onBackPressed(): Boolean = false
+
+    open fun setInsetsListener(toolbar: Toolbar) {
         val activity = activity
+        appBarLayout.addView(toolbar)
         if (activity is MainActivity){
             activity.drawer.setToolbar(activity, toolbar, true)
-            ViewCompat.setOnApplyWindowInsetsListener(toolbarLayout) { _, insets ->
+            ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
                 val statusBarSize = insets.systemWindowInsetTop
-                toolbarLayout.setPadding(0, statusBarSize, 0, 0)
+                appBarLayout.minimumHeight = statusBarSize + activity.toolbarHeight
+                toolbar.setPadding(0, statusBarSize, 0, 0)
+                appBarLayout.removeView(toolbar)
+                appBarLayout.addView(toolbar)
                 if (this is PostsFragment) {
                     app.settings.statusBarHeightInt = statusBarSize
                 }
                 insets
             }
-        } else {
-            ViewCompat.setOnApplyWindowInsetsListener(toolbarLayout) { _, insets ->
-                toolbarLayout.setPadding(0, insets.systemWindowInsetTop, 0, 0)
+        } else if (activity is DetailsActivity){
+            ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
+                val statusBarSize = insets.systemWindowInsetTop
+                appBarLayout.minimumHeight = statusBarSize + activity.toolbarHeight
+                toolbar.setPadding(0, statusBarSize, 0, 0)
+                appBarLayout.removeView(toolbar)
+                appBarLayout.addView(toolbar)
                 insets
             }
         }
     }
-
-    open fun onBackPressed(): Boolean = false
 }

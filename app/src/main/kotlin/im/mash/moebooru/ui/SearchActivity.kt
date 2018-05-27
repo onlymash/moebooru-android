@@ -12,15 +12,26 @@
 package im.mash.moebooru.ui
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import android.util.DisplayMetrics
+import android.util.TypedValue
 import im.mash.moebooru.R
 import im.mash.moebooru.utils.Key
 
-class SearchActivity : AppCompatActivity() {
+class SearchActivity : BaseActivity() {
+
+    internal var widthScreen: Int = 0
+    internal var toolbarHeight = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_moebooru)
+        val metric: DisplayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(metric)
+        widthScreen = metric.widthPixels
+        val tv = TypedValue()
+        if (theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+        }
         val bundle = intent.getBundleExtra(Key.BUNDLE)
         val searchFragment = SearchFragment()
         searchFragment.arguments = bundle

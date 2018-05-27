@@ -32,21 +32,25 @@ class App : Application() {
         private const val TAG = "MoebooruApp"
     }
 
-    val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
-    val settings: Settings by lazy { Settings(this) }
+    private val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
+    internal val settings: Settings by lazy { Settings(this) }
     private val database: DatabaseHelper by lazy { DatabaseHelper.getInstance(this) }
-    val boorusManager: DatabaseBoorusManager by lazy { DatabaseBoorusManager.getInstance(database) }
-    val postsManager: DatabasePostsManager by lazy { DatabasePostsManager.getInstance(database) }
+    internal val boorusManager: DatabaseBoorusManager by lazy { DatabaseBoorusManager.getInstance(database) }
+    internal val postsManager: DatabasePostsManager by lazy { DatabasePostsManager.getInstance(database) }
 
     override fun onCreate() {
         super.onCreate()
         app = this
+        //init night mode
+        AppCompatDelegate.setDefaultNightMode(settings.nightMode)
+        //init firebase
         FirebaseApp.initializeApp(deviceContext)
+        //init Crashlytics
         if (settings.enabledCrashReport) {
             Log.i(TAG, "CrashReport enabled!!")
             Fabric.with(this, Crashlytics())
         }
-        AppCompatDelegate.setDefaultNightMode(settings.nightMode)
+        //init User-Agent
         try {
             val ua = WebView(this).settings.userAgentString
             settings.userAgentWebView = ua

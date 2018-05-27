@@ -16,7 +16,6 @@ import android.content.ActivityNotFoundException
 import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.net.Uri
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.customtabs.CustomTabsIntent
@@ -25,7 +24,9 @@ import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatDelegate
 import android.support.v7.content.res.AppCompatResources
+import android.util.DisplayMetrics
 import android.util.Log
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import com.mikepenz.materialdrawer.AccountHeader
@@ -46,7 +47,7 @@ import org.jetbrains.anko.uiThread
 import java.util.*
 
 @SuppressLint("RtlHardcoded")
-class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
+class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     companion object {
@@ -74,7 +75,11 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
     private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
     private var previousSelectedDrawer: Long = 0L    // it's actually lateinit
 
+    internal var widthScreen: Int = 0
+    internal var toolbarHeight = 0
+
     private val boorus: MutableList<Booru> = mutableListOf()
+
     private fun loadAsync() {
         doAsync {
             boorus.addAll(app.boorusManager.loadBoorus())
@@ -115,6 +120,15 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_moebooru)
+
+        val metric: DisplayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(metric)
+        widthScreen = metric.widthPixels
+        val tv = TypedValue()
+        if (theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+            toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
+        }
+
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
                 .withIcon(R.drawable.ic_drawer_settings_24dp)

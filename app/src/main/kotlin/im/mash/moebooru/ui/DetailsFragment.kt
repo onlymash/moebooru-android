@@ -14,6 +14,7 @@ package im.mash.moebooru.ui
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
+import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -35,18 +36,22 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
     private lateinit var postsPager: ViewPager
     private lateinit var postsPagerAdapter: PostsPagerAdapter
 
+    private lateinit var toolbar: Toolbar
+
     private var items: MutableList<RawPost>? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        toolbar = inflater.inflate(R.layout.layout_toolbar, null) as Toolbar
         return inflater.inflate(R.layout.layout_details, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
-        toolbarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
+        appBarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
         toolbar.title = getString(R.string.post)
+        setInsetsListener(toolbar)
         val activity = activity as DetailsActivity
         activity.setActionBar(toolbar)
         bg = view.findViewById(R.id.details_bg)

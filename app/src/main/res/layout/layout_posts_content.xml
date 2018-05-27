@@ -28,6 +28,6 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
-    <include layout="@layout/layout_toolbar" />
+    <include layout="@layout/layout_appbar" />
 
 </android.support.constraint.ConstraintLayout>

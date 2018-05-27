@@ -16,6 +16,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
@@ -23,9 +24,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.*
 import android.view.*
-import android.util.DisplayMetrics
 import android.util.Log
-import android.util.TypedValue
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -54,9 +53,11 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     private val TAG = this.javaClass.simpleName
 
+    private lateinit var toolbar: Toolbar
     private lateinit var drawer: NavigationView
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var drawerToolbar: Toolbar
+    private lateinit var appBarLayoutTags: AppBarLayout
     private lateinit var tagsDrawerAdapter: TagsDrawerAdapter
     private lateinit var tagsDrawerView: RecyclerView
     private lateinit var postsView: RecyclerView
@@ -66,17 +67,19 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
 
     private var currentGridMode: String = Key.GRID_MODE_STAGGERED_GRID
 
-    private var width: Int = 0
+    private val mainActivity: MainActivity by lazy { activity as MainActivity }
+
     private var spanCount: Int = 1
     private var itemPadding: Int = 0
-    //工具栏高度
-    private var toolbarHeight = 0
     //当前页数
     private var page = 1
     //items data
     private var items: MutableList<RawPost>? = null
 
+    @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        toolbar = inflater.inflate(R.layout.layout_toolbar, null) as Toolbar
+        drawerToolbar = inflater.inflate(R.layout.layout_toolbar_tags, null) as Toolbar
         return inflater.inflate(R.layout.layout_posts, container, false)
     }
 
@@ -85,38 +88,27 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
 
         //init toolbar
-        toolbarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
+        appBarLayout.setBackgroundColor(ContextCompat.getColor(mainActivity, R.color.toolbar_post))
         toolbar.setTitle(R.string.posts)
         toolbar.inflateMenu(R.menu.menu_main)
-        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
         toolbar.setOnMenuItemClickListener(this)
         setToolbarGridOption()
 
-        //计算窗口宽度
-        val activity = activity as MainActivity
-        val metric: DisplayMetrics = DisplayMetrics()
-        activity.windowManager.defaultDisplay.getMetrics(metric)
-        width = metric.widthPixels
+        setInsetsListener(toolbar)
 
         //计算列数
-        spanCount = width/activity.resources.getDimension(R.dimen.item_width).toInt()
+        spanCount = mainActivity.widthScreen/mainActivity.resources.getDimension(R.dimen.item_width).toInt()
         app.settings.spanCountInt = spanCount
 
         //item 边距
-        itemPadding = activity.resources.getDimension(R.dimen.item_padding).toInt()
-
-        //第一行 item 要加上 toolbar 的高度
-        val tv = TypedValue()
-        if (activity.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
-            toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
-        }
+        itemPadding = mainActivity.resources.getDimension(R.dimen.item_padding).toInt()
 
         //监听 MainActivity 的左侧抽屉
-        activity.drawer.drawerLayout.addDrawerListener(this)
+        mainActivity.drawer.drawerLayout.addDrawerListener(this)
 
         //SwipeRefreshLayout
         refresh = view.findViewById(R.id.refresh)
-        refresh.setProgressViewOffset(true, toolbarHeight, toolbarHeight + 150)
+        refresh.setProgressViewOffset(true, mainActivity.toolbarHeight, mainActivity.toolbarHeight + 150)
         refresh.setColorSchemeResources(
                 R.color.blue,
                 R.color.purple,
@@ -130,7 +122,7 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         initRightDrawer(view)
 
         //init Adapter
-        postsAdapter = PostsAdapter(this.requireContext(), itemPadding, toolbarHeight + app.settings.statusBarHeightInt,null)
+        postsAdapter = PostsAdapter(this.requireContext(), itemPadding, mainActivity.toolbarHeight + app.settings.statusBarHeightInt,null)
 
         //init RecyclerView listener
         app.settings.isNotMoreData = false
@@ -176,16 +168,10 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
     private fun initRightDrawer(view: View) {
         drawerLayout = view.findViewById(R.id.drawer_layout_posts)
         drawer = view.findViewById(R.id.tags_drawer_view)
-        drawerToolbar = view.findViewById(R.id.toolbar_tags)
-        drawerToolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar))
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener(this)
         drawerToolbar.setOnClickListener(this)
-        ViewCompat.setOnApplyWindowInsetsListener(drawer) { _, insets ->
-            drawer.setPadding(0, insets.systemWindowInsetTop, 0, 0)
-            insets
-        }
 
         val itemsTag = mutableListOf(
                 "item1",
@@ -214,12 +200,19 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
                 "item8"
         )
         tagsDrawerAdapter = TagsDrawerAdapter(this.requireContext(), itemsTag)
-        tagsDrawerView = view.findViewById(R.id.search_tags_list)
+        tagsDrawerView = view.findViewById(R.id.rv_tags_list)
         tagsDrawerView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
         tagsDrawerView.adapter = tagsDrawerAdapter
-        val tagsLayout: LinearLayout = view.findViewById(R.id.drawer_search_tags_layout)
+        val tagsDrawerViewLayout = view.findViewById<LinearLayout>(R.id.rv_tags_list_layout)
+        appBarLayoutTags = view.findViewById(R.id.appbar_layout_tags)
+        appBarLayoutTags.addView(drawerToolbar)
         ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, insets ->
-            tagsLayout.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            val statusBarSize = insets.systemWindowInsetTop
+            tagsDrawerViewLayout.setPadding(0, mainActivity.toolbarHeight + statusBarSize, 0, insets.systemWindowInsetBottom)
+            drawerToolbar.setPadding(0, statusBarSize, 0, 0)
+            appBarLayoutTags.minimumHeight = mainActivity.toolbarHeight + statusBarSize
+            appBarLayoutTags.removeView(drawerToolbar)
+            appBarLayoutTags.addView(drawerToolbar)
             insets
         }
     }
@@ -305,12 +298,12 @@ class PostsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener, View.O
         currentGridMode = app.settings.gridModeString
         when (currentGridMode) {
             Key.GRID_MODE_GRID -> {
-                postsView.layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                postsView.layoutManager = GridLayoutManager(this.context, 3, GridLayoutManager.VERTICAL, false)
                 postsView.setHasFixedSize(true)
             }
             else -> {
                 currentGridMode = Key.GRID_MODE_STAGGERED_GRID
-                postsView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                postsView.layoutManager = StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL)
                 postsView.setHasFixedSize(false)
             }
         }

@@ -15,19 +15,25 @@ import android.content.Context
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
+import android.support.v7.widget.Toolbar
 import android.view.*
 import im.mash.moebooru.R
 import im.mash.moebooru.utils.childFragManager
 
 class SettingsFragment : ToolbarFragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-            inflater.inflate(R.layout.layout_settings, container, false)
+    private lateinit var toolbar: Toolbar
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        toolbar = inflater.inflate(R.layout.layout_toolbar, null) as Toolbar
+        return inflater.inflate(R.layout.layout_settings, container, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.window_background))
         toolbar.setTitle(R.string.settings)
+        setInsetsListener(toolbar)
         val fm = childFragmentManager
         fm.beginTransaction().replace(R.id.content, SettingsPreferenceFragment()).commit()
         fm.executePendingTransactions()

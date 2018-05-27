@@ -10,18 +10,11 @@
   ~
   -->
 
-<LinearLayout
+<android.support.design.widget.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/appbar_layout_tags"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <include layout="@layout/layout_appbar" />
-
-    <FrameLayout
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-
-</LinearLayout>
+    android:layout_height="wrap_content"
+    app:elevation="0dp"
+    style="@style/AppBar"/>
