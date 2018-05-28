@@ -19,6 +19,7 @@
     </style>
 
     <style name="MoeTheme.Main" parent="MoeTheme">
+        <item name="android:windowBackground">@color/window_background</item>
         <item name="preferenceTheme">@style/MoeTheme.PreferenceTheme</item>
         <!-- MaterialDrawer specific values -->
         <item name="material_drawer_background">@color/drawer_background</item>
@@ -38,7 +39,9 @@
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@style/MoeAnimation.SlidingBack</item>
     </style>
 
 
@@ -63,6 +66,21 @@
 
     <style name="NavView" parent="Widget.Design.NavigationView">
         <item name="android:background">@color/background</item>
+    </style>
+
+    <style name="MoeAnimation.SlidingBack" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/in_from_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/out_to_right</item>
+        <item name="android:activityCloseEnterAnimation">@anim/in_from_right</item>
+        <item name="android:activityCloseExitAnimation">@anim/out_to_right</item>
+        <item name="android:wallpaperOpenEnterAnimation">@anim/in_from_right</item>
+        <item name="android:wallpaperOpenExitAnimation">@anim/out_to_right</item>
+        <item name="android:wallpaperCloseEnterAnimation">@anim/in_from_right</item>
+        <item name="android:wallpaperCloseExitAnimation">@anim/out_to_right</item>
+        <item name="android:wallpaperIntraOpenEnterAnimation">@anim/in_from_right</item>
+        <item name="android:wallpaperIntraOpenExitAnimation">@anim/out_to_right</item>
+        <item name="android:wallpaperIntraCloseEnterAnimation">@anim/in_from_right</item>
+        <item name="android:wallpaperIntraCloseExitAnimation">@anim/out_to_right</item>
     </style>
 
 </resources>
