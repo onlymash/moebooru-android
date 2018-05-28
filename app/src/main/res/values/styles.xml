@@ -16,26 +16,10 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
+    </style>
+
+    <style name="MoeTheme.Main" parent="MoeTheme">
         <item name="preferenceTheme">@style/MoeTheme.PreferenceTheme</item>
-        <item name="android:statusBarColor">@color/transparent</item>
-        <item name="android:navigationBarColor">@color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:windowBackground">@color/window_background</item>
-    </style>
-
-    <style name="ThemeOverlay.AppCompat.DayNight" parent="ThemeOverlay.AppCompat.Light"/>
-
-    <style name="MoeTheme.PreferenceTheme" parent="PreferenceThemeOverlay">
-        <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>
-        <item name="switchPreferenceCompatStyle">@style/Preference.SwitchPreferenceCompat</item>
-    </style>
-
-    <style name="MoeTheme.Base" parent="Theme.AppCompat.DayNight.NoActionBar">
-
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowShowWallpaper">false</item>
-
         <!-- MaterialDrawer specific values -->
         <item name="material_drawer_background">@color/drawer_background</item>
         <item name="material_drawer_primary_text">@color/drawer_primary_text</item>
@@ -48,15 +32,21 @@
         <item name="material_drawer_header_selection_text">@color/drawer_header_selection_text</item>
     </style>
 
-    <style name="DetailsTheme" parent="MoeTheme.Base">
-        <item name="colorPrimary">@color/transparent</item>
-        <item name="colorPrimaryDark">@color/transparent</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="android:statusBarColor">@color/transparent</item>
-        <item name="android:navigationBarColor">@color/transparent</item>
+    <style name="MoeTheme.Base" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowShowWallpaper">false</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
+
+
+    <style name="ThemeOverlay.AppCompat.DayNight" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="MoeTheme.PreferenceTheme" parent="PreferenceThemeOverlay">
+        <item name="simpleMenuPreferenceStyle">@style/Preference.SimpleMenuPreference</item>
+        <item name="switchPreferenceCompatStyle">@style/Preference.SwitchPreferenceCompat</item>
     </style>
 
     <style name="Toolbar" parent="Widget.AppCompat.Toolbar">
