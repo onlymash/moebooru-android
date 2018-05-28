@@ -50,4 +50,11 @@
 
     <string name="remove">Remove</string>
     <string name="copy">Copy</string>
+
+    <string name="post_size_download">Download size</string>
+    <string name="post_size_browse">Browse size</string>
+
+    <string name="post_size_sample">Sample</string>
+    <string name="post_size_larger">Larger</string>
+    <string name="post_size_origin">Origin</string>
 </resources>

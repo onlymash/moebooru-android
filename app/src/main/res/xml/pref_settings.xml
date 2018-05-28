@@ -51,6 +51,26 @@
             android:icon="@drawable/ic_settings_item_numbered_24dp"
             app:iconSpaceReserved="true" />
 
+        <SimpleMenuPreference
+            android:key="post_size_browse"
+            android:entries="@array/post_size"
+            android:entryValues="@array/post_size_values"
+            android:defaultValue="sample"
+            android:summary="%s"
+            android:title="@string/post_size_browse"
+            android:icon="@drawable/ic_settings_eye_24dp"
+            app:iconSpaceReserved="true" />
+
+        <SimpleMenuPreference
+            android:key="post_size_download"
+            android:entries="@array/post_size"
+            android:entryValues="@array/post_size_values"
+            android:defaultValue="larger"
+            android:summary="%s"
+            android:title="@string/post_size_download"
+            android:icon="@drawable/ic_settings_file_download_24dp"
+            app:iconSpaceReserved="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

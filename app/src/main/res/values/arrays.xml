@@ -105,4 +105,16 @@
         <item>2048</item>
     </string-array>
 
+    <string-array name="post_size">
+        <item>@string/post_size_sample</item>
+        <item>@string/post_size_larger</item>
+        <item>@string/post_size_origin</item>
+    </string-array>
+
+    <string-array name="post_size_values">
+        <item>sample</item>
+        <item>larger</item>
+        <item>origin</item>
+    </string-array>
+
 </resources>

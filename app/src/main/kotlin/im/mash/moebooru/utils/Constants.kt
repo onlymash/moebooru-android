@@ -26,6 +26,11 @@ object Key {
     const val GRID_MODE_STAGGERED_GRID = "staggered_grid"
 
     const val POST_LIMIT = "post_limit"
+    const val POST_SIZE_BROWSE = "post_size_browse"
+    const val POST_SIZE_DOWNLOAD = "post_size_download"
+    const val POST_SIZE_SAMPLE = "sample"
+    const val POST_SIZE_LARGER = "larger"
+    const val POST_SIZE_ORIGIN = "origin"
     const val CACHE_MEMORY = "cache_memory"
     const val CACHE_DISK = "cache_disk"
 

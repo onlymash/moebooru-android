@@ -32,9 +32,11 @@ import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.DetailsFragment
+import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader
 
-class PostsPagerAdapter(private val detailsFragment: DetailsFragment, private var items: MutableList<RawPost>?) : PagerAdapter() {
+class PostsPagerAdapter(private val detailsFragment: DetailsFragment,
+                        private var items: MutableList<RawPost>?, private val postSize: String) : PagerAdapter() {
 
     private val context: Context = detailsFragment.requireContext()
 
@@ -62,9 +64,13 @@ class PostsPagerAdapter(private val detailsFragment: DetailsFragment, private va
         }
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
-        container.addView(view, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        val url = when (postSize) {
+            Key.POST_SIZE_LARGER -> items!![position].jpeg_url
+            Key.POST_SIZE_ORIGIN -> items!![position].file_url
+            else -> items!![position].sample_url
+        }
         GlideApp.with(context)
-                .load(GlideUrl(items?.get(position)?.sample_url, glideHeader))
+                .load(GlideUrl(url, glideHeader))
                 .fitCenter()
                 .listener(object : RequestListener<Drawable> {
                     override fun onResourceReady(resource: Drawable?, model: Any?,
@@ -82,6 +88,7 @@ class PostsPagerAdapter(private val detailsFragment: DetailsFragment, private va
                     }
                 })
                 .into(photoView)
+        container.addView(view, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         return view
     }
 

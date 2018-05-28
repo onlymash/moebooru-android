@@ -81,4 +81,12 @@ class Settings(ctx: Context) {
     var enabledCrashReport: Boolean
         get() = sp.getBoolean(Key.ENABLE_CRASH_REPORT, true)
         set(value) = editor.putBoolean(Key.ENABLE_CRASH_REPORT, value).apply()
+
+    var postSizeBrowse: String
+        get() = sp.getString(Key.POST_SIZE_BROWSE, Key.POST_SIZE_SAMPLE)
+        set(value) = editor.putString(Key.POST_SIZE_BROWSE, value).apply()
+
+    var postSizeDownload: String
+        get() = sp.getString(Key.POST_SIZE_DOWNLOAD, Key.POST_SIZE_LARGER)
+        set(value) = editor.putString(Key.POST_SIZE_DOWNLOAD, value).apply()
 }

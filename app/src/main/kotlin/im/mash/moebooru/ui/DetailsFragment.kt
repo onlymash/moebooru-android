@@ -84,7 +84,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
                 uiThread {
                     if (items != null && items!!.size > 0) {
                         Log.i(TAG, "items?.size: ${items?.size}")
-                        postsPagerAdapter = PostsPagerAdapter(this@DetailsFragment, items)
+                        postsPagerAdapter = PostsPagerAdapter(this@DetailsFragment, items, app.settings.postSizeBrowse)
                         postsPager.adapter = postsPagerAdapter
                         postsPager.currentItem = pos
                     } else {
