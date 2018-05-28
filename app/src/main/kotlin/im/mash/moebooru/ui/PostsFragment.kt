@@ -285,7 +285,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
     override fun onResume() {
         super.onResume()
 //        reSetupGridMode()
-        loadData()
+//        loadData()
     }
 
     override fun onBackPressed(): Boolean {
