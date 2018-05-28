@@ -120,6 +120,8 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
 
         tagsDrawerView = view.findViewById(R.id.rv_tags_list)
         tagsDrawerView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
+        tagsDrawerAdapter = TagsDrawerAdapter(this, null)
+        tagsDrawerView.adapter = tagsDrawerAdapter
 
         doAsync {
             try {
@@ -128,8 +130,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
                 Log.i(TAG, "Get tags failed!!")
             }
             uiThread {
-                tagsDrawerAdapter = TagsDrawerAdapter(this@PostsFragment, itemsTag)
-                tagsDrawerView.adapter = tagsDrawerAdapter
+                tagsDrawerAdapter.updateData(itemsTag)
             }
         }
         val tagsDrawerViewLayout = view.findViewById<LinearLayout>(R.id.rv_tags_list_layout)

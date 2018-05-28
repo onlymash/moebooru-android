@@ -39,7 +39,7 @@ class TagsDrawerAdapter(private val postsFragment: PostsFragment,
        return itemsTag?.size?:0
     }
 
-    fun updateData(itemsTag: MutableList<Tag>) {
+    fun updateData(itemsTag: MutableList<Tag>?) {
         this.itemsTag = itemsTag
         notifyDataSetChanged()
     }
@@ -47,9 +47,7 @@ class TagsDrawerAdapter(private val postsFragment: PostsFragment,
     override fun onBindViewHolder(holder: TagsDrawerViewHolder, position: Int) {
         if (itemCount > 0) {
             holder.checkTag.text = itemsTag!![position].name
-            if (itemsTag!![position].is_selected) {
-                holder.checkTag.isChecked = true
-            }
+            holder.checkTag.isChecked = itemsTag!![position].is_selected
             holder.itemView.setOnClickListener {
                 if (holder.checkTag.isChecked) {
                     holder.checkTag.isChecked = false
