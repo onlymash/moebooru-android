@@ -33,7 +33,6 @@ import im.mash.moebooru.R
 import im.mash.moebooru.model.Tag
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.ui.adapter.TagsDrawerAdapter
-import im.mash.moebooru.ui.listener.RecyclerViewClickListener
 import im.mash.moebooru.utils.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
