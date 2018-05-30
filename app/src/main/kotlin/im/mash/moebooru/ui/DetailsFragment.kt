@@ -12,36 +12,36 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.adapter.PostsPagerAdapter
-import im.mash.moebooru.utils.Key
-import im.mash.moebooru.utils.TableType
+import im.mash.moebooru.ui.widget.VerticalViewPager
+import im.mash.moebooru.utils.getViewModel
+import im.mash.moebooru.viewmodel.PostsViewModel
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
-class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
+class DetailsFragment : ToolbarFragment() {
 
     private val TAG = this::class.java.simpleName
     private var post: RawPost? = null
     private lateinit var bg: View
-    private lateinit var postsPager: ViewPager
-    private lateinit var postsPagerAdapter: PostsPagerAdapter
-    private lateinit var type: String
-
+    private lateinit var detailsPager: VerticalViewPager
+    private lateinit var detailsPagerAdapter: DummyAdapter
     private lateinit var toolbar: Toolbar
-
-    private var items: MutableList<RawPost>? = null
+    internal var items: MutableList<RawPost>? = null
+    private lateinit var postsPager: ViewPager
 
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -60,76 +60,91 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
         activity.setActionBar(toolbar)
         bg = view.findViewById(R.id.details_bg)
         bg.visibility = View.GONE
-        postsPager = view.findViewById(R.id.post_view_pager)
-        postsPager.addOnPageChangeListener(this)
-        val bundle = arguments
-        if (bundle != null) {
-            val pos = bundle.getInt(Key.ITEM_POS, 0)
-            val id = bundle.getInt(Key.ITEM_ID)
-            val type = bundle.getString(Key.TYPE)
-            var tags = ""
-            if (type == TableType.SEARCH) {
-                tags = bundle.getString(Key.TAGS_SEARCH)
-            }
-            toolbar.title = "${getString(R.string.post)} $id"
+        activity.fmWidget(bg, toolbar)
+        detailsPager = view.findViewById(R.id.post_page_pager)
+        detailsPagerAdapter = DummyAdapter(activity.supportFragmentManager,
+                mutableListOf(
+                        TagsFragment(),
+                        PagerFragment(),
+                        InfoFragment()
+                ))
+        detailsPager.adapter = detailsPagerAdapter
+        detailsPager.currentItem = 1
+    }
+
+    inner class DummyAdapter(fm: FragmentManager,
+                             private val fragments: MutableList<Fragment>) : FragmentStatePagerAdapter(fm) {
+
+        override fun getItem(position: Int): Fragment {
+            return fragments[position]
+        }
+
+        override fun getCount(): Int {
+            return fragments.size
+        }
+    }
+
+
+    internal class PagerFragment : Fragment() {
+
+        companion object {
+            private const val TAG = "PagerFragment"
+        }
+        private lateinit var postsPager: ViewPager
+        private var postsPagerAdapter: PostsPagerAdapter? = null
+
+        private var currentPosition: Int = 0
+        private var tags: String? = null
+
+        private lateinit var postsViewModel: PostsViewModel
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            return inflater.inflate(R.layout.layout_details_pager, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            val activity = activity as DetailsActivity
+            tags = activity.tags
+            currentPosition = activity.currentPosition
+            postsViewModel = this.getViewModel()
+            postsPager = view.findViewById(R.id.post_pager)
+            postsViewModel.getPosts(tags).observe(this, Observer {
+                activity.items = postsViewModel.getPosts(tags).value
+                if (postsPagerAdapter == null) {
+                    postsPagerAdapter = PostsPagerAdapter(activity.items, app.settings.postSizeBrowse, activity)
+                    postsPager.adapter = postsPagerAdapter
+                    postsPager.currentItem = currentPosition
+                }
+            })
             doAsync {
-                items = try {
-                    when (type) {
-                        TableType.SEARCH -> app.searchManager.loadPosts(app.settings.activeProfile, tags)
-                        else -> app.postsManager.loadPosts(app.settings.activeProfile)
-                    }
-                } catch (e: Exception) {
-                    null
-                }
-                uiThread {
-                    if (items != null && items!!.size > 0) {
-                        Log.i(TAG, "items?.size: ${items?.size}")
-                        postsPagerAdapter = PostsPagerAdapter(this@DetailsFragment, items, app.settings.postSizeBrowse)
-                        postsPager.adapter = postsPagerAdapter
-                        postsPager.currentItem = pos
-                    } else {
-                        Toast.makeText(this@DetailsFragment.requireContext(), "Load failed!!", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                postsViewModel.getPosts(tags)
             }
         }
     }
 
-    override fun onPageScrollStateChanged(state: Int) {
+    internal class TagsFragment : Fragment() {
 
-    }
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            return inflater.inflate(R.layout.layout_details_tags, container, false)
+        }
 
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
-        toolbar.title = "${getString(R.string.post)} ${items!![position].id}"
-    }
-
-    override fun onPageSelected(position: Int) {
-
-    }
-
-    fun onClickPhotoView() {
-        when (bg.visibility) {
-            View.GONE -> {
-                bg.visibility = View.VISIBLE
-                toolbar.visibility = View.GONE
-                hideBar()
-            }
-            else -> {
-                bg.visibility = View.GONE
-                toolbar.visibility = View.VISIBLE
-                showBar()
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+            if (activity != null) {
             }
         }
     }
 
-    private fun showBar() {
-        val uiFlags = View.SYSTEM_UI_FLAG_VISIBLE
-        activity!!.window.decorView.systemUiVisibility = uiFlags
-    }
-    private fun hideBar() {
-        val uiFlags = View.SYSTEM_UI_FLAG_IMMERSIVE or
-                View.SYSTEM_UI_FLAG_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-        activity!!.window.decorView.systemUiVisibility = uiFlags
+    internal class InfoFragment : Fragment() {
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+            return inflater.inflate(R.layout.layout_details_info, container, false)
+        }
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+
+        }
     }
 }

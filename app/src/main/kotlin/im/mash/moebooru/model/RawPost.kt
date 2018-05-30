@@ -11,9 +11,6 @@
 
 package im.mash.moebooru.model
 
-import android.os.Parcel
-import android.os.Parcelable
-
 data class RawPost(
         val id: Long?,
         val tags: String?,
@@ -47,88 +44,4 @@ data class RawPost(
         val width: Long?,
         val height: Long?,
         val is_held: Boolean?
-) : Parcelable {
-    constructor(parcel: Parcel) : this(
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Boolean::class.java.classLoader) as? Boolean,
-            parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Boolean::class.java.classLoader) as? Boolean,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readString(),
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Long::class.java.classLoader) as? Long,
-            parcel.readValue(Boolean::class.java.classLoader) as? Boolean) {
-    }
-
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeValue(id)
-        parcel.writeString(tags)
-        parcel.writeValue(created_at)
-        parcel.writeValue(creator_id)
-        parcel.writeString(author)
-        parcel.writeValue(change)
-        parcel.writeString(source)
-        parcel.writeValue(score)
-        parcel.writeString(md5)
-        parcel.writeValue(file_size)
-        parcel.writeString(file_url)
-        parcel.writeValue(is_shown_in_index)
-        parcel.writeString(preview_url)
-        parcel.writeValue(preview_width)
-        parcel.writeValue(preview_height)
-        parcel.writeValue(actual_preview_width)
-        parcel.writeValue(actual_preview_height)
-        parcel.writeString(sample_url)
-        parcel.writeValue(sample_width)
-        parcel.writeValue(sample_height)
-        parcel.writeValue(sample_file_size)
-        parcel.writeString(jpeg_url)
-        parcel.writeValue(jpeg_width)
-        parcel.writeValue(jpeg_height)
-        parcel.writeValue(jpeg_file_size)
-        parcel.writeString(rating)
-        parcel.writeValue(has_children)
-        parcel.writeValue(parent_id)
-        parcel.writeString(status)
-        parcel.writeValue(width)
-        parcel.writeValue(height)
-        parcel.writeValue(is_held)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<RawPost> {
-        override fun createFromParcel(parcel: Parcel): RawPost {
-            return RawPost(parcel)
-        }
-
-        override fun newArray(size: Int): Array<RawPost?> {
-            return arrayOfNulls(size)
-        }
-    }
-}
+)

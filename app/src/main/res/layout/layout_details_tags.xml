@@ -15,17 +15,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <View
-        android:id="@+id/details_bg"
+    <ImageView
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:background="@color/black"/>
-
-    <im.mash.moebooru.ui.widget.VerticalViewPager
-        android:id="@+id/post_page_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <include layout="@layout/layout_appbar" />
-
+        android:src="@mipmap/ic_launcher"/>
 </android.support.constraint.ConstraintLayout>

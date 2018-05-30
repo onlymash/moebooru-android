@@ -12,14 +12,12 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import im.mash.moebooru.App.Companion.app
@@ -74,6 +72,18 @@ class SearchFragment : BasePostsFragment(), SharedPreferences.OnSharedPreference
         //监听设置变化
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
+
+        postsViewModel!!.getPosts(tags).observe(this, Observer {
+            val posts = postsViewModel!!.getPosts(tags).value
+            if (posts != null && items !=null && posts.size > items!!.size) {
+                //加载更多
+                items = posts
+                postsAdapter.addData(items)
+            } else {
+                items = posts
+                postsAdapter.updateData(posts)
+            }
+        })
 
         loadData()
     }

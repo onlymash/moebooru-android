@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.ui
 
+import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -21,26 +22,19 @@ import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Toast
-import com.google.gson.Gson
-import com.google.gson.JsonParseException
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
-import im.mash.moebooru.model.ParamGet
 import im.mash.moebooru.model.RawPost
-import im.mash.moebooru.network.MoeHttpClient
-import im.mash.moebooru.network.MoeResponse
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.ui.listener.LastItemListener
 import im.mash.moebooru.ui.listener.RecyclerViewClickListener
-import im.mash.moebooru.utils.Key
-import im.mash.moebooru.utils.TableType
-import im.mash.moebooru.utils.fromJson
-import im.mash.moebooru.utils.okHttpHeader
+import im.mash.moebooru.utils.*
+import im.mash.moebooru.viewmodel.PostsViewModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-open class BasePostsFragment : ToolbarFragment(), SwipeRefreshLayout.OnRefreshListener {
+abstract class BasePostsFragment : ToolbarFragment(), SwipeRefreshLayout.OnRefreshListener {
 
     private val TAG = this.javaClass.simpleName
 
@@ -63,10 +57,13 @@ open class BasePostsFragment : ToolbarFragment(), SwipeRefreshLayout.OnRefreshLi
 
     internal var tags: String? = null
 
+    internal var postsViewModel: PostsViewModel? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.primary))
         appBarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
+        postsViewModel = this.getViewModel()
     }
     //设置 Toolbar 网格选项
     internal fun setToolbarGridOption() {
@@ -177,160 +174,39 @@ open class BasePostsFragment : ToolbarFragment(), SwipeRefreshLayout.OnRefreshLi
         }
     }
 
-    private fun getResponseData(): MoeResponse? {
-        var response: MoeResponse? = null
-        val siteUrl = try {
-            app.boorusManager.getBooru(app.settings.activeProfile).url
-        } catch (e: Exception) {
-            null
+    override fun onRefresh() {
+        refreshData()
+    }
+
+    private fun refreshData() {
+        app.settings.isNotMoreData = false
+        refreshLayout.isRefreshing = true
+        doAsync {
+            postsViewModel!!.refreshPosts(tags)
+            uiThread {
+                refreshLayout.isRefreshing = false
+            }
         }
-        if (siteUrl != null) {
-            val limit = app.settings.postLimitInt
-            val url = ParamGet(siteUrl, page.toString(), limit.toString(), null,
-                    tags, null, null, null).makeGetUrl()
-            response = MoeHttpClient.instance.get(url, null, okHttpHeader)
-        }
-        return response
     }
 
     internal fun loadMoreData() {
         refreshLayout.isRefreshing = true
-        page = postsAdapter.itemCount/ app.settings.postLimitInt + 1
-        Log.i(TAG, "Loading more data...")
         doAsync {
-            val response: MoeResponse? = getResponseData()
-            var result: MutableList<RawPost>? = null
-            try {
-                result = Gson().fromJson<MutableList<RawPost>>(response?.getResponseAsString().toString())
-            } catch (e: JsonParseException) {
-                Log.i(TAG, "Gson exception!")
-            }
-            if (result != null && result.size > 0) {
-                if (result.size < app.settings.postLimitInt) {
-                    app.settings.isNotMoreData = true
-                }
-                when (type) {
-                    TableType.POSTS -> {
-                        app.postsManager.savePosts(result, app.settings.activeProfile)
-                    }
-                    TableType.SEARCH -> {
-                        if (tags != null) app.searchManager.savePosts(result, app.settings.activeProfile, tags!!)
-                    }
-                }
-                if (items == null) {
-                    items = result
-                } else {
-                    result.forEach {
-                        items!!.add(it)
-                    }
-                }
-            } else {
-                app.settings.isNotMoreData = true
-            }
+            postsViewModel!!.loadMorePosts(tags)
             uiThread {
                 refreshLayout.isRefreshing = false
-                Log.i(TAG, "Load more data finished!")
-                if (items != null) {
-                    postsAdapter.addData(items)
-                } else {
-                    Log.i(TAG, "Not data")
-                }
             }
         }
     }
 
     internal fun loadData() {
-        doAsync {
-            try {
-                when (type) {
-                    TableType.SEARCH -> {
-                        if (tags != null) {
-                            Log.i(TAG, "Tags: $tags")
-                            items = app.searchManager.loadPosts(app.settings.activeProfile, tags!!)
-                            if (items != null) {
-                                Log.i(TAG, "items.size: ${items!!.size}")
-                            }
-                        }
-                    }
-                    else -> {
-                        items = app.postsManager.loadPosts(app.settings.activeProfile)
-                    }
-                }
-            } catch (e: Exception) {
-                items = null
-                Log.i(TAG, "items = null")
-            }
-            if (items == null) {
-                Log.i(TAG, "$type loadData(): items == null")
-            }
-            uiThread {
-                if (items != null && items!!.size > 0) {
-                    postsAdapter.updateData(items)
-                } else {
-                    refreshData()
-                }
-            }
-        }
-    }
-
-    override fun onRefresh() {
-        Log.i(TAG, "Refreshing!!")
-        refreshData()
-    }
-
-    internal fun refreshData() {
         refreshLayout.isRefreshing = true
-        app.settings.isNotMoreData = false
-        page = 1
         doAsync {
-            val response: MoeResponse? = getResponseData()
-            var result: MutableList<RawPost>? = null
-            if (response != null) {
-                try {
-                    result = Gson().fromJson<MutableList<RawPost>>(response.getResponseAsString().toString())
-                } catch (e: JsonParseException) {
-                    result = null
-                    Log.i(TAG, "Gson exception! response == " + response.getResponseAsString().toString())
-                } finally {
-                    if (result != null) {
-                        when (type) {
-                            TableType.POSTS -> {
-                                try {
-                                    app.postsManager.deletePosts(app.settings.activeProfile)
-                                } catch (e: Exception) {
-                                    Log.i(TAG, "Delete posts failed!!")
-                                }
-                                try {
-                                    app.postsManager.savePosts(result, app.settings.activeProfile)
-                                } catch (e: Exception) {
-                                    Log.i(TAG, "Save posts failed!!")
-                                }
-                            }
-                            TableType.SEARCH -> {
-                                if (tags != null) {
-                                    try {
-                                        app.searchManager.deletePosts(app.settings.activeProfile, tags!!)
-                                    } catch (e: Exception) {
-                                        Log.i(TAG, "Delete search posts failed!!")
-                                    }
-                                    try {
-                                        app.searchManager.savePosts(result, app.settings.activeProfile, tags!!)
-                                    } catch (e: Exception) {
-                                        Log.i(TAG, "Save search posts failed!!")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            items = postsViewModel!!.getPosts(tags).value
             uiThread {
                 refreshLayout.isRefreshing = false
-                if (result != null) {
-                    items = result
-                    postsAdapter.updateData(items)
-                } else {
-                    Toast.makeText(context, "Not data.", Toast.LENGTH_SHORT).show()
+                if (items == null) {
+                    refreshData()
                 }
             }
         }

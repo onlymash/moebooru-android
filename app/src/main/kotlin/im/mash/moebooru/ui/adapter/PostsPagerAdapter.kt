@@ -31,14 +31,13 @@ import com.bumptech.glide.request.target.Target
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.model.RawPost
-import im.mash.moebooru.ui.DetailsFragment
+import im.mash.moebooru.ui.DetailsActivity
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader
 
-class PostsPagerAdapter(private val detailsFragment: DetailsFragment,
-                        private var items: MutableList<RawPost>?, private val postSize: String) : PagerAdapter() {
-
-    private val context: Context = detailsFragment.requireContext()
+class PostsPagerAdapter(private var items: MutableList<RawPost>?,
+                        private val postSize: String,
+                        private val activity: DetailsActivity) : PagerAdapter() {
 
     override fun isViewFromObject(view: View, `object`: Any): Boolean {
         return view == `object`
@@ -60,7 +59,7 @@ class PostsPagerAdapter(private val detailsFragment: DetailsFragment,
         val photoView = view.findViewById<PhotoView>(R.id.post_img)
         photoView.enable()
         photoView.setOnClickListener {
-            detailsFragment.onClickPhotoView()
+            activity.onClickPhotoView()
         }
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
@@ -69,7 +68,7 @@ class PostsPagerAdapter(private val detailsFragment: DetailsFragment,
             Key.POST_SIZE_ORIGIN -> items!![position].file_url
             else -> items!![position].sample_url
         }
-        GlideApp.with(context)
+        GlideApp.with(container.context)
                 .load(GlideUrl(url, glideHeader))
                 .fitCenter()
                 .listener(object : RequestListener<Drawable> {

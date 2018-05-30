@@ -11,18 +11,39 @@
 
 package im.mash.moebooru.ui
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
 import android.view.MenuItem
+import android.view.View
+import android.widget.ImageView
 import im.mash.moebooru.R
+import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.utils.*
+import im.mash.moebooru.viewmodel.DetailsPositionViewModel
+import im.mash.moebooru.viewmodel.PostsViewModel
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class DetailsActivity : BaseActivity() {
 
+    companion object {
+        private const val TAG = "DetailsActivity"
+    }
+
     internal var widthScreen: Int = 0
     internal var toolbarHeight = 0
+    internal var tags: String? = null
+    internal var currentPosition: Int = 0
+    internal var currentPostId: Int = 0
+    internal lateinit var positionViewModel: DetailsPositionViewModel
+    internal var items: MutableList<RawPost>? =null
+
+    internal lateinit var toolbarFm: Toolbar
+    internal lateinit var bgFm: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +55,18 @@ class DetailsActivity : BaseActivity() {
         if (theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
         }
-
+        positionViewModel = this.getViewModel()
         val bundle = intent.getBundleExtra(Key.BUNDLE)
+        if (bundle != null) {
+            currentPosition = bundle.getInt(Key.ITEM_POS, 0)
+            currentPostId = bundle.getInt(Key.ITEM_ID)
+            val type = bundle.getString(Key.TYPE)
+            if (type == TableType.SEARCH) {
+                tags = bundle.getString(Key.TAGS_SEARCH)
+            }
+        }
+        positionViewModel.setPosition(currentPosition)
         val detailsFragment = DetailsFragment()
-        detailsFragment.arguments = bundle
         if (savedInstanceState == null) {
             displayFragment(detailsFragment)
         }
@@ -53,6 +82,37 @@ class DetailsActivity : BaseActivity() {
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         supportActionBar!!.setDisplayShowHomeEnabled(true)
+    }
+
+    internal fun fmWidget(bg: View, toolbar: Toolbar) {
+        toolbarFm = toolbar
+        bgFm = bg
+    }
+
+    fun onClickPhotoView() {
+        when (bgFm.visibility) {
+            View.GONE -> {
+                bgFm.visibility = View.VISIBLE
+                toolbarFm.visibility = View.GONE
+                hideBar()
+            }
+            else -> {
+                bgFm.visibility = View.GONE
+                toolbarFm.visibility = View.VISIBLE
+                showBar()
+            }
+        }
+    }
+
+    private fun showBar() {
+        val uiFlags = View.SYSTEM_UI_FLAG_VISIBLE
+        window.decorView.systemUiVisibility = uiFlags
+    }
+    private fun hideBar() {
+        val uiFlags = View.SYSTEM_UI_FLAG_IMMERSIVE or
+                View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+        window.decorView.systemUiVisibility = uiFlags
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

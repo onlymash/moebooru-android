@@ -21,7 +21,7 @@ import android.view.View
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 
-open class ToolbarFragment : Fragment() {
+abstract class ToolbarFragment : Fragment() {
 
     protected lateinit var appBarLayout: AppBarLayout
 

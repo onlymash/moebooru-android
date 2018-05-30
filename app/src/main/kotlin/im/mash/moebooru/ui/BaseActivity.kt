@@ -81,9 +81,6 @@ abstract class BaseActivity : AppCompatActivity(), SlidingPaneLayout.PanelSlideL
     }
 
     private fun isSupportSwipeBack(): Boolean {
-        if (this is MainActivity) {
-            return false
-        }
         return true
     }
 }

@@ -12,6 +12,7 @@
 package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
 import android.content.*
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -34,6 +35,7 @@ import im.mash.moebooru.model.Tag
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.ui.adapter.TagsDrawerAdapter
 import im.mash.moebooru.utils.*
+import im.mash.moebooru.viewmodel.PostsViewModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -102,6 +104,18 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
 
+        postsViewModel!!.getPosts(tags).observe(this, Observer {
+            val posts = postsViewModel!!.getPosts(tags).value
+            if (posts != null && items !=null && posts.size > items!!.size) {
+                //加载更多
+                items = posts
+                postsAdapter.addData(items)
+            } else {
+                items = posts
+                postsAdapter.updateData(posts)
+            }
+        })
+
         if (savedInstanceState == null) {
             loadData()
             Log.i(TAG, "savedInstanceState == null, loadCacheData()")
@@ -132,6 +146,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
                 tagsDrawerAdapter.updateData(itemsTag)
             }
         }
+
         val tagsDrawerViewLayout = view.findViewById<LinearLayout>(R.id.rv_tags_list_layout)
         appBarLayoutTags = view.findViewById(R.id.appbar_layout_tags)
         appBarLayoutTags.addView(drawerToolbar)
@@ -261,6 +276,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
                         tagsDrawerAdapter.updateData(itemsTag)
                     }
                 }
+                postsViewModel?.cleanPosts()
                 loadData()
             }
         }
@@ -285,7 +301,9 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
     override fun onResume() {
         super.onResume()
 //        reSetupGridMode()
-//        loadData()
+        if (items == null) {
+            loadData()
+        }
     }
 
     override fun onBackPressed(): Boolean {
