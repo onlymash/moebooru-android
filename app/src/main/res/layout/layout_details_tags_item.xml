@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:paddingLeft="16dp"
-            android:paddingRight="10dp"
+            android:paddingRight="12dp"
             android:src="@drawable/ic_action_remove_circle_outline_24dp"
             android:background="?android:selectableItemBackgroundBorderless"
             android:contentDescription="@null" />
@@ -58,7 +58,7 @@
             android:layout_gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingLeft="10dp"
+            android:paddingLeft="12dp"
             android:paddingRight="16dp"
             android:src="@drawable/ic_action_add_circle_24dp"
             android:background="?android:selectableItemBackgroundBorderless"

@@ -19,16 +19,15 @@ class DetailsPositionViewModel : ViewModel() {
         private var position: MutableLiveData<Int> = MutableLiveData()
     }
 
-    init {
-        position.value = 0
-    }
-
     fun getPositionModel(): MutableLiveData<Int> {
+
         return position
     }
 
     fun getPosition(): Int {
-        return position.value!!
+        return if (position.value != null) {
+            position.value!!
+        } else 0
     }
 
     fun setPosition(pos: Int) {

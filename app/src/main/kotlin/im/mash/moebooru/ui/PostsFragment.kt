@@ -31,11 +31,11 @@ import android.widget.Toast
 
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import im.mash.moebooru.database.TagsManager
 import im.mash.moebooru.model.Tag
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.ui.adapter.TagsDrawerAdapter
 import im.mash.moebooru.utils.*
-import im.mash.moebooru.viewmodel.PostsViewModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -120,6 +120,21 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
             initData()
             Log.i(TAG, "savedInstanceState == null, loadCacheData()")
         }
+        val tagsChangeListener: TagsManager.TagsChangeListener = object : TagsManager.TagsChangeListener {
+            override fun onTagsChanged() {
+                doAsync {
+                    try {
+                        itemsTag = app.tagsManager.getTags(app.settings.activeProfile)
+                    } catch (e: Exception) {
+                        Log.i(TAG, "Get tags failed!!")
+                    }
+                    uiThread {
+                        tagsDrawerAdapter.updateData(itemsTag)
+                    }
+                }
+            }
+        }
+        app.tagsManager.setTagsChangeListener(tagsChangeListener)
     }
 
     //初始右侧化抽屉
@@ -231,8 +246,8 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
                                 doAsync {
                                     app.tagsManager.saveTag(tag)
                                 }
-                                itemsTag.add(tag)
-                                tagsDrawerAdapter.updateData(itemsTag)
+//                                itemsTag.add(tag)
+//                                tagsDrawerAdapter.updateData(itemsTag)
                             }
                         })
                         .setNegativeButton(getString(R.string.cancel), null)
@@ -317,13 +332,10 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
     internal fun changeTagStatus(position: Int, isCecked: Boolean){
         itemsTag[position].is_selected = isCecked
     }
-    internal fun deleteTag(position: Int) {
-        itemsTag.removeAt(position)
-        tagsDrawerAdapter.updateData(itemsTag)
-    }
+
     internal fun copyTag(position: Int) {
         val cm: ClipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
-        val cd = ClipData.newPlainText("Tag:+ $position", itemsTag[position].name)
+        val cd = ClipData.newPlainText("Tag: $position", itemsTag[position].name)
         cm.primaryClip = cd
     }
 }

@@ -13,6 +13,7 @@ package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -32,22 +33,18 @@ import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.adapter.DetailsTagsAdapter
 import im.mash.moebooru.ui.adapter.PostsPagerAdapter
 import im.mash.moebooru.ui.widget.VerticalViewPager
-import im.mash.moebooru.utils.getViewModel
-import im.mash.moebooru.utils.statusBarHeight
-import im.mash.moebooru.viewmodel.PostsViewModel
+import im.mash.moebooru.utils.Key
 import org.jetbrains.anko.doAsync
 
 class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListener {
 
     private val TAG = this::class.java.simpleName
-    private var post: RawPost? = null
     private lateinit var bg: View
     private lateinit var detailsPager: VerticalViewPager
     private lateinit var detailsPagerAdapter: DummyAdapter
     private var detailsPagerPosition = 2
     private lateinit var toolbar: Toolbar
     internal var items: MutableList<RawPost>? = null
-    private lateinit var postsPager: ViewPager
 
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -73,17 +70,17 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             insets
         }
         detailsPager = view.findViewById(R.id.post_page_pager)
-        detailsPager.offscreenPageLimit = 4
+//        detailsPager.offscreenPageLimit = 4
         detailsPagerAdapter = DummyAdapter(activity.supportFragmentManager,
                 mutableListOf(
-                        TagsFragment(),
+//                        TagsFragment(),
                         InfoFragment(),
                         PagerFragment(),
-                        TagsFragment(),
-                        InfoFragment()
+                        TagsFragment()
+//                        InfoFragment()
                 ))
         detailsPager.adapter = detailsPagerAdapter
-        detailsPager.currentItem = detailsPagerPosition
+        detailsPager.currentItem = 1
         detailsPager.addOnPageChangeListener(this)
     }
 
@@ -92,7 +89,7 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
     }
 
     override fun onPageSelected(position: Int) {
-        detailsPagerPosition = position
+//        detailsPagerPosition = position
     }
 
     override fun onPageScrollStateChanged(state: Int) {
@@ -101,13 +98,13 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             toolbar.visibility = View.VISIBLE
             (activity as DetailsActivity).showBar()
         }
-        if (state == 0) {
-            if (detailsPagerPosition == 0) {
-                detailsPager.setCurrentItem(3, false)
-            } else if (detailsPagerPosition == 4) {
-                detailsPager.setCurrentItem(1, false)
-            }
-        }
+//        if (state == 0) {
+//            if (detailsPagerPosition == 0) {
+//                detailsPager.setCurrentItem(3, false)
+//            } else if (detailsPagerPosition == 4) {
+//                detailsPager.setCurrentItem(1, false)
+//            }
+//        }
     }
 
     inner class DummyAdapter(fm: FragmentManager,
@@ -174,6 +171,11 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
 
     internal class TagsFragment : Fragment() {
 
+        private var pos = 0
+        private var tagsList: MutableList<String>? = null
+        private lateinit var tagsView: RecyclerView
+        private lateinit var tagsAdapter: DetailsTagsAdapter
+
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             return inflater.inflate(R.layout.layout_details_tags, container, false)
         }
@@ -182,36 +184,25 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             super.onViewCreated(view, savedInstanceState)
             val activity = activity as DetailsActivity
             view.setPadding(0, activity.toolbarHeight + activity.statusBarHeight, 0, activity.navBarHeight)
-            val tagsView: RecyclerView = view.findViewById(R.id.rv_details_tags)
+            tagsView = view.findViewById(R.id.rv_details_tags)
             tagsView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
-            val tagsAdapter: DetailsTagsAdapter = DetailsTagsAdapter(mutableListOf(
-                    "yuri",
-                    "mash",
-                    "blush",
-                    "underwear",
-                    "yuri",
-                    "mash",
-                    "blush",
-                    "underwear",
-                    "yuri",
-                    "mash",
-                    "blush",
-                    "underwear",
-                    "yuri",
-                    "mash",
-                    "blush",
-                    "underwear",
-                    "yuri",
-                    "mash",
-                    "blush",
-                    "underwear",
-                    "yuri",
-                    "mash",
-                    "blush",
-                    "underwear"
-            ))
+            pos = activity.positionViewModel.getPosition()
+            tagsList = activity.items?.get(pos)?.tags?.split(" ")?.toMutableList()
+            tagsAdapter = DetailsTagsAdapter(this, tagsList)
             tagsView.adapter = tagsAdapter
+            activity.positionViewModel.getPositionModel().observe(this, Observer {
+                pos = it!!
+                tagsList = activity.items?.get(pos)?.tags?.split(" ")?.toMutableList()
+                tagsAdapter.updateData(tagsList)
+            })
+        }
 
+        internal fun clickTag(position: Int) {
+            val intent = Intent(activity, SearchActivity().javaClass)
+            val bundle = Bundle()
+            bundle.putString(Key.TAGS_SEARCH, tagsList!![position])
+            intent.putExtra(Key.BUNDLE, bundle)
+            startActivity(intent)
         }
     }
 

@@ -20,6 +20,8 @@ import org.jetbrains.anko.db.update
 
 class TagsManager(private val database: DatabaseHelper) {
 
+    private var tagsChangeListener: TagsChangeListener? = null
+
     companion object {
         private var instance: TagsManager? = null
         @Synchronized
@@ -31,6 +33,14 @@ class TagsManager(private val database: DatabaseHelper) {
         }
     }
 
+    interface TagsChangeListener {
+        fun onTagsChanged()
+    }
+
+    fun setTagsChangeListener(tagsChangeListener: TagsChangeListener) {
+        this.tagsChangeListener = tagsChangeListener
+    }
+
     fun saveTag(tag: Tag) {
         database.use {
             insert(TagsTable.TABLE_NAME,
@@ -38,7 +48,9 @@ class TagsManager(private val database: DatabaseHelper) {
                     TagsTable.NAME to tag.name,
                     TagsTable.IS_SELECTED to tag.is_selected)
         }
+        tagsChangeListener?.onTagsChanged()
     }
+
     fun getSelectedTags(site: Long): MutableList<Tag> {
         val tags: MutableList<Tag> = mutableListOf()
         database.use {
@@ -91,5 +103,6 @@ class TagsManager(private val database: DatabaseHelper) {
         database.use {
             execSQL("delete from ${TagsTable.TABLE_NAME} where ${TagsTable.SITE} = $site and ${TagsTable.NAME} = '$name'")
         }
+        tagsChangeListener?.onTagsChanged()
     }
 }

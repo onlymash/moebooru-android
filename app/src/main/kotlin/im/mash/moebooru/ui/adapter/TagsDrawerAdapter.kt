@@ -24,7 +24,6 @@ import im.mash.moebooru.R
 import im.mash.moebooru.model.Tag
 import im.mash.moebooru.ui.PostsFragment
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 class TagsDrawerAdapter(private val postsFragment: PostsFragment,
                         private var itemsTag: MutableList<Tag>?) : RecyclerView.Adapter<TagsDrawerAdapter.TagsDrawerViewHolder>() {
@@ -72,9 +71,6 @@ class TagsDrawerAdapter(private val postsFragment: PostsFragment,
                         R.id.action_remove -> {
                             doAsync {
                                 app.tagsManager.deleteTag(app.settings.activeProfile, itemsTag!![position].name)
-                                uiThread {
-                                    postsFragment.deleteTag(position)
-                                }
                             }
                         }
                         R.id.action_copy -> {
