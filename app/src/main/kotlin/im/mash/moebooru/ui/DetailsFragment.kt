@@ -32,6 +32,7 @@ import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.adapter.DetailsTagsAdapter
 import im.mash.moebooru.ui.adapter.PostsPagerAdapter
+import im.mash.moebooru.ui.widget.AccordionTransformer
 import im.mash.moebooru.ui.widget.VerticalViewPager
 import im.mash.moebooru.utils.Key
 import org.jetbrains.anko.doAsync
@@ -141,6 +142,7 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             tags = detailsActivity.tags
             postsPager = view.findViewById(R.id.post_pager)
             postsPager.addOnPageChangeListener(this)
+            postsPager.setPageTransformer(true, AccordionTransformer())
             detailsActivity.postsViewModel.getPostsModel(tags).observe(this, Observer {
                 detailsActivity.items = detailsActivity.postsViewModel.getPosts(tags)
                 if (postsPagerAdapter == null && detailsActivity.items != null) {
