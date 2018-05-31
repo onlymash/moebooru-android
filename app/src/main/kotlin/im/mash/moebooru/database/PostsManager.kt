@@ -100,19 +100,23 @@ class PostsManager(private val database: DatabaseHelper) {
         return post
     }
 
-    fun loadPosts(site: Long): MutableList<RawPost> {
+    fun loadPosts(site: Long): MutableList<RawPost>? {
         val posts: MutableList<RawPost> = mutableListOf()
-        database.use {
-            select(PostsTable.TABLE_NAME)
-                    .whereSimple("${PostsTable.SITE} = ?", site.toString())
-                    .parseList(object : MapRowParser<MutableList<RawPost>> {
-                        override fun parseRow(columns: Map<String, Any?>): MutableList<RawPost> {
-                            posts.add(makePost(columns))
-                            return posts
-                        }
-                    })
+        try {
+            database.use {
+                select(PostsTable.TABLE_NAME)
+                        .whereSimple("${PostsTable.SITE} = ?", site.toString())
+                        .parseList(object : MapRowParser<MutableList<RawPost>> {
+                            override fun parseRow(columns: Map<String, Any?>): MutableList<RawPost> {
+                                posts.add(makePost(columns))
+                                return posts
+                            }
+                        })
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        return posts
+        return if (posts.size > 0) { posts } else { null }
     }
 
     fun deletePosts(site: Long) {

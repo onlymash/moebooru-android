@@ -104,8 +104,8 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
 
-        postsViewModel!!.getPosts(tags).observe(this, Observer {
-            val posts = postsViewModel!!.getPosts(tags).value
+        postsViewModel!!.getPostsModel(tags).observe(this, Observer {
+            val posts = postsViewModel!!.getPosts(tags)
             if (posts != null && items !=null && posts.size > items!!.size) {
                 //加载更多
                 items = posts
@@ -117,7 +117,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
         })
 
         if (savedInstanceState == null) {
-            loadData()
+            initData()
             Log.i(TAG, "savedInstanceState == null, loadCacheData()")
         }
     }
@@ -277,7 +277,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
                     }
                 }
                 postsViewModel?.cleanPosts()
-                loadData()
+                initData()
             }
         }
     }
@@ -302,7 +302,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
         super.onResume()
 //        reSetupGridMode()
         if (items == null) {
-            loadData()
+            initData()
         }
     }
 

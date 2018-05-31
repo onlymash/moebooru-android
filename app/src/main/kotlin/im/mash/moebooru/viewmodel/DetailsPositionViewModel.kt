@@ -15,19 +15,23 @@ import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 
 class DetailsPositionViewModel : ViewModel() {
-    private var position: MutableLiveData<Int>? =null
+    companion object {
+        private var position: MutableLiveData<Int> = MutableLiveData()
+    }
 
-    fun getPosition(): MutableLiveData<Int> {
-        if (position == null) {
-            position = MutableLiveData()
-        }
-        return position!!
+    init {
+        position.value = 0
+    }
+
+    fun getPositionModel(): MutableLiveData<Int> {
+        return position
+    }
+
+    fun getPosition(): Int {
+        return position.value!!
     }
 
     fun setPosition(pos: Int) {
-        if (position == null) {
-            position = MutableLiveData()
-        }
-        position!!.postValue(pos)
+        position.postValue(pos)
     }
 }

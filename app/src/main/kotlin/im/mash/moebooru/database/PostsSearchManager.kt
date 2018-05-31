@@ -102,20 +102,23 @@ class PostsSearchManager(private val database: DatabaseHelper) {
         return post
     }
 
-    fun loadPosts(site: Long, tagsKey: String): MutableList<RawPost> {
+    fun loadPosts(site: Long, tagsKey: String): MutableList<RawPost>? {
         val posts: MutableList<RawPost> = mutableListOf()
-        Log.i(this.javaClass.simpleName, "site: $site")
-        database.use {
-            select(SearchTable.TABLE_NAME)
-                    .whereSimple("(${PostsTable.SITE} = ?) and (${SearchTable.KEY_WORD} = ?)", site.toString(), tagsKey)
-                    .parseList(object : MapRowParser<MutableList<RawPost>> {
-                        override fun parseRow(columns: Map<String, Any?>): MutableList<RawPost> {
-                            posts.add(makePost(columns))
-                            return posts
-                        }
-                    })
+        try {
+            database.use {
+                select(SearchTable.TABLE_NAME)
+                        .whereSimple("(${PostsTable.SITE} = ?) and (${SearchTable.KEY_WORD} = ?)", site.toString(), tagsKey)
+                        .parseList(object : MapRowParser<MutableList<RawPost>> {
+                            override fun parseRow(columns: Map<String, Any?>): MutableList<RawPost> {
+                                posts.add(makePost(columns))
+                                return posts
+                            }
+                        })
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-        return posts
+        return if (posts.size > 0) { posts } else { null }
     }
 
     fun deletePosts(site: Long, tagsKey: String) {

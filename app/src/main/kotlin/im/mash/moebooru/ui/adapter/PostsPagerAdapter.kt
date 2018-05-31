@@ -59,7 +59,7 @@ class PostsPagerAdapter(private var items: MutableList<RawPost>?,
         val photoView = view.findViewById<PhotoView>(R.id.post_img)
         photoView.enable()
         photoView.setOnClickListener {
-            activity.onClickPhotoView()
+            activity.changeBackground()
         }
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)

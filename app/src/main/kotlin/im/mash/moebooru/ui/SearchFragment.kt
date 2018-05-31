@@ -25,6 +25,8 @@ import im.mash.moebooru.R
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.TableType
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class SearchFragment : BasePostsFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -73,8 +75,8 @@ class SearchFragment : BasePostsFragment(), SharedPreferences.OnSharedPreference
         val sp: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this.context)
         sp.registerOnSharedPreferenceChangeListener(this)
 
-        postsViewModel!!.getPosts(tags).observe(this, Observer {
-            val posts = postsViewModel!!.getPosts(tags).value
+        postsViewModel!!.getPostsModel(tags).observe(this, Observer {
+            val posts = postsViewModel!!.getPosts(tags)
             if (posts != null && items !=null && posts.size > items!!.size) {
                 //加载更多
                 items = posts
@@ -85,7 +87,7 @@ class SearchFragment : BasePostsFragment(), SharedPreferences.OnSharedPreference
             }
         })
 
-        loadData()
+        initData()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
@@ -96,7 +98,7 @@ class SearchFragment : BasePostsFragment(), SharedPreferences.OnSharedPreference
             Key.ACTIVE_PROFILE -> {
                 app.settings.isNotMoreData = false
                 postsAdapter.updateData(null)
-                loadData()
+                initData()
             }
         }
     }

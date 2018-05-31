@@ -10,16 +10,10 @@
   ~
   -->
 
-<android.support.constraint.ConstraintLayout
+<android.support.v4.view.ViewPager
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/post_pager"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/post_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </android.support.v4.view.ViewPager>
-
-</android.support.constraint.ConstraintLayout>
+</android.support.v4.view.ViewPager>

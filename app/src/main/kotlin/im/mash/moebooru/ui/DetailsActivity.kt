@@ -36,9 +36,11 @@ class DetailsActivity : BaseActivity() {
 
     internal var widthScreen: Int = 0
     internal var toolbarHeight = 0
+    internal var navBarHeight = 0
+    internal var statusBarHeight = 0
     internal var tags: String? = null
-    internal var currentPosition: Int = 0
     internal var currentPostId: Int = 0
+    internal lateinit var postsViewModel: PostsViewModel
     internal lateinit var positionViewModel: DetailsPositionViewModel
     internal var items: MutableList<RawPost>? =null
 
@@ -55,17 +57,15 @@ class DetailsActivity : BaseActivity() {
         if (theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
         }
+        postsViewModel = this.getViewModel()
         positionViewModel = this.getViewModel()
         val bundle = intent.getBundleExtra(Key.BUNDLE)
-        if (bundle != null) {
-            currentPosition = bundle.getInt(Key.ITEM_POS, 0)
-            currentPostId = bundle.getInt(Key.ITEM_ID)
-            val type = bundle.getString(Key.TYPE)
-            if (type == TableType.SEARCH) {
-                tags = bundle.getString(Key.TAGS_SEARCH)
-            }
+        positionViewModel.setPosition(bundle.getInt(Key.ITEM_POS, 0))
+        currentPostId = bundle.getInt(Key.ITEM_ID)
+        val type = bundle.getString(Key.TYPE)
+        if (type == TableType.SEARCH) {
+            tags = bundle.getString(Key.TAGS_SEARCH)
         }
-        positionViewModel.setPosition(currentPosition)
         val detailsFragment = DetailsFragment()
         if (savedInstanceState == null) {
             displayFragment(detailsFragment)
@@ -89,7 +89,7 @@ class DetailsActivity : BaseActivity() {
         bgFm = bg
     }
 
-    fun onClickPhotoView() {
+    fun changeBackground() {
         when (bgFm.visibility) {
             View.GONE -> {
                 bgFm.visibility = View.VISIBLE
@@ -104,7 +104,7 @@ class DetailsActivity : BaseActivity() {
         }
     }
 
-    private fun showBar() {
+    internal fun showBar() {
         val uiFlags = View.SYSTEM_UI_FLAG_VISIBLE
         window.decorView.systemUiVisibility = uiFlags
     }

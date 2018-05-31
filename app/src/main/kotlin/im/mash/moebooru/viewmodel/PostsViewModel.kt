@@ -30,21 +30,42 @@ class PostsViewModel : ViewModel() {
     private var allPosts: MutableLiveData<MutableList<RawPost>>? = null
     private var searchPosts: MutableLiveData<MutableList<RawPost>>? = null
 
-    fun getPosts(tags: String?): MutableLiveData<MutableList<RawPost>> {
+    fun getPostsModel(tags: String?): MutableLiveData<MutableList<RawPost>> {
         return if (tags != null) {
             if (searchPosts == null) {
                 searchPosts = MutableLiveData()
-                //load from database
-                loadSearchPosts(tags)
             }
             searchPosts!!
         } else {
             if (allPosts == null) {
                 allPosts = MutableLiveData()
-                //load from database
-                loadAllPosts()
             }
             allPosts!!
+        }
+    }
+
+    fun initData(tags: String?) {
+        when (tags) {
+            null -> {
+                if (searchPosts == null) {
+                    searchPosts = MutableLiveData()
+                }
+            }
+
+            else -> {
+                if (allPosts == null) {
+                    allPosts = MutableLiveData()
+                }
+            }
+        }
+        loadPosts(tags)
+    }
+
+    fun getPosts(tags: String?): MutableList<RawPost>? {
+        return if (tags != null) {
+            searchPosts!!.value
+        } else {
+            allPosts!!.value
         }
     }
 
@@ -56,8 +77,17 @@ class PostsViewModel : ViewModel() {
     fun loadMorePosts(tags: String?) {
         var page = 1
         val limit = app.settings.postLimitInt
-        if (allPosts != null && allPosts!!.value != null && allPosts!!.value!!.size > 0) {
-            page = allPosts!!.value!!.size/limit +1
+        when (tags) {
+            null -> {
+                if (allPosts != null && allPosts!!.value != null && allPosts!!.value!!.size > 0) {
+                    page = allPosts!!.value!!.size/limit +1
+                }
+            }
+            else -> {
+                if (searchPosts != null && searchPosts!!.value != null && searchPosts!!.value!!.size > 0) {
+                    page = searchPosts!!.value!!.size/limit +1
+                }
+            }
         }
         val response: MoeResponse? = getResponseData(tags, page.toLong(), limit)
         var result: MutableList<RawPost>? = null
@@ -152,28 +182,26 @@ class PostsViewModel : ViewModel() {
         }
     }
 
-    private fun loadAllPosts() {
-        var data: MutableList<RawPost>? =null
-        try {
-            data = app.postsManager.loadPosts(app.settings.activeProfile)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        if (data != null) {
-            Log.i(TAG, "loadAllPosts(), data size: ${data.size}")
-            allPosts!!.postValue(data)
+    private fun loadPosts(tags: String?) {
+        var data: MutableList<RawPost>? = null
+        when (tags) {
+            null -> {
+                data = app.postsManager.loadPosts(app.settings.activeProfile)
+                if (data != null) {
+                    allPosts!!.postValue(data)
+                } else {
+                    refreshPosts(tags)
+                }
+            }
+            else -> {
+                data = app.searchManager.loadPosts(app.settings.activeProfile, tags)
+                if (data != null) {
+                    searchPosts!!.postValue(data)
+                } else {
+                    refreshPosts(tags)
+                }
+            }
         }
     }
 
-    private fun loadSearchPosts(tags: String) {
-        var data: MutableList<RawPost>? =null
-        try {
-            data = app.searchManager.loadPosts(app.settings.activeProfile, tags)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        if (data != null) {
-            searchPosts!!.postValue(data)
-        }
-    }
 }

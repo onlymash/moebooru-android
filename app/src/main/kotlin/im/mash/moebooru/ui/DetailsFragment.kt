@@ -18,7 +18,10 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
@@ -26,19 +29,22 @@ import android.view.ViewGroup
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
+import im.mash.moebooru.ui.adapter.DetailsTagsAdapter
 import im.mash.moebooru.ui.adapter.PostsPagerAdapter
 import im.mash.moebooru.ui.widget.VerticalViewPager
 import im.mash.moebooru.utils.getViewModel
+import im.mash.moebooru.utils.statusBarHeight
 import im.mash.moebooru.viewmodel.PostsViewModel
 import org.jetbrains.anko.doAsync
 
-class DetailsFragment : ToolbarFragment() {
+class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListener {
 
     private val TAG = this::class.java.simpleName
     private var post: RawPost? = null
     private lateinit var bg: View
     private lateinit var detailsPager: VerticalViewPager
     private lateinit var detailsPagerAdapter: DummyAdapter
+    private var detailsPagerPosition = 2
     private lateinit var toolbar: Toolbar
     internal var items: MutableList<RawPost>? = null
     private lateinit var postsPager: ViewPager
@@ -61,15 +67,47 @@ class DetailsFragment : ToolbarFragment() {
         bg = view.findViewById(R.id.details_bg)
         bg.visibility = View.GONE
         activity.fmWidget(bg, toolbar)
+        ViewCompat.setOnApplyWindowInsetsListener(view) {_, insets ->
+            activity.statusBarHeight = insets.systemWindowInsetTop
+            activity.navBarHeight = insets.systemWindowInsetBottom
+            insets
+        }
         detailsPager = view.findViewById(R.id.post_page_pager)
+        detailsPager.offscreenPageLimit = 4
         detailsPagerAdapter = DummyAdapter(activity.supportFragmentManager,
                 mutableListOf(
                         TagsFragment(),
+                        InfoFragment(),
                         PagerFragment(),
+                        TagsFragment(),
                         InfoFragment()
                 ))
         detailsPager.adapter = detailsPagerAdapter
-        detailsPager.currentItem = 1
+        detailsPager.currentItem = detailsPagerPosition
+        detailsPager.addOnPageChangeListener(this)
+    }
+
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+    }
+
+    override fun onPageSelected(position: Int) {
+        detailsPagerPosition = position
+    }
+
+    override fun onPageScrollStateChanged(state: Int) {
+        if (bg.visibility == View.VISIBLE) {
+            bg.visibility = View.GONE
+            toolbar.visibility = View.VISIBLE
+            (activity as DetailsActivity).showBar()
+        }
+        if (state == 0) {
+            if (detailsPagerPosition == 0) {
+                detailsPager.setCurrentItem(3, false)
+            } else if (detailsPagerPosition == 4) {
+                detailsPager.setCurrentItem(1, false)
+            }
+        }
     }
 
     inner class DummyAdapter(fm: FragmentManager,
@@ -85,18 +123,16 @@ class DetailsFragment : ToolbarFragment() {
     }
 
 
-    internal class PagerFragment : Fragment() {
+    internal class PagerFragment : Fragment(), ViewPager.OnPageChangeListener {
 
         companion object {
             private const val TAG = "PagerFragment"
         }
+
+        private lateinit var detailsActivity: DetailsActivity
         private lateinit var postsPager: ViewPager
         private var postsPagerAdapter: PostsPagerAdapter? = null
-
-        private var currentPosition: Int = 0
         private var tags: String? = null
-
-        private lateinit var postsViewModel: PostsViewModel
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             return inflater.inflate(R.layout.layout_details_pager, container, false)
@@ -104,22 +140,35 @@ class DetailsFragment : ToolbarFragment() {
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            val activity = activity as DetailsActivity
-            tags = activity.tags
-            currentPosition = activity.currentPosition
-            postsViewModel = this.getViewModel()
+            detailsActivity = activity as DetailsActivity
+            tags = detailsActivity.tags
             postsPager = view.findViewById(R.id.post_pager)
-            postsViewModel.getPosts(tags).observe(this, Observer {
-                activity.items = postsViewModel.getPosts(tags).value
-                if (postsPagerAdapter == null) {
-                    postsPagerAdapter = PostsPagerAdapter(activity.items, app.settings.postSizeBrowse, activity)
+            postsPager.addOnPageChangeListener(this)
+            detailsActivity.postsViewModel.getPostsModel(tags).observe(this, Observer {
+                detailsActivity.items = detailsActivity.postsViewModel.getPosts(tags)
+                if (postsPagerAdapter == null && detailsActivity.items != null) {
+                    detailsActivity.toolbarFm.title = getString(R.string.post) + " " + detailsActivity.items!![detailsActivity.positionViewModel.getPosition()].id
+                    postsPagerAdapter = PostsPagerAdapter(detailsActivity.items, app.settings.postSizeBrowse, detailsActivity)
                     postsPager.adapter = postsPagerAdapter
-                    postsPager.currentItem = currentPosition
+                    postsPager.currentItem = detailsActivity.positionViewModel.getPosition()
                 }
             })
             doAsync {
-                postsViewModel.getPosts(tags)
+                detailsActivity.postsViewModel.initData(tags)
             }
+        }
+
+        override fun onPageScrollStateChanged(state: Int) {
+
+        }
+
+        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+        }
+
+        override fun onPageSelected(position: Int) {
+            detailsActivity.positionViewModel.setPosition(position)
+            detailsActivity.toolbarFm.title = getString(R.string.post) + " " + detailsActivity.items!![position].id
         }
     }
 
@@ -131,8 +180,38 @@ class DetailsFragment : ToolbarFragment() {
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
-            if (activity != null) {
-            }
+            val activity = activity as DetailsActivity
+            view.setPadding(0, activity.toolbarHeight + activity.statusBarHeight, 0, activity.navBarHeight)
+            val tagsView: RecyclerView = view.findViewById(R.id.rv_details_tags)
+            tagsView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
+            val tagsAdapter: DetailsTagsAdapter = DetailsTagsAdapter(mutableListOf(
+                    "yuri",
+                    "mash",
+                    "blush",
+                    "underwear",
+                    "yuri",
+                    "mash",
+                    "blush",
+                    "underwear",
+                    "yuri",
+                    "mash",
+                    "blush",
+                    "underwear",
+                    "yuri",
+                    "mash",
+                    "blush",
+                    "underwear",
+                    "yuri",
+                    "mash",
+                    "blush",
+                    "underwear",
+                    "yuri",
+                    "mash",
+                    "blush",
+                    "underwear"
+            ))
+            tagsView.adapter = tagsAdapter
+
         }
     }
 

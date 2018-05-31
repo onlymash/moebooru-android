@@ -199,15 +199,12 @@ abstract class BasePostsFragment : ToolbarFragment(), SwipeRefreshLayout.OnRefre
         }
     }
 
-    internal fun loadData() {
+    internal fun initData() {
         refreshLayout.isRefreshing = true
         doAsync {
-            items = postsViewModel!!.getPosts(tags).value
+            postsViewModel!!.initData(tags)
             uiThread {
                 refreshLayout.isRefreshing = false
-                if (items == null) {
-                    refreshData()
-                }
             }
         }
     }
