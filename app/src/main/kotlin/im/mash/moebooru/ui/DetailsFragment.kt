@@ -13,8 +13,12 @@ package im.mash.moebooru.ui
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -32,6 +36,9 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.text.format.Formatter
+import android.webkit.MimeTypeMap
+import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
@@ -40,7 +47,10 @@ import im.mash.moebooru.ui.adapter.PostsPagerAdapter
 import im.mash.moebooru.ui.widget.AccordionTransformer
 import im.mash.moebooru.ui.widget.VerticalViewPager
 import im.mash.moebooru.utils.Key
+import im.mash.moebooru.utils.downloadPost
+import im.mash.moebooru.utils.verifyStoragePermissions
 import org.jetbrains.anko.doAsync
+import java.net.URL
 import java.util.*
 
 class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListener {
@@ -244,6 +254,21 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
         private lateinit var parentId: ImageButton
         private lateinit var parentIdLayout: LinearLayout
 
+        private lateinit var sampleDownload: ImageButton
+        private lateinit var sampleOpen: ImageButton
+        private lateinit var sampleSize: TextView
+        private lateinit var sampleLayout: LinearLayout
+
+        private lateinit var largerDownload: ImageButton
+        private lateinit var largerOpen: ImageButton
+        private lateinit var largerSize: TextView
+        private lateinit var largerLayout: LinearLayout
+
+        private lateinit var originDownload: ImageButton
+        private lateinit var originOpen: ImageButton
+        private lateinit var originSize: TextView
+        private lateinit var originLayout: LinearLayout
+
         private var post: RawPost? = null
         private var pos = 0
 
@@ -259,12 +284,13 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             init(view)
             pos = activity.positionViewModel.getPosition()
             post = activity.items?.get(pos)
-            setData()
             activity.positionViewModel.getPositionModel().observe(this, Observer {
                 pos = it!!
                 post = activity.items?.get(pos)
                 setData()
             })
+            setListener()
+            setData()
         }
 
         private fun setData() {
@@ -289,6 +315,120 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
                 } else {
                     parentIdLayout.visibility = View.GONE
                 }
+
+                sampleSize.text = Formatter.formatFileSize(this.requireContext(), post!!.sample_file_size!!)
+
+                if (post!!.jpeg_url != null) {
+                    if (largerLayout.visibility == View.GONE) {
+                        largerLayout.visibility = View.VISIBLE
+                    }
+                    largerSize.text = Formatter.formatFileSize(this.requireContext(), post!!.jpeg_file_size!!)
+                } else {
+                    if (largerLayout.visibility == View.VISIBLE) {
+                        largerLayout.visibility = View.GONE
+                    }
+                }
+
+                if (post!!.file_url != null) {
+                    if (originLayout.visibility == View.GONE) {
+                        originLayout.visibility = View.VISIBLE
+                    }
+                    originSize.text = Formatter.formatFileSize(this.requireContext(), post!!.file_size!!)
+                } else {
+                    if (originLayout.visibility == View.VISIBLE) {
+                        originLayout.visibility = View.GONE
+                    }
+                }
+            }
+        }
+
+        private fun setListener() {
+            sampleDownload.setOnClickListener {
+                if (post != null) {
+                    val booru = app.boorusManager.getBooru(app.settings.activeProfile)
+                    val title = booru.name + " " + post!!.id
+                    val url = URL(booru.url)
+                    val ext = MimeTypeMap.getFileExtensionFromUrl(post!!.sample_url!!)
+                    val fileName = url.host + " - " + post!!.id + " " + post!!.tags + "." + ext
+                    if (verifyStoragePermissions(activity as DetailsActivity)) {
+                        downloadPost(post!!.sample_url!!, title, booru.name, fileName)
+                    }
+                }
+            }
+            sampleOpen.setOnClickListener {
+                if (post != null) {
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    val uri = Uri.parse(post!!.sample_url)
+                    intent.data = uri
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                }
+            }
+            sampleLayout.setOnLongClickListener {
+                val cm: ClipboardManager = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
+                val cd = ClipData.newPlainText("Tag: $pos", post!!.sample_url)
+                cm.primaryClip = cd
+                Toast.makeText(activity, "Sample url has been copied", Toast.LENGTH_SHORT).show()
+                true
+            }
+            largerDownload.setOnClickListener {
+                if (post != null) {
+                    val booru = app.boorusManager.getBooru(app.settings.activeProfile)
+                    val title = booru.name + " " + post!!.id
+                    val url = URL(booru.url)
+                    val ext = MimeTypeMap.getFileExtensionFromUrl(post!!.jpeg_url!!)
+                    val fileName = url.host + " - " + post!!.id + " " + post!!.tags + "." + ext
+                    if (verifyStoragePermissions(activity as DetailsActivity)) {
+                        downloadPost(post!!.jpeg_url!!, title, booru.name, fileName)
+                    }
+                }
+            }
+            largerOpen.setOnClickListener {
+                if (post != null) {
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    val uri = Uri.parse(post!!.jpeg_url)
+                    intent.data = uri
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                }
+            }
+            largerLayout.setOnLongClickListener {
+                val cm: ClipboardManager = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
+                val cd = ClipData.newPlainText("Tag: $pos", post!!.jpeg_url)
+                cm.primaryClip = cd
+                Toast.makeText(activity, "Larger url has been copied", Toast.LENGTH_SHORT).show()
+                true
+            }
+            originDownload.setOnClickListener {
+                if (post != null) {
+                    val booru = app.boorusManager.getBooru(app.settings.activeProfile)
+                    val title = booru.name + " " + post!!.id
+                    val url = URL(booru.url)
+                    val ext = MimeTypeMap.getFileExtensionFromUrl(post!!.file_url!!)
+                    val fileName = url.host + " - " + post!!.id + " " + post!!.tags + "." + ext
+                    if (verifyStoragePermissions(activity as DetailsActivity)) {
+                        downloadPost(post!!.file_url!!, title, booru.name, fileName)
+                    }
+                }
+            }
+            originOpen.setOnClickListener {
+                if (post != null) {
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_VIEW
+                    val uri = Uri.parse(post!!.file_url)
+                    intent.data = uri
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                }
+            }
+            originLayout.setOnLongClickListener {
+                val cm: ClipboardManager = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
+                val cd = ClipData.newPlainText("Tag: $pos", post!!.file_url)
+                cm.primaryClip = cd
+                Toast.makeText(activity, "Origin url has been copied", Toast.LENGTH_SHORT).show()
+                true
             }
         }
 
@@ -303,6 +443,21 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             score = view.findViewById(R.id.tv_score)
             parentId = view.findViewById(R.id.btn_parent_id)
             parentIdLayout = view.findViewById(R.id.container_parent_id)
+
+            sampleDownload = view.findViewById(R.id.btn_download_sample)
+            sampleOpen = view.findViewById(R.id.btn_browser_sample)
+            sampleSize = view.findViewById(R.id.tv_sample_size)
+            sampleLayout = view.findViewById(R.id.sample_layout)
+
+            largerDownload = view.findViewById(R.id.btn_download_larger)
+            largerOpen = view.findViewById(R.id.btn_browser_larger)
+            largerSize = view.findViewById(R.id.tv_larger_size)
+            largerLayout = view.findViewById(R.id.larger_layout)
+
+            originDownload = view.findViewById(R.id.btn_download_origin)
+            originOpen = view.findViewById(R.id.btn_browser_origin)
+            originSize = view.findViewById(R.id.tv_origin_size)
+            originLayout = view.findViewById(R.id.origin_layout)
         }
     }
 }

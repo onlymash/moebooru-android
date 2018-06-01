@@ -10,18 +10,23 @@
   ~
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:id="@+id/content_container"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:ignore="RtlHardcoded, RtlSymmetry">
+    android:layout_height="wrap_content">
 
-    <include layout="@layout/layout_details_info_stats"/>
-
-    <Space
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="8dp" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</LinearLayout>
+        <include layout="@layout/layout_details_info_stats"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <include layout="@layout/layout_details_info_url"/>
+    </LinearLayout>
+
+</ScrollView>

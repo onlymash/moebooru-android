@@ -32,7 +32,7 @@
                 android:text="@string/post_stats_id" />
             <TextView
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#ffffffff"
+                android:textColor="@color/white"
                 android:ellipsize="marquee"
                 android:gravity="right"
                 android:id="@+id/tv_id"
@@ -55,7 +55,7 @@
                 android:text="@string/post_stats_created_at" />
             <TextView
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#ffffffff"
+                android:textColor="@color/white"
                 android:ellipsize="marquee"
                 android:gravity="right"
                 android:id="@+id/tv_created_at"
@@ -78,7 +78,7 @@
                 android:text="@string/post_stats_author" />
             <TextView
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#ffffffff"
+                android:textColor="@color/white"
                 android:ellipsize="marquee"
                 android:gravity="right"
                 android:id="@+id/tv_author"
@@ -101,7 +101,7 @@
                 android:text="@string/post_stats_creator" />
             <TextView
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#ffffffff"
+                android:textColor="@color/white"
                 android:ellipsize="marquee"
                 android:gravity="right"
                 android:id="@+id/tv_creator_id"
@@ -124,7 +124,7 @@
                 android:text="@string/post_stats_size" />
             <TextView
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#ffffffff"
+                android:textColor="@color/white"
                 android:ellipsize="marquee"
                 android:gravity="right"
                 android:id="@+id/tv_height_width"
@@ -146,7 +146,7 @@
                 android:text="@string/post_stats_source" />
             <TextView
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColorLink="#ffffffff"
+                android:textColorLink="@color/white"
                 android:ellipsize="end"
                 android:gravity="end"
                 android:autoLink="web"
@@ -171,7 +171,7 @@
                 android:text="@string/post_stats_rating" />
             <TextView
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#ffffffff"
+                android:textColor="@color/white"
                 android:ellipsize="marquee"
                 android:gravity="right"
                 android:id="@+id/tv_rating"
@@ -195,7 +195,7 @@
                 android:text="@string/post_stats_score" />
             <TextView
                 android:textAppearance="?android:textAppearanceMedium"
-                android:textColor="#ffffffff"
+                android:textColor="@color/white"
                 android:ellipsize="marquee"
                 android:gravity="right"
                 android:id="@+id/tv_score"
@@ -221,8 +221,8 @@
             <ImageButton
                 android:id="@+id/btn_parent_id"
                 android:background="?selectableItemBackgroundBorderless"
-                android:layout_width="@dimen/list_height"
-                android:layout_height="@dimen/list_height"
+                android:layout_width="@dimen/list_size"
+                android:layout_height="@dimen/list_size"
                 android:src="@drawable/ic_action_search_24dp"
                 android:contentDescription="@null" />
         </LinearLayout>

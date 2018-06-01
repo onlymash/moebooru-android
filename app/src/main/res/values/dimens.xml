@@ -16,6 +16,6 @@
     <dimen name="drawer_width">300dp</dimen>
     <dimen name="dialog_margin">20dp</dimen>
     <dimen name="tag_item_width">300dp</dimen>
-    <dimen name="list_height">48dp</dimen>
+    <dimen name="list_size">48dp</dimen>
     <dimen name="list_padding">8dp</dimen>
 </resources>
