@@ -14,6 +14,7 @@ package im.mash.moebooru.ui
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -147,6 +148,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
         loadAsync()
 
         drawerLayout = DrawerLayout(this)
+        drawerLayout.setScrimColor(Color.TRANSPARENT)
 
         val aboutItem =  PrimaryDrawerItem()
                 .withIdentifier(DRAWER_ITEM_ABOUT)

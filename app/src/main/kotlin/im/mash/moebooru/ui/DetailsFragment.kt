@@ -66,8 +66,8 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
         bg.visibility = View.GONE
         activity.fmWidget(bg, toolbar)
         ViewCompat.setOnApplyWindowInsetsListener(view) {_, insets ->
-            activity.statusBarHeight = insets.systemWindowInsetTop
-            activity.navBarHeight = insets.systemWindowInsetBottom
+            activity.topHeight = insets.systemWindowInsetTop
+            activity.bottomHeight = insets.systemWindowInsetBottom
             insets
         }
         detailsPager = view.findViewById(R.id.post_page_pager)
@@ -185,7 +185,7 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             val activity = activity as DetailsActivity
-            view.setPadding(0, activity.toolbarHeight + activity.statusBarHeight, 0, activity.navBarHeight)
+            view.setPadding(0, activity.toolbarHeight + activity.topHeight, 0, activity.bottomHeight)
             tagsView = view.findViewById(R.id.rv_details_tags)
             tagsView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
             pos = activity.positionViewModel.getPosition()

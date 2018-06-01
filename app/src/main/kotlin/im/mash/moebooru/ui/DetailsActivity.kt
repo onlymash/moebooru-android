@@ -11,22 +11,17 @@
 
 package im.mash.moebooru.ui
 
-import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
-import android.util.Log
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
-import android.widget.ImageView
 import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.utils.*
 import im.mash.moebooru.viewmodel.DetailsPositionViewModel
 import im.mash.moebooru.viewmodel.PostsViewModel
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 class DetailsActivity : BaseActivity() {
 
@@ -36,8 +31,8 @@ class DetailsActivity : BaseActivity() {
 
     internal var widthScreen: Int = 0
     internal var toolbarHeight = 0
-    internal var navBarHeight = 0
-    internal var statusBarHeight = 0
+    internal var topHeight = 0
+    internal var bottomHeight = 0
     internal var tags: String? = null
     internal var currentPostId: Int = 0
     internal lateinit var postsViewModel: PostsViewModel

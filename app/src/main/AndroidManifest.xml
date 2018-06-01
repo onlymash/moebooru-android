@@ -20,10 +20,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/MoeTheme"
+        tools:replace="android:supportsRtl"
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
             android:name=".ui.MainActivity"
+            android:configChanges="orientation"
             android:theme="@style/MoeTheme.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,7 +35,8 @@
         </activity>
 
         <activity
-            android:name=".ui.DetailsActivity">
+            android:name=".ui.DetailsActivity"
+            android:configChanges="orientation">
             <intent-filter>
                 <action android:name="${applicationId}.action.SHOW_DETAILS"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -41,7 +44,8 @@
         </activity>
 
         <activity
-            android:name=".ui.SearchActivity">
+            android:name=".ui.SearchActivity"
+            android:configChanges="orientation">
             <intent-filter>
                 <action android:name="${applicationId}.action.SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT"/>

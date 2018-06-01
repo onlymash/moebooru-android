@@ -14,6 +14,7 @@ package im.mash.moebooru.ui
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.*
+import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.AppBarLayout
@@ -140,6 +141,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
     //初始右侧化抽屉
     private fun initRightDrawer(view: View) {
         drawerLayout = view.findViewById(R.id.drawer_layout_posts)
+        drawerLayout.setScrimColor(Color.TRANSPARENT)
         drawer = view.findViewById(R.id.tags_drawer_view)
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
         drawerToolbar.inflateMenu(R.menu.menu_search)
