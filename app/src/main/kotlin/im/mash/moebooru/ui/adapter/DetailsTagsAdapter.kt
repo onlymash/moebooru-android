@@ -29,7 +29,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
 class DetailsTagsAdapter internal constructor(private val tagsFragment: DetailsFragment.TagsFragment,
-                                              private var tags: MutableList<String>?) : RecyclerView.Adapter<DetailsTagsAdapter.DetailsTagsViewHolder>() {
+                                              private var tags: List<String>?) : RecyclerView.Adapter<DetailsTagsAdapter.DetailsTagsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DetailsTagsViewHolder {
         val itemView: View = LayoutInflater.from(parent.context)
@@ -41,7 +41,7 @@ class DetailsTagsAdapter internal constructor(private val tagsFragment: DetailsF
         return tags?.size?:0
     }
 
-    fun updateData(tags: MutableList<String>?) {
+    fun updateData(tags: List<String>?) {
         this.tags = tags
         notifyDataSetChanged()
     }

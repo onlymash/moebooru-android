@@ -29,7 +29,6 @@ class DetailsActivity : BaseActivity() {
         private const val TAG = "DetailsActivity"
     }
 
-    internal var widthScreen: Int = 0
     internal var toolbarHeight = 0
     internal var topHeight = 0
     internal var bottomHeight = 0
@@ -45,9 +44,6 @@ class DetailsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_moebooru)
-        val metric: DisplayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(metric)
-        widthScreen = metric.widthPixels
         val tv = TypedValue()
         if (theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)
@@ -115,5 +111,11 @@ class DetailsActivity : BaseActivity() {
             finish()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    internal fun getScreenWidth(): Int {
+        val metric: DisplayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(metric)
+        return metric.widthPixels
     }
 }

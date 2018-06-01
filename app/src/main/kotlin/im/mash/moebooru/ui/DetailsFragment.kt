@@ -14,6 +14,7 @@ package im.mash.moebooru.ui
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -21,7 +22,7 @@ import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
-import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
@@ -174,9 +175,10 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
     internal class TagsFragment : Fragment() {
 
         private var pos = 0
-        private var tagsList: MutableList<String>? = null
+        private var tagsList: List<String>? = null
         private lateinit var tagsView: RecyclerView
         private lateinit var tagsAdapter: DetailsTagsAdapter
+        private var spanCount = 1
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             return inflater.inflate(R.layout.layout_details_tags, container, false)
@@ -186,15 +188,20 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             super.onViewCreated(view, savedInstanceState)
             val activity = activity as DetailsActivity
             view.setPadding(0, activity.toolbarHeight + activity.topHeight, 0, activity.bottomHeight)
+            spanCount = activity.getScreenWidth()/activity.resources.getDimension(R.dimen.tag_item_width).toInt()
+            if (spanCount == 0) {
+                spanCount = 1
+            }
             tagsView = view.findViewById(R.id.rv_details_tags)
-            tagsView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
+            tagsView.layoutManager = GridLayoutManager(this.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
+            tagsView.hasFixedSize()
             pos = activity.positionViewModel.getPosition()
             tagsList = activity.items?.get(pos)?.tags?.split(" ")?.toMutableList()
             tagsAdapter = DetailsTagsAdapter(this, tagsList)
             tagsView.adapter = tagsAdapter
             activity.positionViewModel.getPositionModel().observe(this, Observer {
                 pos = it!!
-                tagsList = activity.items?.get(pos)?.tags?.split(" ")?.toMutableList()
+                tagsList = activity.items?.get(pos)?.tags?.split(" ")
                 tagsAdapter.updateData(tagsList)
             })
         }
@@ -205,6 +212,16 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             bundle.putString(Key.TAGS_SEARCH, tagsList!![position])
             intent.putExtra(Key.BUNDLE, bundle)
             startActivity(intent)
+        }
+
+        override fun onConfigurationChanged(newConfig: Configuration?) {
+            super.onConfigurationChanged(newConfig)
+            val activity = activity as DetailsActivity
+            spanCount = activity.getScreenWidth()/activity.resources.getDimension(R.dimen.tag_item_width).toInt()
+            if (spanCount == 0) {
+                spanCount = 1
+            }
+            tagsView.layoutManager = GridLayoutManager(this.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
         }
     }
 

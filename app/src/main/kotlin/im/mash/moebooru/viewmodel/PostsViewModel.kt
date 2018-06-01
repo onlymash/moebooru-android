@@ -89,6 +89,10 @@ class PostsViewModel : ViewModel() {
                 }
             }
         }
+        if (page == 1) {
+            app.settings.isNotMoreData = true
+            return
+        }
         val response: MoeResponse? = getResponseData(tags, page.toLong(), limit)
         var result: MutableList<RawPost>? = null
         if (response != null) {
