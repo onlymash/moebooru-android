@@ -25,9 +25,13 @@ import android.support.v4.view.ViewPager
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.text.format.DateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
@@ -37,6 +41,7 @@ import im.mash.moebooru.ui.widget.AccordionTransformer
 import im.mash.moebooru.ui.widget.VerticalViewPager
 import im.mash.moebooru.utils.Key
 import org.jetbrains.anko.doAsync
+import java.util.*
 
 class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListener {
 
@@ -227,13 +232,77 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
 
     internal class InfoFragment : Fragment() {
 
+        private lateinit var id: TextView
+        private lateinit var createdAt: TextView
+        private lateinit var author: TextView
+        private lateinit var creatorId: TextView
+        private lateinit var heightWidth: TextView
+        private lateinit var source: TextView
+        private lateinit var rating: TextView
+        private lateinit var score: TextView
+
+        private lateinit var parentId: ImageButton
+        private lateinit var parentIdLayout: LinearLayout
+
+        private var post: RawPost? = null
+        private var pos = 0
+
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
             return inflater.inflate(R.layout.layout_details_info, container, false)
         }
 
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
+            val activity = activity as DetailsActivity
+            val padding = activity.resources.getDimension(R.dimen.list_padding).toInt()
+            view.setPadding(padding, activity.toolbarHeight + activity.topHeight + padding, padding, activity.bottomHeight)
+            init(view)
+            pos = activity.positionViewModel.getPosition()
+            post = activity.items?.get(pos)
+            setData()
+            activity.positionViewModel.getPositionModel().observe(this, Observer {
+                pos = it!!
+                post = activity.items?.get(pos)
+                setData()
+            })
+        }
 
+        private fun setData() {
+            if (post != null) {
+                id.text = post!!.id.toString()
+                author.text = post!!.author
+                val cal = Calendar.getInstance(Locale.getDefault())
+                cal.timeInMillis = post!!.created_at!! * 1000
+                createdAt.text = DateFormat.format("yyyy-MM-dd HH:mm", cal)
+                creatorId.text = post!!.creator_id.toString()
+                val hw = "${post!!.height} x ${post!!.width}"
+                heightWidth.text = hw
+                if (post!!.source != null) {
+                    source.text = post!!.source
+                } else {
+                    source.text = ""
+                }
+                rating.text = post!!.rating
+                score.text = post!!.score.toString()
+                if (post!!.parent_id != null) {
+                    parentIdLayout.visibility = View.VISIBLE
+                } else {
+                    parentIdLayout.visibility = View.GONE
+                }
+            }
+        }
+
+        private fun init(view: View) {
+            id = view.findViewById(R.id.tv_id)
+            author = view.findViewById(R.id.tv_author)
+            createdAt = view.findViewById(R.id.tv_created_at)
+            creatorId = view.findViewById(R.id.tv_creator_id)
+            heightWidth = view.findViewById(R.id.tv_height_width)
+            source = view.findViewById(R.id.tv_source)
+            rating = view.findViewById(R.id.tv_rating)
+            score = view.findViewById(R.id.tv_score)
+            parentId = view.findViewById(R.id.btn_parent_id)
+            parentIdLayout = view.findViewById(R.id.container_parent_id)
         }
     }
 }

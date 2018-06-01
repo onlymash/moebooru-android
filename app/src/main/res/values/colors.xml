@@ -27,6 +27,8 @@
     <color name="drawer_selected_text">@color/accent</color>
     <color name="drawer_header_selection_text">@color/material_drawer_header_selection_text</color>
 
+    <color name="stats_title">#aaffffff</color>
+
     <color name="black">#FF000000</color>
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFFFF</color>

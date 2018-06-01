@@ -57,4 +57,21 @@
     <string name="post_size_sample">Sample</string>
     <string name="post_size_larger">Larger</string>
     <string name="post_size_origin">Origin</string>
+
+    <string name="post_stats_author">Author</string>
+    <string name="post_stats_children">Children</string>
+    <string name="post_stats_created_at">Created at</string>
+    <string name="post_stats_creator">Creator</string>
+    <string name="post_stats_id">Id</string>
+    <string name="post_stats_larger_size">Larger size</string>
+    <string name="post_stats_larger_url">Larger url</string>
+    <string name="post_stats_origin_size">Origin size</string>
+    <string name="post_stats_origin_url">Origin url</string>
+    <string name="post_stats_parent_id">Parent</string>
+    <string name="post_stats_rating">Rating</string>
+    <string name="post_stats_sample_size">Sample size</string>
+    <string name="post_stats_sample_url">Sample url</string>
+    <string name="post_stats_score">Score</string>
+    <string name="post_stats_size">Size</string>
+    <string name="post_stats_source">Source</string>
 </resources>

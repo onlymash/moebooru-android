@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:focusable="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?android:selectableItemBackground"
+    app:cardBackgroundColor="@color/toolbar_post"
+    app:cardCornerRadius="2dp"
+    app:cardElevation="0dp"
+    app:contentPadding="8dp"
+    tools:ignore="RtlHardcoded, RtlSymmetry">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_id" />
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#ffffffff"
+                android:ellipsize="marquee"
+                android:gravity="right"
+                android:id="@+id/tv_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_created_at" />
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#ffffffff"
+                android:ellipsize="marquee"
+                android:gravity="right"
+                android:id="@+id/tv_created_at"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_author" />
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#ffffffff"
+                android:ellipsize="marquee"
+                android:gravity="right"
+                android:id="@+id/tv_author"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_creator" />
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#ffffffff"
+                android:ellipsize="marquee"
+                android:gravity="right"
+                android:id="@+id/tv_creator_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_size" />
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#ffffffff"
+                android:ellipsize="marquee"
+                android:gravity="right"
+                android:id="@+id/tv_height_width"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_source" />
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColorLink="#ffffffff"
+                android:ellipsize="end"
+                android:gravity="end"
+                android:autoLink="web"
+                android:id="@+id/tv_source"
+                android:paddingLeft="16.0dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="false"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_rating" />
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#ffffffff"
+                android:ellipsize="marquee"
+                android:gravity="right"
+                android:id="@+id/tv_rating"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_weight="1"
+                android:textAllCaps="true" />
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_score" />
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#ffffffff"
+                android:ellipsize="marquee"
+                android:gravity="right"
+                android:id="@+id/tv_score"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:id="@+id/container_parent_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+            <TextView
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="@color/stats_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/post_stats_parent_id"
+                android:layout_weight="1" />
+            <ImageButton
+                android:id="@+id/btn_parent_id"
+                android:background="?selectableItemBackgroundBorderless"
+                android:layout_width="@dimen/list_height"
+                android:layout_height="@dimen/list_height"
+                android:src="@drawable/ic_action_search_24dp"
+                android:contentDescription="@null" />
+        </LinearLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>
