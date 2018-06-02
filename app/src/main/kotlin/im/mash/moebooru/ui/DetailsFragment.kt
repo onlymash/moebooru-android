@@ -333,9 +333,8 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
                 if (post != null) {
                     val booru = app.boorusManager.getBooru(app.settings.activeProfile)
                     val title = booru.name + " " + post!!.id
-                    val url = URL(booru.url)
-                    val ext = MimeTypeMap.getFileExtensionFromUrl(post!!.sample_url!!)
-                    val fileName = url.host + " - " + post!!.id + " " + post!!.tags + "." + ext
+                    val url = post!!.sample_url!!
+                    val fileName = url.substring(url.lastIndexOf("/") + 1)
                     if (verifyStoragePermissions(activity as DetailsActivity)) {
                         downloadPost(post!!.sample_url!!, title, booru.name, fileName)
                     }
@@ -364,11 +363,10 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
                 if (post != null) {
                     val booru = app.boorusManager.getBooru(app.settings.activeProfile)
                     val title = booru.name + " " + post!!.id
-                    val url = URL(booru.url)
-                    val ext = MimeTypeMap.getFileExtensionFromUrl(post!!.jpeg_url!!)
-                    val fileName = url.host + " - " + post!!.id + " " + post!!.tags + "." + ext
+                    val url = post!!.jpeg_url!!
+                    val fileName = url.substring(url.lastIndexOf("/") + 1)
                     if (verifyStoragePermissions(activity as DetailsActivity)) {
-                        downloadPost(post!!.jpeg_url!!, title, booru.name, fileName)
+                        downloadPost(url, title, booru.name, fileName)
                     }
                 }
             }
@@ -395,9 +393,8 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
                 if (post != null) {
                     val booru = app.boorusManager.getBooru(app.settings.activeProfile)
                     val title = booru.name + " " + post!!.id
-                    val url = URL(booru.url)
-                    val ext = MimeTypeMap.getFileExtensionFromUrl(post!!.file_url!!)
-                    val fileName = url.host + " - " + post!!.id + " " + post!!.tags + "." + ext
+                    val url = post!!.file_url!!
+                    val fileName = url.substring(url.lastIndexOf("/") + 1)
                     if (verifyStoragePermissions(activity as DetailsActivity)) {
                         downloadPost(post!!.file_url!!, title, booru.name, fileName)
                     }

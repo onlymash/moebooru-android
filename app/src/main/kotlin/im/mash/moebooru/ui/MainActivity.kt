@@ -139,8 +139,11 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.background_header)
                 .withOnAccountHeaderListener { _, profile, _ ->
-                    app.settings.activeProfile = profile.identifier
-                    Log.i(TAG, "activeProfile: " + app.settings.activeProfile)
+                    if (profile.identifier != profileSettingDrawerItem.identifier) {
+                        app.settings.activeProfile = profile.identifier
+                    } else {
+
+                    }
                     false
                 }
                 .build()
