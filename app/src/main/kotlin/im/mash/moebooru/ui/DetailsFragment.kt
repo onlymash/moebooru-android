@@ -25,7 +25,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -48,6 +47,7 @@ import im.mash.moebooru.ui.widget.AccordionTransformer
 import im.mash.moebooru.ui.widget.VerticalViewPager
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.downloadPost
+import im.mash.moebooru.utils.statusBarHeight
 import im.mash.moebooru.utils.verifyStoragePermissions
 import org.jetbrains.anko.doAsync
 import java.net.URL
@@ -81,11 +81,6 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
         bg = view.findViewById(R.id.details_bg)
         bg.visibility = View.GONE
         activity.fmWidget(bg, toolbar)
-        ViewCompat.setOnApplyWindowInsetsListener(view) {_, insets ->
-            activity.topHeight = insets.systemWindowInsetTop
-            activity.bottomHeight = insets.systemWindowInsetBottom
-            insets
-        }
         detailsPager = view.findViewById(R.id.post_page_pager)
 //        detailsPager.offscreenPageLimit = 4
         detailsPagerAdapter = DummyAdapter(activity.supportFragmentManager,
@@ -202,7 +197,7 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
             val activity = activity as DetailsActivity
-            view.setPadding(0, activity.toolbarHeight + activity.topHeight, 0, activity.bottomHeight)
+            view.setPadding(0, activity.toolbarHeight + statusBarHeight, 0, activity.bottomHeight)
             spanCount = activity.getScreenWidth()/activity.resources.getDimension(R.dimen.tag_item_width).toInt()
             if (spanCount == 0) {
                 spanCount = 1
@@ -229,15 +224,6 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             startActivity(intent)
         }
 
-        override fun onConfigurationChanged(newConfig: Configuration?) {
-            super.onConfigurationChanged(newConfig)
-            val activity = activity as DetailsActivity
-            spanCount = activity.getScreenWidth()/activity.resources.getDimension(R.dimen.tag_item_width).toInt()
-            if (spanCount == 0) {
-                spanCount = 1
-            }
-            tagsView.layoutManager = GridLayoutManager(this.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
-        }
     }
 
     internal class InfoFragment : Fragment() {
@@ -280,7 +266,7 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             super.onViewCreated(view, savedInstanceState)
             val activity = activity as DetailsActivity
             val padding = activity.resources.getDimension(R.dimen.list_padding).toInt()
-            view.setPadding(padding, activity.toolbarHeight + activity.topHeight + padding, padding, activity.bottomHeight)
+            view.setPadding(padding, activity.toolbarHeight + statusBarHeight + padding, padding, activity.bottomHeight)
             init(view)
             pos = activity.positionViewModel.getPosition()
             post = activity.items?.get(pos)

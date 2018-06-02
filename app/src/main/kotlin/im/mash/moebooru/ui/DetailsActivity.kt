@@ -12,6 +12,7 @@
 package im.mash.moebooru.ui
 
 import android.os.Bundle
+import android.support.v4.view.ViewCompat
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -44,6 +45,11 @@ class DetailsActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_moebooru)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.moebooru_layout)) { _, insets ->
+            topHeight = insets.systemWindowInsetTop
+            bottomHeight = insets.systemWindowInsetBottom
+            insets
+        }
         val tv = TypedValue()
         if (theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
             toolbarHeight = TypedValue.complexToDimensionPixelSize(tv.data, resources.displayMetrics)

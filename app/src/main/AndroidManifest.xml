@@ -25,7 +25,6 @@
 
         <activity
             android:name=".ui.MainActivity"
-            android:configChanges="orientation"
             android:theme="@style/MoeTheme.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,8 +34,7 @@
         </activity>
 
         <activity
-            android:name=".ui.DetailsActivity"
-            android:configChanges="orientation">
+            android:name=".ui.DetailsActivity">
             <intent-filter>
                 <action android:name="${applicationId}.action.SHOW_DETAILS"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -44,8 +42,7 @@
         </activity>
 
         <activity
-            android:name=".ui.SearchActivity"
-            android:configChanges="orientation">
+            android:name=".ui.SearchActivity">
             <intent-filter>
                 <action android:name="${applicationId}.action.SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT"/>
