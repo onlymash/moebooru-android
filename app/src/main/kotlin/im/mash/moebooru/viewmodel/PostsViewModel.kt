@@ -25,7 +25,9 @@ import im.mash.moebooru.utils.okHttpHeader
 
 class PostsViewModel : ViewModel() {
 
-    private val TAG = "PostsViewModel"
+    companion object {
+        private const val TAG = "PostsViewModel"
+    }
 
     private var allPosts: MutableLiveData<MutableList<RawPost>>? = null
     private var searchPosts: MutableLiveData<MutableList<RawPost>>? = null

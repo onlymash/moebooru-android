@@ -20,6 +20,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
@@ -38,7 +39,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.text.format.Formatter
 import android.webkit.MimeTypeMap
-import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
@@ -367,9 +367,11 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             }
             sampleLayout.setOnLongClickListener {
                 val cm: ClipboardManager = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
-                val cd = ClipData.newPlainText("Tag: $pos", post!!.sample_url)
+                val cd = ClipData.newPlainText("url: $pos", post!!.sample_url)
                 cm.primaryClip = cd
-                Toast.makeText(activity, "Sample url has been copied", Toast.LENGTH_SHORT).show()
+                val snackbar = Snackbar.make(view!!, "Sample url has been copied", Snackbar.LENGTH_SHORT)
+                snackbar.view.setPadding(0, 0, 0, (activity as DetailsActivity).bottomHeight)
+                snackbar.show()
                 true
             }
             largerDownload.setOnClickListener {
@@ -396,9 +398,11 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             }
             largerLayout.setOnLongClickListener {
                 val cm: ClipboardManager = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
-                val cd = ClipData.newPlainText("Tag: $pos", post!!.jpeg_url)
+                val cd = ClipData.newPlainText("url: $pos", post!!.jpeg_url)
                 cm.primaryClip = cd
-                Toast.makeText(activity, "Larger url has been copied", Toast.LENGTH_SHORT).show()
+                val snackbar = Snackbar.make(view!!, "Larger url has been copied", Snackbar.LENGTH_SHORT)
+                snackbar.view.setPadding(0, 0, 0, (activity as DetailsActivity).bottomHeight)
+                snackbar.show()
                 true
             }
             originDownload.setOnClickListener {
@@ -425,9 +429,11 @@ class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListene
             }
             originLayout.setOnLongClickListener {
                 val cm: ClipboardManager = activity!!.getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
-                val cd = ClipData.newPlainText("Tag: $pos", post!!.file_url)
+                val cd = ClipData.newPlainText("url: $pos", post!!.file_url)
                 cm.primaryClip = cd
-                Toast.makeText(activity, "Origin url has been copied", Toast.LENGTH_SHORT).show()
+                val snackbar = Snackbar.make(view!!, "Origin url has been copied", Snackbar.LENGTH_SHORT)
+                snackbar.view.setPadding(0, 0, 0, (activity as DetailsActivity).bottomHeight)
+                snackbar.show()
                 true
             }
         }

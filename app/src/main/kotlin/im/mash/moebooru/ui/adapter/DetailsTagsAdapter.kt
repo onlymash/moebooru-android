@@ -14,16 +14,17 @@ package im.mash.moebooru.ui.adapter
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.model.Tag
+import im.mash.moebooru.ui.DetailsActivity
 import im.mash.moebooru.ui.DetailsFragment
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -57,14 +58,18 @@ class DetailsTagsAdapter internal constructor(private val tagsFragment: DetailsF
                 val cm: ClipboardManager = tagsFragment.requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
                 val cd = ClipData.newPlainText("Tag: $position", tags!![position])
                 cm.primaryClip = cd
-                Toast.makeText(tagsFragment.requireContext(), tags!![position] + " has been copied", Toast.LENGTH_SHORT).show()
+                val snackbar = Snackbar.make(it.rootView, tags!![position] + " has been copied", Snackbar.LENGTH_SHORT)
+                snackbar.view.setPadding(0, 0, 0, (tagsFragment.activity as DetailsActivity).bottomHeight)
+                snackbar.show()
                 true
             }
             holder.tagAdd.setOnClickListener {
                 doAsync {
                     app.tagsManager.saveTag(Tag(app.settings.activeProfile, tags!![position], false))
                     uiThread {
-                        Toast.makeText(app, tags!![position] + " has been added to search list", Toast.LENGTH_SHORT).show()
+                        val snackbar = Snackbar.make(holder.itemView.rootView, tags!![position] + " has been added to search list", Snackbar.LENGTH_SHORT)
+                        snackbar.view.setPadding(0, 0, 0, (tagsFragment.activity as DetailsActivity).bottomHeight)
+                        snackbar.show()
                     }
                 }
             }
@@ -72,7 +77,9 @@ class DetailsTagsAdapter internal constructor(private val tagsFragment: DetailsF
                 doAsync {
                     app.tagsManager.saveTag(Tag(app.settings.activeProfile, "-" + tags!![position], false))
                     uiThread {
-                        Toast.makeText(app, "-" + tags!![position] + " has been added to search list", Toast.LENGTH_SHORT).show()
+                        val snackbar = Snackbar.make(holder.itemView.rootView, "-" + tags!![position] + " has been added to search list", Snackbar.LENGTH_SHORT)
+                        snackbar.view.setPadding(0, 0, 0, (tagsFragment.activity as DetailsActivity).bottomHeight)
+                        snackbar.show()
                     }
                 }
             }

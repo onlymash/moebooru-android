@@ -19,6 +19,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AlertDialog
@@ -28,7 +29,6 @@ import android.util.Log
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.Toast
 
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
@@ -55,6 +55,8 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
     private lateinit var tagsDrawerView: RecyclerView
 
     private var itemsTag = mutableListOf<Tag>()
+
+    private var navBarHeight = 0
 
     private val mainActivity: MainActivity by lazy { activity as MainActivity }
 
@@ -169,6 +171,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
         appBarLayoutTags.addView(drawerToolbar)
         ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, insets ->
             val statusBarSize = insets.systemWindowInsetTop
+            navBarHeight = insets.systemWindowInsetBottom
             tagsDrawerViewLayout.setPadding(0, mainActivity.toolbarHeight + statusBarSize, 0, insets.systemWindowInsetBottom)
             drawerToolbar.setPadding(0, statusBarSize, 0, 0)
             appBarLayoutTags.minimumHeight = mainActivity.toolbarHeight + statusBarSize
@@ -221,7 +224,9 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
                     startActivity(intent)
                     closeRightDrawer()
                 } else {
-                    Toast.makeText(context, "Tag is null", Toast.LENGTH_SHORT).show()
+                    val snackbar = Snackbar.make(view!!, getString(R.string.tag_can_not_be_empty), Snackbar.LENGTH_SHORT)
+                    snackbar.view.setPadding(0, 0, 0, navBarHeight)
+                    snackbar.show()
                 }
             }
             R.id.action_add -> {
@@ -242,7 +247,9 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
                         .setPositiveButton(getString(R.string.ok), {_, _->
                             val input = editText.text.toString()
                             if (input.isEmpty() || input == "") {
-                                Toast.makeText(context, getString(R.string.tag_can_not_be_empty), Toast.LENGTH_SHORT).show()
+                                val snackbar = Snackbar.make(view!!, getString(R.string.tag_can_not_be_empty), Snackbar.LENGTH_SHORT)
+                                snackbar.view.setPadding(0, 0, 0, navBarHeight)
+                                snackbar.show()
                             } else {
                                 val tag = Tag(app.settings.activeProfile, input, false)
                                 doAsync {
