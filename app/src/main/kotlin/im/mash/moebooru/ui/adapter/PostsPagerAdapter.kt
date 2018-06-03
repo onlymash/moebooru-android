@@ -12,7 +12,6 @@
 package im.mash.moebooru.ui.adapter
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
@@ -22,7 +21,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.widget.ProgressBar
-import com.bm.library.PhotoView
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.model.GlideUrl
@@ -32,6 +30,7 @@ import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.DetailsActivity
+import im.mash.moebooru.ui.widget.photoview.PhotoView
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.glideHeader
 
@@ -58,6 +57,7 @@ class PostsPagerAdapter(private var items: MutableList<RawPost>?,
                 .inflate(R.layout.layout_post_img, null)
         val photoView = view.findViewById<PhotoView>(R.id.post_img)
         photoView.enable()
+        photoView.enableRotate()
         photoView.setOnClickListener {
             activity.changeBackground()
         }

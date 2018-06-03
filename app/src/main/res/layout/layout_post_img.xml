@@ -15,7 +15,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.bm.library.PhotoView
+    <im.mash.moebooru.ui.widget.photoview.PhotoView
         android:id="@+id/post_img"
         android:scaleType="fitCenter"
         android:layout_width="match_parent"
