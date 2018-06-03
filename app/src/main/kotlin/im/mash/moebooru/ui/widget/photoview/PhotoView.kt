@@ -36,7 +36,7 @@ class PhotoView : AppCompatImageView {
     /**
      * 设置最大可以缩放的倍数
      */
-    var maxScale: Float = 0.toFloat()
+    var maxScale: Float = 0F
 
     private var MAX_OVER_SCROLL = 0
     private var MAX_FLING_OVER_SCROLL = 0
@@ -70,14 +70,14 @@ class PhotoView : AppCompatImageView {
     private var imgLargeWidth: Boolean = false
     private var imgLargeHeight: Boolean = false
 
-    private var mRotateFlag: Float = 0.toFloat()
-    private var mDegrees: Float = 0.toFloat()
+    private var mRotateFlag: Float = 0F
+    private var mDegrees: Float = 0F
     private var mScale = 1.0f
     private var mTranslateX: Int = 0
     private var mTranslateY: Int = 0
 
-    private var mHalfBaseRectWidth: Float = 0.toFloat()
-    private var mHalfBaseRectHeight: Float = 0.toFloat()
+    private var mHalfBaseRectWidth: Float = 0F
+    private var mHalfBaseRectHeight: Float = 0F
 
     private val mWidgetRect = RectF()
     private val mBaseRect = RectF()
@@ -106,9 +106,9 @@ class PhotoView : AppCompatImageView {
 
     companion object {
 
-        private val MIN_ROTATE = 35
-        private val ANIMA_DURING = 340
-        private val MAX_SCALE = 2.5f
+        private const val MIN_ROTATE = 35
+        private const val ANIMA_DURING = 340
+        private const val MAX_SCALE = 2.5f
 
         private fun getDrawableWidth(d: Drawable): Int {
             var width = d.intrinsicWidth
