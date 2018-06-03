@@ -38,10 +38,10 @@ class PhotoView : AppCompatImageView {
      */
     var maxScale: Float = 0F
 
-    private var MAX_OVER_SCROLL = 0
-    private var MAX_FLING_OVER_SCROLL = 0
-    private var MAX_OVER_RESISTANCE = 0
-    private var MAX_ANIM_FROM_WAITE = 500
+    private var maxOverScroll = 0
+    private var maxFlingOverScroll = 0
+    private var maxOverResistance = 0
+    private var maxAnimFromWaite = 500
 
     private val mBaseMatrix = Matrix()
     private val mAnimaMatrix = Matrix()
@@ -64,7 +64,7 @@ class PhotoView : AppCompatImageView {
     private var isInit: Boolean = false
     private var mAdjustViewBounds: Boolean = false
     // 当前是否处于放大状态
-    private var isZoonUp: Boolean = false
+    private var isZoomUp: Boolean = false
     private var canRotate: Boolean = false
 
     private var imgLargeWidth: Boolean = false
@@ -235,7 +235,7 @@ class PhotoView : AppCompatImageView {
         override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
             if (hasMultiTouch) return false
             if (!imgLargeWidth && !imgLargeHeight) return false
-            if (mTranslate.isRuning) return false
+            if (mTranslate.isRunning) return false
 
             var vx = velocityX
             var vy = velocityY
@@ -274,7 +274,7 @@ class PhotoView : AppCompatImageView {
         override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
             var dX = distanceX
             var dY = distanceY
-            if (mTranslate.isRuning) {
+            if (mTranslate.isRunning) {
                 mTranslate.stop()
             }
 
@@ -346,7 +346,7 @@ class PhotoView : AppCompatImageView {
             mTranslateX = 0
             mTranslateY = 0
 
-            if (isZoonUp) {
+            if (isZoomUp) {
                 from = mScale
                 to = 1f
             } else {
@@ -366,7 +366,7 @@ class PhotoView : AppCompatImageView {
             mTmpMatrix.mapRect(mTmpRect, mBaseRect)
             doTranslateReset(mTmpRect)
 
-            isZoonUp = !isZoonUp
+            isZoomUp = !isZoomUp
             mTranslate.withScale(from, to)
             mTranslate.start()
 
@@ -402,9 +402,9 @@ class PhotoView : AppCompatImageView {
         mDetector = GestureDetector(context, mGestureListener)
         mScaleDetector = ScaleGestureDetector(context, mScaleListener)
         val density = resources.displayMetrics.density
-        MAX_OVER_SCROLL = (density * 30).toInt()
-        MAX_FLING_OVER_SCROLL = (density * 30).toInt()
-        MAX_OVER_RESISTANCE = (density * 140).toInt()
+        maxOverScroll = (density * 30).toInt()
+        maxFlingOverScroll = (density * 30).toInt()
+        maxOverResistance = (density * 140).toInt()
 
         mMinRotate = MIN_ROTATE
         animaDuring = ANIMA_DURING
@@ -449,7 +449,7 @@ class PhotoView : AppCompatImageView {
     /**
      * 禁用缩放功能
      */
-    fun disenable() {
+    fun disable() {
         isEnable = false
     }
 
@@ -470,7 +470,7 @@ class PhotoView : AppCompatImageView {
     /**
      */
     fun setMaxAnimFromWaiteTime(wait: Int) {
-        MAX_ANIM_FROM_WAITE = wait
+        maxAnimFromWaite = wait
     }
 
     override fun setImageResource(resId: Int) {
@@ -514,7 +514,7 @@ class PhotoView : AppCompatImageView {
         mBaseMatrix.reset()
         mAnimaMatrix.reset()
 
-        isZoonUp = false
+        isZoomUp = false
 
         val img = drawable
 
@@ -570,7 +570,7 @@ class PhotoView : AppCompatImageView {
 
         isInit = true
 
-        if (mFromInfo != null && System.currentTimeMillis() - mInfoTime < MAX_ANIM_FROM_WAITE) {
+        if (mFromInfo != null && System.currentTimeMillis() - mInfoTime < maxAnimFromWaite) {
             animaFrom(mFromInfo!!)
         }
 
@@ -789,7 +789,7 @@ class PhotoView : AppCompatImageView {
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (isEnable) {
-            val Action = event.actionMasked
+            val action = event.actionMasked
             if (event.pointerCount >= 2) hasMultiTouch = true
 
             mDetector!!.onTouchEvent(event)
@@ -798,7 +798,7 @@ class PhotoView : AppCompatImageView {
             }
             mScaleDetector!!.onTouchEvent(event)
 
-            if (Action == MotionEvent.ACTION_UP || Action == MotionEvent.ACTION_CANCEL) onUp()
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) onUp()
 
             return true
         } else {
@@ -807,7 +807,7 @@ class PhotoView : AppCompatImageView {
     }
 
     private fun onUp() {
-        if (mTranslate.isRuning) return
+        if (mTranslate.isRunning) return
 
         if (canRotate || mDegrees % 90 != 0f) {
             var toDegrees = ((mDegrees / 90).toInt() * 90).toFloat()
@@ -894,11 +894,11 @@ class PhotoView : AppCompatImageView {
     }
 
     private fun resistanceScrollByX(overScroll: Float, detalX: Float): Float {
-        return detalX * (Math.abs(Math.abs(overScroll) - MAX_OVER_RESISTANCE) / MAX_OVER_RESISTANCE.toFloat())
+        return detalX * (Math.abs(Math.abs(overScroll) - maxOverResistance) / maxOverResistance.toFloat())
     }
 
     private fun resistanceScrollByY(overScroll: Float, detalY: Float): Float {
-        return detalY * (Math.abs(Math.abs(overScroll) - MAX_OVER_RESISTANCE) / MAX_OVER_RESISTANCE.toFloat())
+        return detalY * (Math.abs(Math.abs(overScroll) - maxOverResistance) / maxOverResistance.toFloat())
     }
 
     /**
@@ -973,7 +973,7 @@ class PhotoView : AppCompatImageView {
 
     private inner class Transform internal constructor() : Runnable {
 
-        internal var isRuning: Boolean = false
+        internal var isRunning: Boolean = false
 
         internal var mTranslateScroller: OverScroller
         internal var mFlingScroller: OverScroller
@@ -981,7 +981,7 @@ class PhotoView : AppCompatImageView {
         internal var mClipScroller: Scroller
         internal var mRotateScroller: Scroller
 
-        internal lateinit var C: ClipCalculate
+        internal lateinit var mC: ClipCalculate
 
         internal var mLastFlingX: Int = 0
         internal var mLastFlingY: Int = 0
@@ -1018,7 +1018,7 @@ class PhotoView : AppCompatImageView {
 
         internal fun withClip(fromX: Float, fromY: Float, deltaX: Float, deltaY: Float, d: Int, c: ClipCalculate) {
             mClipScroller.startScroll((fromX * 10000).toInt(), (fromY * 10000).toInt(), (deltaX * 10000).toInt(), (deltaY * 10000).toInt(), d)
-            C = c
+            mC = c
         }
 
         internal fun withRotate(fromDegrees: Int, toDegrees: Int) {
@@ -1054,11 +1054,11 @@ class PhotoView : AppCompatImageView {
                 minY = 0
             }
 
-            mFlingScroller.fling(mLastFlingX, mLastFlingY, velocityX.toInt(), velocityY.toInt(), minX, maxX, minY, maxY, if (Math.abs(overX) < MAX_FLING_OVER_SCROLL * 2) 0 else MAX_FLING_OVER_SCROLL, if (Math.abs(overY) < MAX_FLING_OVER_SCROLL * 2) 0 else MAX_FLING_OVER_SCROLL)
+            mFlingScroller.fling(mLastFlingX, mLastFlingY, velocityX.toInt(), velocityY.toInt(), minX, maxX, minY, maxY, if (Math.abs(overX) < maxFlingOverScroll * 2) 0 else maxFlingOverScroll, if (Math.abs(overY) < maxFlingOverScroll * 2) 0 else maxFlingOverScroll)
         }
 
         internal fun start() {
-            isRuning = true
+            isRunning = true
             postExecute()
         }
 
@@ -1068,12 +1068,12 @@ class PhotoView : AppCompatImageView {
             mScaleScroller.abortAnimation()
             mFlingScroller.abortAnimation()
             mRotateScroller.abortAnimation()
-            isRuning = false
+            isRunning = false
         }
 
         override fun run() {
 
-            // if (!isRuning) return;
+            // if (!isRunning) return;
 
             var endAnima = true
 
@@ -1112,7 +1112,7 @@ class PhotoView : AppCompatImageView {
             if (mClipScroller.computeScrollOffset() || mClip != null) {
                 val sx = mClipScroller.currX / 10000f
                 val sy = mClipScroller.currY / 10000f
-                mTmpMatrix.setScale(sx, sy, (mImgRect.left + mImgRect.right) / 2, C.calculateTop())
+                mTmpMatrix.setScale(sx, sy, (mImgRect.left + mImgRect.right) / 2, mC.calculateTop())
                 mTmpMatrix.mapRect(mClipRect, mImgRect)
 
                 if (sx == 1f) {
@@ -1132,7 +1132,7 @@ class PhotoView : AppCompatImageView {
                 applyAnima()
                 postExecute()
             } else {
-                isRuning = false
+                isRunning = false
 
                 // 修复动画结束后边距有些空隙，
                 var needFix = false
@@ -1181,7 +1181,7 @@ class PhotoView : AppCompatImageView {
 
 
         private fun postExecute() {
-            if (isRuning) post(this)
+            if (isRunning) post(this)
         }
     }
 
@@ -1261,9 +1261,11 @@ class PhotoView : AppCompatImageView {
                 clipX = if (clipX > 1) 1F else clipX
                 clipY = if (clipY > 1) 1F else clipY
 
-                val c = if (info.scaleType === ImageView.ScaleType.FIT_START) START() 
-                else if (info.scaleType === ImageView.ScaleType.FIT_END) END() 
-                else OTHER()
+                val c = when {
+                    info.scaleType === ImageView.ScaleType.FIT_START -> START()
+                    info.scaleType === ImageView.ScaleType.FIT_END -> END()
+                    else -> OTHER()
+                }
 
                 mTranslate.withClip(clipX, clipY, 1 - clipX, 1 - clipY, animaDuring / 3, c)
 
