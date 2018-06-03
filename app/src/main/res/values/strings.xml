@@ -93,4 +93,8 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
 
+
+    <string name="share">Share</string>
+    <string name="download">Download</string>
+    <string name="share_to">Share to:</string>
 </resources>

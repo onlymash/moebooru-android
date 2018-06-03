@@ -11,13 +11,16 @@
 
 package im.mash.moebooru.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.TypedValue
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.utils.*
@@ -41,6 +44,8 @@ class DetailsActivity : BaseActivity() {
 
     internal lateinit var toolbarFm: Toolbar
     internal lateinit var bgFm: View
+
+    internal var menu: Menu? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,9 +117,45 @@ class DetailsActivity : BaseActivity() {
         window.decorView.systemUiVisibility = uiFlags
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_details, menu)
+        this.menu = menu
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
-            finish()
+        when (item?.itemId) {
+            android.R.id.home -> finish()
+            R.id.action_download -> {
+                val post = items!![positionViewModel.getPosition()]
+                val booru = app.boorusManager.getBooru(app.settings.activeProfile)
+                val title = booru.name + " " + post.id
+                val url = when (app.settings.postSizeDownload) {
+                    Key.POST_SIZE_SAMPLE -> {
+                        post.sample_url!!
+                    }
+                    Key.POST_SIZE_LARGER -> {
+                        post.jpeg_url!!
+                    }
+                    else -> {
+                        post.file_url!!
+                    }
+                }
+                val fileName = url.substring(url.lastIndexOf("/") + 1)
+                if (mayRequestStoragePermission(this, 0)) {
+                    downloadPost(url, title, booru.name, fileName)
+                }
+            }
+            R.id.action_share -> {
+                val post = items!![positionViewModel.getPosition()]
+                val booru = app.boorusManager.getBooru(app.settings.activeProfile)
+                val url = booru.url + "/post/show/" + post.id
+                val intent = Intent()
+                intent.action = Intent.ACTION_SEND
+                intent.type = "text/*"
+                intent.putExtra(Intent.EXTRA_TEXT, url)
+                startActivity(Intent.createChooser(intent, getString(R.string.share_to)))
+            }
         }
         return super.onOptionsItemSelected(item)
     }
