@@ -145,7 +145,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
         drawerLayout = view.findViewById(R.id.drawer_layout_posts)
         drawerLayout.setScrimColor(Color.TRANSPARENT)
         drawer = view.findViewById(R.id.tags_drawer_view)
-        drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_24dp)
+        drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_white_24dp)
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener(this)
         drawerToolbar.setOnClickListener(this)

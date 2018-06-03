@@ -29,6 +29,8 @@
     <string name="drawer_close">Close drawer</string>
     <string name="edit">Edit</string>
 
+    <string name="downloads">Downloads</string>
+
     <string name="appearance">Appearance</string>
 
     <string name="night_mode">Night mode</string>
@@ -74,4 +76,21 @@
     <string name="post_stats_score">Score</string>
     <string name="post_stats_size">Size</string>
     <string name="post_stats_source">Source</string>
+
+    <string name="downloads_stop">Stop</string>
+    <string name="downloads_start">Start</string>
+    <string name="downloads_stop_all">Stop all</string>
+    <string name="downloads_start_all">Start all</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <string name="title_account">Account</string>
+    <string name="title_login">Login</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="action_login">Login</string>
+    <string name="error_invalid_username">This username is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+
 </resources>

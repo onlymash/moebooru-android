@@ -223,7 +223,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:layout_width="@dimen/list_size"
                 android:layout_height="@dimen/list_size"
-                android:src="@drawable/ic_action_search_24dp"
+                android:src="@drawable/ic_action_search_white_24dp"
                 android:contentDescription="@null" />
         </LinearLayout>
     </LinearLayout>

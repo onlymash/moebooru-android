@@ -12,6 +12,7 @@ buildscript {
         rikka_preference_version = '2.2.3'
         glide_version = '4.7.1'
         firebase_version = '16.0.0'
+        okdownload_version = '1.0.3'
     }
     repositories {
         google()

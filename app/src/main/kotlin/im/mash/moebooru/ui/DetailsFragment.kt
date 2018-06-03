@@ -43,10 +43,7 @@ import im.mash.moebooru.ui.adapter.DetailsTagsAdapter
 import im.mash.moebooru.ui.adapter.PostsPagerAdapter
 import im.mash.moebooru.ui.widget.AccordionTransformer
 import im.mash.moebooru.ui.widget.VerticalViewPager
-import im.mash.moebooru.utils.Key
-import im.mash.moebooru.utils.downloadPost
-import im.mash.moebooru.utils.statusBarHeight
-import im.mash.moebooru.utils.verifyStoragePermissions
+import im.mash.moebooru.utils.*
 import org.jetbrains.anko.doAsync
 import java.net.URL
 import java.util.*
@@ -333,7 +330,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
                     val title = booru.name + " " + post!!.id
                     val url = post!!.sample_url!!
                     val fileName = url.substring(url.lastIndexOf("/") + 1)
-                    if (verifyStoragePermissions(activity as DetailsActivity)) {
+                    if (mayRequestStoragePermission(activity!!, 0)) {
                         downloadPost(post!!.sample_url!!, title, booru.name, fileName)
                     }
                 }
@@ -363,7 +360,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
                     val title = booru.name + " " + post!!.id
                     val url = post!!.jpeg_url!!
                     val fileName = url.substring(url.lastIndexOf("/") + 1)
-                    if (verifyStoragePermissions(activity as DetailsActivity)) {
+                    if (mayRequestStoragePermission(activity!!, 0)) {
                         downloadPost(url, title, booru.name, fileName)
                     }
                 }
@@ -393,7 +390,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
                     val title = booru.name + " " + post!!.id
                     val url = post!!.file_url!!
                     val fileName = url.substring(url.lastIndexOf("/") + 1)
-                    if (verifyStoragePermissions(activity as DetailsActivity)) {
+                    if (mayRequestStoragePermission(activity!!, 0)) {
                         downloadPost(post!!.file_url!!, title, booru.name, fileName)
                     }
                 }

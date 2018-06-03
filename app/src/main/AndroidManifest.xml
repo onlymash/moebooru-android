@@ -20,9 +20,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/MoeTheme"
-        tools:replace="android:supportsRtl"
-        tools:ignore="GoogleAppIndexingWarning">
-
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:replace="android:supportsRtl">
         <activity
             android:name=".ui.MainActivity"
             android:theme="@style/MoeTheme.Main">
@@ -32,31 +31,27 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".ui.DetailsActivity">
+        <activity android:name=".ui.DetailsActivity">
             <intent-filter>
-                <action android:name="${applicationId}.action.SHOW_DETAILS"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="${applicationId}.action.SHOW_DETAILS" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".ui.SearchActivity">
+        <activity android:name=".ui.SearchActivity">
             <intent-filter>
-                <action android:name="${applicationId}.action.SEARCH"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="${applicationId}.action.SEARCH" />
+
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <meta-data
             android:name="com.google.android.backup.api_key"
             android:value="AEdPqrEAAAAI_-OPvxUf9Pl2F4ttwL1K4SCl15dWoEKJGFdb9Q" />
-
         <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
-
     </application>
 
 </manifest>

@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.utils
 
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.app.DownloadManager
 import android.content.Context
@@ -21,8 +22,8 @@ import android.support.v4.app.FragmentManager
 import com.bumptech.glide.load.model.Headers
 import com.bumptech.glide.load.model.LazyHeaders
 import im.mash.moebooru.App.Companion.app
-import android.support.v4.app.ActivityCompat
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Environment
 
 
@@ -75,26 +76,13 @@ fun downloadPost(url: String, title: String, booruName: String, fileName: String
     downloadManager.enqueue(request)
 }
 
-fun verifyStoragePermissions(activity: Activity): Boolean {
-    val permissionStorage: Array<String> = arrayOf(
-            "android.permission.READ_EXTERNAL_STORAGE",
-            "android.permission.WRITE_EXTERNAL_STORAGE"
-    )
-
-    var permission: Int = -1
-
-    try {
-        //检测是否有写的权限
-        permission = ActivityCompat.checkSelfPermission(activity, "android.permission.WRITE_EXTERNAL_STORAGE")
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // 没有写的权限，去申请写的权限，会弹出对话框
-            ActivityCompat.requestPermissions(activity, permissionStorage, 1)
-        }
-
-    } catch (e: Exception) {
-        e.printStackTrace()
+fun mayRequestStoragePermission(activity: Activity, requestCode: Int): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+        return true
     }
-
-    return permission == PackageManager.PERMISSION_GRANTED
+    if (activity.checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        return true
+    }
+    activity.requestPermissions(arrayOf(WRITE_EXTERNAL_STORAGE), requestCode)
+    return false
 }

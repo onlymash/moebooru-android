@@ -41,14 +41,14 @@
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
-                    android:src="@drawable/ic_action_file_download_24dp"
+                    android:src="@drawable/ic_action_file_download_white_24dp"
                     android:contentDescription="@null" />
                 <ImageButton
                     android:id="@+id/btn_browser_sample"
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
-                    android:src="@drawable/ic_action_open_in_browser_24dp"
+                    android:src="@drawable/ic_action_open_in_browser_white_24dp"
                     android:contentDescription="@null" />
             </LinearLayout>
             <LinearLayout
@@ -100,14 +100,14 @@
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
-                    android:src="@drawable/ic_action_file_download_24dp"
+                    android:src="@drawable/ic_action_file_download_white_24dp"
                     android:contentDescription="@null" />
                 <ImageButton
                     android:id="@+id/btn_browser_larger"
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
-                    android:src="@drawable/ic_action_open_in_browser_24dp"
+                    android:src="@drawable/ic_action_open_in_browser_white_24dp"
                     android:contentDescription="@null" />
             </LinearLayout>
             <LinearLayout
@@ -158,14 +158,14 @@
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
-                    android:src="@drawable/ic_action_file_download_24dp"
+                    android:src="@drawable/ic_action_file_download_white_24dp"
                     android:contentDescription="@null" />
                 <ImageButton
                     android:id="@+id/btn_browser_origin"
                     android:background="?selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
-                    android:src="@drawable/ic_action_open_in_browser_24dp"
+                    android:src="@drawable/ic_action_open_in_browser_white_24dp"
                     android:contentDescription="@null" />
             </LinearLayout>
             <LinearLayout

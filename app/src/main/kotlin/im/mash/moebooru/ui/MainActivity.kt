@@ -54,8 +54,10 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
 
     companion object {
         private const val DRAWER_ITEM_POSTS = 0L
-        private const val DRAWER_ITEM_SETTINGS = 1L
-        private const val DRAWER_ITEM_ABOUT = 2L
+        private const val DRAWER_ITEM_ACCOUNT = 1L
+        private const val DRAWER_ITEM_DOWNLOADS = 2L
+        private const val DRAWER_ITEM_SETTINGS = 3L
+        private const val DRAWER_ITEM_ABOUT = 4L
         private val builder = getTextDrawableBuilder()
         private fun getTextDrawableBuilder(): TextDrawable.Builder {
             val builder = TextDrawable.builder()
@@ -172,6 +174,16 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
                                 .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_posts_24dp))
                                 .withIconTintingEnabled(true),
                         PrimaryDrawerItem()
+                                .withIdentifier(DRAWER_ITEM_ACCOUNT)
+                                .withName(R.string.title_account)
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_account_circle_24dp))
+                                .withIconTintingEnabled(true),
+                        PrimaryDrawerItem()
+                                .withIdentifier(DRAWER_ITEM_DOWNLOADS)
+                                .withName(R.string.downloads)
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_file_download_24dp))
+                                .withIconTintingEnabled(true),
+                        PrimaryDrawerItem()
                                 .withIdentifier(DRAWER_ITEM_SETTINGS)
                                 .withName(R.string.settings)
                                 .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_settings_24dp))
@@ -228,6 +240,8 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
             previousSelectedDrawer = id
             when (id) {
                 DRAWER_ITEM_POSTS -> displayFragment(PostsFragment())
+                DRAWER_ITEM_ACCOUNT -> displayFragment(AccountFragment())
+                DRAWER_ITEM_DOWNLOADS -> displayFragment(DownloadsFragment())
                 DRAWER_ITEM_SETTINGS -> displayFragment(SettingsFragment())
                 DRAWER_ITEM_ABOUT -> displayFragment(AboutFragment())
             }
