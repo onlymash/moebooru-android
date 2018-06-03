@@ -17,7 +17,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -37,7 +36,6 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.text.format.Formatter
-import android.webkit.MimeTypeMap
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.model.RawPost
@@ -53,7 +51,7 @@ import org.jetbrains.anko.doAsync
 import java.net.URL
 import java.util.*
 
-class DetailsFragment : ToolbarFragment(), VerticalViewPager.OnPageChangeListener {
+class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
 
     private val TAG = this::class.java.simpleName
     private lateinit var bg: View
