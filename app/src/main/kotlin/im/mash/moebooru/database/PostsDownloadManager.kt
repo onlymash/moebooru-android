@@ -1,44 +1,40 @@
-/*
- * Copyright (C) 2018 by onlymash <im@mash.im>, All rights reserved
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- */
-
 package im.mash.moebooru.database
 
-import android.util.Log
 import im.mash.moebooru.model.RawPost
+import im.mash.moebooru.utils.DownloadsTable
 import im.mash.moebooru.utils.PostsTable
-import im.mash.moebooru.utils.SearchTable
-import org.jetbrains.anko.db.*
+import org.jetbrains.anko.db.MapRowParser
+import org.jetbrains.anko.db.insert
+import org.jetbrains.anko.db.select
 
-class PostsSearchManager(private val database: DatabaseHelper) {
-
-    private val TAG = this.javaClass.simpleName
+class PostsDownloadManager(private val database: DatabaseHelper) {
 
     companion object {
-        private var instance: PostsSearchManager? = null
+        private var instance: PostsDownloadManager? = null
 
         @Synchronized
-        fun getInstance(database: DatabaseHelper): PostsSearchManager {
+        fun getInstance(database: DatabaseHelper): PostsDownloadManager {
             if (instance == null) {
-                instance = PostsSearchManager(database)
+                instance = PostsDownloadManager(database)
             }
             return instance!!
         }
-
     }
 
-    fun savePosts(posts: MutableList<RawPost>, site: Long, tagsKey: String) {
+    private var listener: DownloadListChangeListener? = null
+
+    interface DownloadListChangeListener {
+        fun onDownloadListChanged()
+    }
+
+    fun setDownloadListChangeListener(listChangeListener: DownloadListChangeListener) {
+        listener = listChangeListener
+    }
+
+    fun savePosts(posts: MutableList<RawPost>, site: Long) {
         posts.forEach {
             database.use {
-                insert(SearchTable.TABLE_NAME,
-                        SearchTable.KEY_WORD to tagsKey,
+                insert(DownloadsTable.TABLE_NAME,
                         PostsTable.SITE to site,
                         PostsTable.ID to it.id,
                         PostsTable.TAGS to it.tags,
@@ -74,13 +70,14 @@ class PostsSearchManager(private val database: DatabaseHelper) {
                         PostsTable.IS_HELD to it.is_held)
             }
         }
+        listener?.onDownloadListChanged()
     }
 
-    fun getPost(site: Long, tagsKey: String): RawPost? {
+    fun getPost(site: Long): RawPost? {
         val post: RawPost? = null
         database.use {
-            select(SearchTable.TABLE_NAME)
-                    .whereSimple("(${PostsTable.SITE} = ?) and (${SearchTable.KEY_WORD} = ?)", site.toString(), tagsKey)
+            select(DownloadsTable.TABLE_NAME)
+                    .whereSimple("${PostsTable.SITE} = ?", site.toString())
         }
         return post
     }
@@ -89,7 +86,7 @@ class PostsSearchManager(private val database: DatabaseHelper) {
         var post: RawPost? = null
         if (id > -1) {
             database.use {
-                select(SearchTable.TABLE_NAME)
+                select(DownloadsTable.TABLE_NAME)
                         .whereSimple("(${PostsTable.SITE} = ?) and (${PostsTable.ID} = ?)", site.toString(), id.toString())
                         .parseOpt(object : MapRowParser<RawPost> {
                             override fun parseRow(columns: Map<String, Any?>): RawPost {
@@ -102,12 +99,12 @@ class PostsSearchManager(private val database: DatabaseHelper) {
         return post
     }
 
-    fun loadPosts(site: Long, tagsKey: String): MutableList<RawPost>? {
+    fun loadPosts(site: Long): MutableList<RawPost>? {
         val posts: MutableList<RawPost> = mutableListOf()
         try {
             database.use {
-                select(SearchTable.TABLE_NAME)
-                        .whereSimple("(${PostsTable.SITE} = ?) and (${SearchTable.KEY_WORD} = ?)", site.toString(), tagsKey)
+                select(DownloadsTable.TABLE_NAME)
+                        .whereSimple("${PostsTable.SITE} = ?", site.toString())
                         .parseList(object : MapRowParser<MutableList<RawPost>> {
                             override fun parseRow(columns: Map<String, Any?>): MutableList<RawPost> {
                                 posts.add(makePost(columns))
@@ -121,9 +118,10 @@ class PostsSearchManager(private val database: DatabaseHelper) {
         return if (posts.size > 0) { posts } else { null }
     }
 
-    fun deletePosts(site: Long, tagsKey: String) {
+    fun deletePosts(site: Long) {
         database.use {
-            execSQL("delete from ${SearchTable.TABLE_NAME} where ${PostsTable.SITE} = $site and ${SearchTable.KEY_WORD} = '$tagsKey'")
+            execSQL("delete from ${DownloadsTable.TABLE_NAME} where ${PostsTable.SITE} = $site")
         }
+        listener?.onDownloadListChanged()
     }
 }

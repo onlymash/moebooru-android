@@ -20,6 +20,7 @@ import android.webkit.WebView
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
 import im.mash.moebooru.database.*
+import im.mash.moebooru.download.MoeDownloadController
 import im.mash.moebooru.utils.DeviceContext
 import io.fabric.sdk.android.Fabric
 
@@ -37,6 +38,8 @@ class App : Application() {
     internal val postsManager: PostsManager by lazy { PostsManager.getInstance(database) }
     internal val searchManager: PostsSearchManager by lazy { PostsSearchManager.getInstance(database) }
     internal val tagsManager: TagsManager by lazy { TagsManager.getInstance(database) }
+    internal val downloadManager: PostsDownloadManager by lazy { PostsDownloadManager.getInstance(database) }
+    internal val downloadController: MoeDownloadController by lazy { MoeDownloadController.getInstance() }
 
     override fun onCreate() {
         super.onCreate()

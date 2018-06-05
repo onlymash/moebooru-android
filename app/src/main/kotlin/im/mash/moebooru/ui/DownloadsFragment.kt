@@ -8,14 +8,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.liulishuo.okdownload.DownloadContextListener
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import im.mash.moebooru.database.PostsDownloadManager.DownloadListChangeListener
+import im.mash.moebooru.download.MoeDownloadController
+import im.mash.moebooru.download.MoeDownloadListener
+import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.adapter.DownloadsAdapter
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 class DownloadsFragment : ToolbarFragment() {
 
     private lateinit var toolbar: Toolbar
     private lateinit var downloadsView: RecyclerView
     private lateinit var downloadsAdapter: DownloadsAdapter
+    private lateinit var controller: MoeDownloadController
+    private lateinit var downloadListChangeListener: DownloadListChangeListener
+    private var posts: MutableList<RawPost> = mutableListOf()
 
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -32,11 +43,48 @@ class DownloadsFragment : ToolbarFragment() {
         toolbar.setTitle(R.string.downloads)
         toolbar.inflateMenu(R.menu.menu_downloads)
         setInsetsListener(toolbar)
-        downloadsAdapter = DownloadsAdapter()
         downloadsView = view.findViewById(R.id.rv_downloads)
         downloadsView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayout.VERTICAL, false)
         downloadsView.hasFixedSize()
         downloadsView.addItemDecoration(DividerItemDecoration(this.requireContext(), DividerItemDecoration.VERTICAL))
+        initController()
+        initDownloadListChangeListener()
+    }
+
+    private fun initDownloadListChangeListener() {
+        downloadListChangeListener = object : DownloadListChangeListener {
+            override fun onDownloadListChanged() {
+                doAsync {
+                    val data = app.downloadManager.loadPosts(app.settings.activeProfile)
+                    uiThread {
+                        if (data != null) {
+                            posts = data
+                            controller.updateData(posts)
+                            downloadsAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+
+            }
+        }
+        app.downloadManager.setDownloadListChangeListener(downloadListChangeListener)
+    }
+
+    private fun initController() {
+
+        controller = MoeDownloadController()
+        controller.setDownloadListener(MoeDownloadListener())
+        downloadsAdapter = DownloadsAdapter(controller)
         downloadsView.adapter = downloadsAdapter
+        doAsync {
+            val data = app.downloadManager.loadPosts(app.settings.activeProfile)
+            uiThread {
+                if (data != null) {
+                    posts = data
+                    controller.updateData(posts)
+                    downloadsAdapter.notifyDataSetChanged()
+                }
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@
  *
  */
 
-package im.mash.moebooru.ui.adapter.Deatils
+package im.mash.moebooru.ui.adapter.deatils
 
 import android.view.View
 
@@ -22,11 +22,11 @@ class TypeFactoryImpl : TypeFactory {
     override fun type(pagerInfo: PagerInfo): Int = R.layout.layout_details_pager
 
     override fun createViewHolder(type: Int, itemView: View): BaseViewHolder<*>? {
-        when (type) {
-            R.layout.layout_details_tags -> return DetailsTagsViewHolder(itemView)
-            R.layout.layout_details_info -> return DetailsInfoViewHolder(itemView)
-            R.layout.layout_details_pager -> return DetailsPostViewHolder(itemView)
-            else -> return null
+        return when (type) {
+            R.layout.layout_details_tags -> DetailsTagsViewHolder(itemView)
+            R.layout.layout_details_info -> DetailsInfoViewHolder(itemView)
+            R.layout.layout_details_pager -> DetailsPostViewHolder(itemView)
+            else -> null
         }
     }
 }

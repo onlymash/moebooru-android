@@ -78,6 +78,10 @@ object TableType {
     const val POSTS = "posts"
 }
 
+object DownloadsTable {
+    const val TABLE_NAME = "downloads"
+}
+
 object SearchTable {
     const val TABLE_NAME = "search"
     const val KEY_WORD = "keyword"

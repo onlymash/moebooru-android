@@ -31,7 +31,7 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
 
         const val DB_NAME = "database.db"
 
-        const val DB_VERSION = 1
+        const val DB_VERSION = 2
     }
     override fun onCreate(db: SQLiteDatabase?) {
         db?.createTable(
@@ -49,13 +49,18 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
                 TagsTable.NAME to TEXT,
                 TagsTable.IS_SELECTED to INTEGER
         )
-        createPostsTable(db)
+        createPostsTable(db, "post")
+        createPostsTable(db, "download")
         createPostsSearchTable(db)
     }
 
-    private fun createPostsTable(db: SQLiteDatabase?) {
+    private fun createPostsTable(db: SQLiteDatabase?, type: String) {
+        val tableName = when (type) {
+            "post" -> PostsTable.TABLE_NAME
+            else -> DownloadsTable.TABLE_NAME
+        }
         db?.createTable(
-                PostsTable.TABLE_NAME,
+                tableName,
                 true,
                 PostsTable.ID_UNIQUE to INTEGER + PRIMARY_KEY + UNIQUE,
                 PostsTable.SITE to INTEGER,
@@ -140,6 +145,7 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
         db?.dropTable(BoorusTable.TABLE_NAME, true)
         db?.dropTable(TagsTable.TABLE_NAME, true)
         db?.dropTable(PostsTable.TABLE_NAME, true)
+        db?.dropTable(DownloadsTable.TABLE_NAME, true)
         db?.dropTable(SearchTable.TABLE_NAME, true)
     }
 }

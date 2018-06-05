@@ -9,7 +9,7 @@
  *
  */
 
-package im.mash.moebooru.ui.adapter.Deatils
+package im.mash.moebooru.ui.adapter.deatils
 
 import android.view.View
 

@@ -5,7 +5,7 @@ import android.view.MotionEvent
 class RotateGestureDetector(private val mListener: OnRotateListener) {
 
     companion object {
-        private val MAX_DEGREES_STEP = 120
+        private const val MAX_DEGREES_STEP = 120
     }
 
     private var mPrevSlope: Float = 0F

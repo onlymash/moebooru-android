@@ -9,7 +9,7 @@
  *
  */
 
-package im.mash.moebooru.ui.adapter.Deatils
+package im.mash.moebooru.ui.adapter.deatils
 
 abstract class Visitable {
     abstract fun type(typeFactory: TypeFactory): Int
