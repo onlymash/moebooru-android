@@ -1,16 +1,19 @@
 package im.mash.moebooru.download
 
-import android.content.Context
+import android.net.Uri
+import android.util.Log
 import com.liulishuo.okdownload.DownloadContext
 import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.DownloadContextListener
 import com.liulishuo.okdownload.core.cause.EndCause
 import im.mash.moebooru.App.Companion.app
-import im.mash.moebooru.content.booruDir
-import im.mash.moebooru.model.RawPost
-import im.mash.moebooru.utils.Key
+import im.mash.moebooru.content.UriRetriever.getUriFromFilePath
+import im.mash.moebooru.content.moebooruDir
+import im.mash.moebooru.model.DownloadPost
+import im.mash.moebooru.utils.okDownloadHeaders
 import java.io.File
 import java.lang.Exception
+import java.net.URLDecoder
 import java.util.ArrayList
 
 class MoeDownloadController : DownloadContextListener {
@@ -27,70 +30,55 @@ class MoeDownloadController : DownloadContextListener {
         }
     }
 
-    private lateinit var posts: MutableList<RawPost>
+    private lateinit var posts: MutableList<DownloadPost>
     private lateinit var downloadListener: MoeDownloadListener
 
     private var tasks: MutableList<DownloadTask> = mutableListOf()
-    private var parentDir: File? = null
     private var size = 0
 
     private lateinit var downloadContext: DownloadContext
+    private lateinit var builder: DownloadContext.Builder
 
     private fun initTask() {
+        size = posts.size
+        if (size == 0) {
+            return
+        }
+        tasks.clear()
+        for (index in 0 until size) {
+            val url = posts[size - index - 1].url
+            val fileUri = getPostUri(url, posts[size - index - 1].domain)
+            val boundTask: DownloadTask = DownloadTask.Builder(url, fileUri).build()
+            tasks.add(boundTask)
+            TagUtil.saveTaskName(boundTask, posts[size - index - 1].id.toString()
+                    + " - " + posts[size - index - 1].domain)
+        }
         val set: DownloadContext.QueueSet = DownloadContext.QueueSet()
-        parentDir = booruDir
-        set.setParentPathFile(parentDir!!)
-        set.minIntervalMillisCallbackProcess = 200
-        initData()
-        val builder: DownloadContext.Builder = DownloadContext.Builder(set, tasks as ArrayList<DownloadTask>?)
+        set.minIntervalMillisCallbackProcess = 100
+        set.headerMapFields = okDownloadHeaders
+        builder = DownloadContext.Builder(set, tasks as ArrayList<DownloadTask>?)
         builder.setListener(this)
         downloadContext = builder.build()
     }
 
-    private fun initData() {
-        val data = app.downloadManager.loadPosts(app.settings.activeProfile)
-        if (data != null) {
-            posts = data
-        }
-        size = posts.size
-        when (app.settings.postSizeDownload) {
-            Key.POST_SIZE_SAMPLE -> {
-                for (index in 0 until size) {
-                    val url = posts[size - index - 1].sample_url!!
-                    val fileName = url.substring(url.lastIndexOf("/") + 1).replace("%20", " ")
-                    val boundTask: DownloadTask = DownloadTask.Builder(url, parentDir!!)
-                            .setFilename(fileName)
-                            .build()
-                    tasks.add(boundTask)
-                    TagUtil.saveTaskName(boundTask, posts[size - index - 1].id.toString())
-                }
-            }
-            Key.POST_SIZE_LARGER -> {
-                for (index in 0 until size) {
-                    val url = posts[size - index - 1].jpeg_url!!
-                    val fileName = url.substring(url.lastIndexOf("/") + 1).replace("%20", " ")
-                    val boundTask: DownloadTask = DownloadTask.Builder(url, parentDir!!)
-                            .setFilename(fileName)
-                            .build()
-                    tasks.add(boundTask)
-                    TagUtil.saveTaskName(boundTask, posts[size - index - 1].id.toString())
-                }
-            }
-            else -> {
-                for (index in 0 until size) {
-                    val url = posts[size - index - 1].file_url!!
-                    val fileName = url.substring(url.lastIndexOf("/") + 1).replace("%20", " ")
-                    val boundTask: DownloadTask = DownloadTask.Builder(url, parentDir!!)
-                            .setFilename(fileName)
-                            .build()
-                    tasks.add(boundTask)
-                    TagUtil.saveTaskName(boundTask, posts[size - index - 1].id.toString())
-                }
+    private fun getPostUri(url: String, domain: String): Uri {
+        val fileName: String = URLDecoder.decode(url.substring(url.lastIndexOf("/") + 1), "UTF-8")
+        val booruPath = moebooruDir.absolutePath + "/" + domain
+        val booruDir = File(booruPath)
+        if (!booruDir.exists()) {
+            if (!booruDir.mkdirs()) {
+                Log.i(TAG, "Directory not created")
             }
         }
+        return getUriFromFilePath(app, "$booruPath/$fileName")
     }
 
-    fun updateData(posts: MutableList<RawPost>) {
+    fun getPostsUriFromPosition(position: Int): Uri {
+        val url = posts[size - position - 1].url
+        return getPostUri(url, posts[size - position - 1].domain)
+    }
+
+    fun updateData(posts: MutableList<DownloadPost>) {
         this.posts = posts
         initTask()
     }
@@ -114,14 +102,9 @@ class MoeDownloadController : DownloadContextListener {
     }
 
     fun deleteFiles() {
-        if (parentDir != null) {
-            parentDir!!.list()?.forEach { child ->
-                File(parentDir, child).delete()
-            }
-            parentDir!!.delete()
-        }
         tasks.forEach { task ->
             TagUtil.clearProceedTask(task)
+            task.file?.delete()
         }
     }
 
@@ -142,7 +125,7 @@ class MoeDownloadController : DownloadContextListener {
         // priority
         val priority = TagUtil.getPriority(task)
 
-        listener.onLoadPreview(posts[size - position - 1].preview_url!!)
+        listener.onLoadPreview(posts[size - position - 1].preview_url)
     }
 
     fun getCount(): Int = tasks.size

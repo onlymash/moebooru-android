@@ -32,6 +32,18 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
         const val DB_NAME = "database.db"
 
         const val DB_VERSION = 2
+
+        private const val TABLE_NAME = "downloads"
+        private const val _ID = "_id"
+        private const val DOMAIN = "domain"
+        private const val ID = "id"
+        private const val PREVIEW_URL = "preview_url"
+        private const val URL ="url"
+        private const val SIZE = "size"
+        private const val WIDTH = "width"
+        private const val HEIGHT = "height"
+        private const val SCORE = "score"
+        private const val RATING = "rating"
     }
     override fun onCreate(db: SQLiteDatabase?) {
         db?.createTable(
@@ -49,18 +61,14 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
                 TagsTable.NAME to TEXT,
                 TagsTable.IS_SELECTED to INTEGER
         )
-        createPostsTable(db, "post")
-        createPostsTable(db, "download")
+        createPostsTable(db)
+        createDownloadsTable(db)
         createPostsSearchTable(db)
     }
 
-    private fun createPostsTable(db: SQLiteDatabase?, type: String) {
-        val tableName = when (type) {
-            "post" -> PostsTable.TABLE_NAME
-            else -> DownloadsTable.TABLE_NAME
-        }
+    private fun createPostsTable(db: SQLiteDatabase?) {
         db?.createTable(
-                tableName,
+                PostsTable.TABLE_NAME,
                 true,
                 PostsTable.ID_UNIQUE to INTEGER + PRIMARY_KEY + UNIQUE,
                 PostsTable.SITE to INTEGER,
@@ -139,6 +147,21 @@ class DatabaseHelper(ctx: Context) : ManagedSQLiteOpenHelper(ctx, DB_NAME, null,
                 PostsTable.HEIGHT to INTEGER,
                 PostsTable.IS_HELD to INTEGER
         )
+    }
+
+    private fun createDownloadsTable(db: SQLiteDatabase?) {
+        db?.createTable(TABLE_NAME,
+                true,
+                _ID to INTEGER + PRIMARY_KEY + UNIQUE,
+                DOMAIN to TEXT,
+                ID to INTEGER,
+                PREVIEW_URL to TEXT,
+                URL to TEXT + UNIQUE,
+                SIZE to INTEGER,
+                WIDTH to INTEGER,
+                HEIGHT to INTEGER,
+                SCORE to INTEGER,
+                RATING to TEXT)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {

@@ -7,10 +7,9 @@ import java.io.File
 
 private const val TAG = "FileUtil"
 
-val booruDir: File
+val moebooruDir: File
     get() {
-        val booru = app.boorusManager.getBooru(app.settings.activeProfile)
-        val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Moebooru/${booru.name}")
+        val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Moebooru")
         if (dir.exists()) {
             if (dir.isFile) {
                 if (!dir.delete()) {

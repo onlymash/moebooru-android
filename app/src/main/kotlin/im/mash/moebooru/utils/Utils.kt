@@ -49,6 +49,9 @@ val okHttpHeader: List<Pair<String, String>>
 val glideHeader: Headers
     get() = LazyHeaders.Builder().addHeader(Net.USER_AGENT_KEY, userAgentWebView).build()
 
+val okDownloadHeaders: Map<String, List<String>>
+    get() = mapOf(Net.USER_AGENT_KEY to listOf(userAgentWebView))
+
 val statusBarHeight: Int
     get() {
         val res = Resources.getSystem()

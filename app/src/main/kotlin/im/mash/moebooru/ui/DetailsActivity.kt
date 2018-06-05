@@ -27,6 +27,7 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.content.UriRetriever.getUriFromFilePath
 import im.mash.moebooru.download.MoeDownloadListener
+import im.mash.moebooru.model.DownloadPost
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.utils.*
 import im.mash.moebooru.viewmodel.DetailsPositionViewModel
@@ -35,6 +36,7 @@ import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.io.File
 import java.lang.Exception
+import java.net.URL
 
 class DetailsActivity : BaseActivity() {
 
@@ -138,8 +140,62 @@ class DetailsActivity : BaseActivity() {
             return
         }
         val post = items!![positionViewModel.getPosition()]
+        val domain = URL(app.boorusManager.getBooru(app.settings.activeProfile).url).host
+        val url: String
+        var size: Long = 0
+        var width: Long = 0
+        var height: Long = 0
+        when (app.settings.postSizeDownload) {
+            Key.POST_SIZE_SAMPLE -> {
+                url = post.sample_url
+                if (post.sample_file_size != null) {
+                    size = post.sample_file_size
+                }
+                if (post.sample_width != null) {
+                    width = post.sample_width
+                }
+                if (post.sample_height != null) {
+                    height = post.sample_height
+                }
+            }
+            Key.POST_SIZE_LARGER -> {
+                url = post.jpeg_url
+                if (post.jpeg_file_size != null) {
+                    size = post.jpeg_file_size
+                }
+                if (post.jpeg_width != null) {
+                    width = post.jpeg_width
+                }
+                if (post.jpeg_height != null) {
+                    height = post.jpeg_height
+                }
+            }
+            else -> {
+                url = post.file_url!!
+                if (post.file_size != null) {
+                    size = post.file_size
+                }
+                if (post.width != null) {
+                    width = post.width
+                }
+                if (post.height != null) {
+                    height = post.height
+                }
+            }
+        }
+        val downloadPost = DownloadPost(
+                domain,
+                post.id,
+                post.preview_url,
+                url,
+                size,
+                width,
+                height,
+                post.score,
+                post.rating
+        )
         doAsync {
-            app.downloadManager.savePosts(mutableListOf(post), app.settings.activeProfile)
+            app.downloadManager.savePosts(mutableListOf(downloadPost))
         }
 
 //        val booru = app.boorusManager.getBooru(app.settings.activeProfile)

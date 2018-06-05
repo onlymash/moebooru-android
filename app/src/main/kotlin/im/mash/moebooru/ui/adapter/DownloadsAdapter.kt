@@ -1,5 +1,6 @@
 package im.mash.moebooru.ui.adapter
 
+import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -15,9 +16,12 @@ import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.download.MoeStatusChangeListener
 import im.mash.moebooru.download.ProgressUtil
 import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.model.DownloadPost
 import im.mash.moebooru.utils.glideHeader
+import java.time.Instant
 
-class DownloadsAdapter(private val controller: MoeDownloadController) : RecyclerView.Adapter<DownloadsAdapter.DownloadsViewHolder>() {
+class DownloadsAdapter(private val controller: MoeDownloadController,
+                       private var size: Int) : RecyclerView.Adapter<DownloadsAdapter.DownloadsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DownloadsViewHolder {
         val itemsView: View = LayoutInflater.from(parent.context)
@@ -25,12 +29,31 @@ class DownloadsAdapter(private val controller: MoeDownloadController) : Recycler
         return DownloadsViewHolder(itemsView)
     }
 
+    fun updateSize(size: Int) {
+        this.size = size
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
-        return controller.getCount()
+        return size
     }
 
     override fun onBindViewHolder(holder: DownloadsViewHolder, position: Int) {
         controller.bind(holder.listener, position)
+        holder.start.setOnClickListener {
+            controller.start(position)
+        }
+        holder.itemView.setOnClickListener {
+            val uri = controller.getPostsUriFromPosition(position)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setDataAndType(uri, "image/*")
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            try {
+                app.startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     class DownloadsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), MoeStatusChangeListener {
@@ -42,7 +65,7 @@ class DownloadsAdapter(private val controller: MoeDownloadController) : Recycler
         val stop: ImageView = itemView.findViewById(R.id.stop)
         val percent: TextView = itemView.findViewById(R.id.percent)
         val speed: TextView = itemView.findViewById(R.id.speed)
-        val progressBar: ProgressBar = itemView.findViewById(R.id.progress_bar)
+        private val progressBar: ProgressBar = itemView.findViewById(R.id.progress_bar)
         val listener: MoeStatusChangeListener = this
 
         override fun onSetTitle(title: String) {
