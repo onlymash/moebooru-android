@@ -47,8 +47,15 @@ class MoeDownloadController : DownloadContextListener {
         tasks.clear()
         for (index in 0 until size) {
             val url = posts[size - index - 1].url
-            val fileUri = getPostUri(url, posts[size - index - 1].domain)
-            val boundTask: DownloadTask = DownloadTask.Builder(url, fileUri).build()
+            val fileName: String = URLDecoder.decode(url.substring(url.lastIndexOf("/") + 1), "UTF-8")
+            val booruPath = moebooruDir.absolutePath + "/" + posts[size - index - 1].domain
+            val booruDir = File(booruPath)
+            if (!booruDir.exists()) {
+                if (!booruDir.mkdirs()) {
+                    Log.i(TAG, "Directory not created")
+                }
+            }
+            val boundTask: DownloadTask = DownloadTask.Builder(url, booruDir).setFilename(fileName).build()
             tasks.add(boundTask)
             TagUtil.saveTaskName(boundTask, posts[size - index - 1].id.toString()
                     + " - " + posts[size - index - 1].domain)
