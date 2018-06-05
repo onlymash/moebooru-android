@@ -197,45 +197,6 @@ class DetailsActivity : BaseActivity() {
         doAsync {
             app.downloadManager.savePosts(mutableListOf(downloadPost))
         }
-
-//        val booru = app.boorusManager.getBooru(app.settings.activeProfile)
-//        val url = when (app.settings.postSizeDownload) {
-//            Key.POST_SIZE_SAMPLE -> {
-//                post.sample_url!!
-//            }
-//            Key.POST_SIZE_LARGER -> {
-//                post.jpeg_url!!
-//            }
-//            else -> {
-//                post.file_url!!
-//            }
-//        }
-//        val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Moebooru/${booru.name}")
-//        if (dir.exists()) {
-//            if (dir.isFile) {
-//                if (!dir.delete()) {
-//                    Log.i(TAG, "Exists file delete failed")
-//                }
-//                if (!dir.mkdirs()) {
-//                    Log.i(TAG, "Directory not created")
-//                }
-//            }
-//        } else {
-//            if (!dir.mkdirs()) {
-//                Log.i(TAG, "Directory not created")
-//            }
-//        }
-//        val fileName = url.substring(url.lastIndexOf("/") + 1).replace("%20", " ")
-//        val filePath = dir.absolutePath + "/$fileName"
-//        val fileUri = getUriFromFilePath(this, filePath)
-//
-//        val task = DownloadTask.Builder(url, fileUri)
-//                .setMinIntervalMillisCallbackProcess(30)
-//                .setPassIfAlreadyCompleted(false)
-//                .build()
-//        doAsync {
-//            task.execute(MoeDownloadListener())
-//        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

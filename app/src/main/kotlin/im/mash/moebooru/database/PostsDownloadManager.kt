@@ -97,6 +97,12 @@ class PostsDownloadManager(private val database: DatabaseHelper) {
         listener?.onDownloadListChanged()
     }
 
+    fun deletePost(url: String) {
+        database.use {
+            execSQL("delete from $TABLE_NAME where $URL = '$url'")
+        }
+    }
+
     fun makeDownloadPost(columns: Map<String, Any?>): DownloadPost {
         val domain: String = columns.get(DOMAIN) as String
         val id: Long = columns.getValue(ID) as Long

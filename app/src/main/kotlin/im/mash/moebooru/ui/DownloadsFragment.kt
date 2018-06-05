@@ -125,6 +125,33 @@ class DownloadsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         when (item?.itemId) {
             R.id.action_start_all -> app.downloadController.startAll(true)
             R.id.action_stop_all -> app.downloadController.stopAll()
+            R.id.action_clear_completed -> {
+                doAsync {
+                    app.downloadController.clearCompleted()
+                    val data = app.downloadManager.loadPosts()
+                    uiThread {
+                        if (data != null) {
+                            posts = data
+                            app.downloadController.updateData(posts)
+                            downloadsAdapter.updateSize(posts.size)
+                        } else {
+                            posts.clear()
+                            app.downloadController.updateData(posts)
+                            downloadsAdapter.updateSize(posts.size)
+                        }
+                    }
+                }
+            }
+            R.id.action_clear_all -> {
+                doAsync {
+                    app.downloadManager.deletePosts()
+                    uiThread {
+                        posts.clear()
+                        app.downloadController.updateData(posts)
+                        downloadsAdapter.updateSize(posts.size)
+                    }
+                }
+            }
         }
         return true
     }

@@ -5,12 +5,14 @@ import android.util.Log
 import com.liulishuo.okdownload.DownloadContext
 import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.DownloadContextListener
+import com.liulishuo.okdownload.StatusUtil
 import com.liulishuo.okdownload.core.cause.EndCause
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.content.UriRetriever.getUriFromFilePath
 import im.mash.moebooru.content.moebooruDir
 import im.mash.moebooru.model.DownloadPost
 import im.mash.moebooru.utils.okDownloadHeaders
+import org.jetbrains.anko.doAsync
 import java.io.File
 import java.lang.Exception
 import java.net.URLDecoder
@@ -106,6 +108,16 @@ class MoeDownloadController : DownloadContextListener {
 
     fun stop(position: Int) {
         tasks[position].cancel()
+    }
+
+    fun clearCompleted() {
+        val size = posts.size
+        for (index in 0 until size) {
+            if (TagUtil.getStatus(tasks[index]) == EndCause.COMPLETED.toString()
+                    || StatusUtil.getStatus(tasks[index]) ==  StatusUtil.Status.COMPLETED) {
+                app.downloadManager.deletePost(posts[size - index - 1].url)
+            }
+        }
     }
 
     fun deleteFiles() {

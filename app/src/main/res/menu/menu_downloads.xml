@@ -10,11 +10,20 @@
         android:icon="@drawable/ic_action_play_arrow_white_24dp"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
+
     <item
         android:id="@+id/action_stop_all"
         android:title="@string/downloads_stop_all"
         android:icon="@drawable/ic_action_pause_white_24dp"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
+    <item
+        android:id="@+id/action_clear_completed"
+        android:title="@string/clear_completed"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_clear_all"
+        android:title="@string/clear_all"
+        app:showAsAction="never"/>
 
 </menu>

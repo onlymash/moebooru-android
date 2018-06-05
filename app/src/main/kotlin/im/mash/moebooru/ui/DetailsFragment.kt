@@ -36,8 +36,10 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.text.format.Formatter
+import android.util.Log
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import im.mash.moebooru.model.DownloadPost
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.adapter.DetailsTagsAdapter
 import im.mash.moebooru.ui.adapter.PostsPagerAdapter
@@ -223,6 +225,10 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
 
     internal class InfoFragment : Fragment() {
 
+        companion object {
+            private const val TAG = "InfoFragment"
+        }
+
         private lateinit var id: TextView
         private lateinit var createdAt: TextView
         private lateinit var author: TextView
@@ -299,16 +305,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
 
                 sampleSize.text = Formatter.formatFileSize(this.requireContext(), post!!.sample_file_size!!)
 
-                if (post!!.jpeg_url != null) {
-                    if (largerLayout.visibility == View.GONE) {
-                        largerLayout.visibility = View.VISIBLE
-                    }
-                    largerSize.text = Formatter.formatFileSize(this.requireContext(), post!!.jpeg_file_size!!)
-                } else {
-                    if (largerLayout.visibility == View.VISIBLE) {
-                        largerLayout.visibility = View.GONE
-                    }
-                }
+                largerSize.text = Formatter.formatFileSize(this.requireContext(), post!!.jpeg_file_size!!)
 
                 if (post!!.file_url != null) {
                     if (originLayout.visibility == View.GONE) {
@@ -325,15 +322,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
 
         private fun setListener() {
             sampleDownload.setOnClickListener {
-                if (post != null) {
-                    val booru = app.boorusManager.getBooru(app.settings.activeProfile)
-                    val title = booru.name + " " + post!!.id
-                    val url = post!!.sample_url!!
-                    val fileName = url.substring(url.lastIndexOf("/") + 1)
-                    if (mayRequestStoragePermission(activity!!, 0)) {
-                        downloadPost(post!!.sample_url!!, title, booru.name, fileName)
-                    }
-                }
+                downloadPost("sample")
             }
             sampleOpen.setOnClickListener {
                 if (post != null) {
@@ -355,15 +344,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
                 true
             }
             largerDownload.setOnClickListener {
-                if (post != null) {
-                    val booru = app.boorusManager.getBooru(app.settings.activeProfile)
-                    val title = booru.name + " " + post!!.id
-                    val url = post!!.jpeg_url!!
-                    val fileName = url.substring(url.lastIndexOf("/") + 1)
-                    if (mayRequestStoragePermission(activity!!, 0)) {
-                        downloadPost(url, title, booru.name, fileName)
-                    }
-                }
+                downloadPost("larger")
             }
             largerOpen.setOnClickListener {
                 if (post != null) {
@@ -385,15 +366,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
                 true
             }
             originDownload.setOnClickListener {
-                if (post != null) {
-                    val booru = app.boorusManager.getBooru(app.settings.activeProfile)
-                    val title = booru.name + " " + post!!.id
-                    val url = post!!.file_url!!
-                    val fileName = url.substring(url.lastIndexOf("/") + 1)
-                    if (mayRequestStoragePermission(activity!!, 0)) {
-                        downloadPost(post!!.file_url!!, title, booru.name, fileName)
-                    }
-                }
+                downloadPost("origin")
             }
             originOpen.setOnClickListener {
                 if (post != null) {
@@ -413,6 +386,77 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
                 snackbar.view.setPadding(0, 0, 0, (activity as DetailsActivity).bottomHeight)
                 snackbar.show()
                 true
+            }
+        }
+
+        private fun downloadPost(type: String) {
+
+            val post = this.post ?: return
+
+            if (!mayRequestStoragePermission(this.requireActivity(), 0)) {
+                Log.i(TAG, "Not storage permission")
+                return
+            }
+
+            val domain = URL(app.boorusManager.getBooru(app.settings.activeProfile).url).host
+            val url: String
+            var size: Long = 0
+            var width: Long = 0
+            var height: Long = 0
+
+            when (type) {
+                "sample" -> {
+                    url = post.sample_url
+                    if (post.sample_file_size != null) {
+                        size = post.sample_file_size
+                    }
+                    if (post.sample_width != null) {
+                        width = post.sample_width
+                    }
+                    if (post.sample_height != null) {
+                        height = post.sample_height
+                    }
+                }
+                "larger" -> {
+                    url = post.jpeg_url
+                    if (post.jpeg_file_size != null) {
+                        size = post.jpeg_file_size
+                    }
+                    if (post.jpeg_width != null) {
+                        width = post.jpeg_width
+                    }
+                    if (post.jpeg_height != null) {
+                        height = post.jpeg_height
+                    }
+                }
+                else -> {
+                    url = post.file_url!!
+                    if (post.file_size != null) {
+                        size = post.file_size
+                    }
+                    if (post.width != null) {
+                        width = post.width
+                    }
+                    if (post.height != null) {
+                        height = post.height
+                    }
+                }
+            }
+
+            val downloadPost = DownloadPost(
+                    domain,
+                    post.id,
+                    post.preview_url,
+                    url,
+                    size,
+                    width,
+                    height,
+                    post.score,
+                    post.rating
+            )
+
+            doAsync {
+                app.downloadManager.savePosts(mutableListOf(downloadPost))
             }
         }
 
