@@ -51,7 +51,7 @@ class DownloadsFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         toolbar.setOnMenuItemClickListener(this)
         downloadsView = view.findViewById(R.id.rv_downloads)
         downloadsView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayout.VERTICAL, false)
-        downloadsView.hasFixedSize()
+        downloadsView.setHasFixedSize(true)
         downloadsView.addItemDecoration(DividerItemDecoration(this.requireContext(), DividerItemDecoration.VERTICAL))
         downloadsAdapter = DownloadsAdapter(app.downloadController, 0)
         downloadsView.adapter = downloadsAdapter

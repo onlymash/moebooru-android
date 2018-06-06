@@ -10,17 +10,11 @@
   ~
   -->
 
-<android.support.design.widget.NavigationView
+<android.support.design.widget.AppBarLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/drawer_width"
-    android:layout_height="match_parent"
-    android:layout_gravity="right"
-    android:orientation="vertical"
-    android:id="@+id/tags_drawer_view"
-    tools:ignore="RtlHardcoded"
-    style="@style/NavView">
-
-    <include layout="@layout/layout_drawer_tags_content"/>
-
-</android.support.design.widget.NavigationView>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/appbar_layout_drawer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:elevation="0dp"
+    style="@style/AppBar"/>

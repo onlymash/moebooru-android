@@ -11,6 +11,7 @@
 
 package im.mash.moebooru.utils
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.app.DownloadManager
@@ -25,6 +26,8 @@ import im.mash.moebooru.App.Companion.app
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
+import android.util.DisplayMetrics
+import android.view.WindowManager
 
 
 private val fieldChildFragmentManager by lazy {
@@ -86,6 +89,22 @@ fun mayRequestStoragePermission(activity: Activity, requestCode: Int): Boolean {
     if (activity.checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
         return true
     }
-    activity.requestPermissions(arrayOf(WRITE_EXTERNAL_STORAGE), requestCode)
+    activity.requestPermissions(arrayOf(READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE), requestCode)
     return false
 }
+
+val Context.screenWidth: Int
+    get() {
+        val wm = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val metric: DisplayMetrics = DisplayMetrics()
+        wm.defaultDisplay.getMetrics(metric)
+        return metric.widthPixels
+    }
+
+val Context.screenHeight: Int
+    get() {
+        val wm = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val metric: DisplayMetrics = DisplayMetrics()
+        wm.defaultDisplay.getMetrics(metric)
+        return metric.heightPixels
+    }

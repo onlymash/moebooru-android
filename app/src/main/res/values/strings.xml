@@ -107,4 +107,7 @@
 
     <string name="clear_completed">Clear completed</string>
     <string name="clear_all">Clear all</string>
+
+    <string name="local_gallery">Local gallery</string>
+
 </resources>

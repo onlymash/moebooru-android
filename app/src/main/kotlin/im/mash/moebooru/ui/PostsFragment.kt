@@ -63,7 +63,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         toolbar = inflater.inflate(R.layout.layout_toolbar, null) as Toolbar
-        drawerToolbar = inflater.inflate(R.layout.layout_toolbar_tags, null) as Toolbar
+        drawerToolbar = inflater.inflate(R.layout.layout_toolbar_drawer, null) as Toolbar
         return inflater.inflate(R.layout.layout_posts, container, false)
     }
 
@@ -144,13 +144,13 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
     private fun initRightDrawer(view: View) {
         drawerLayout = view.findViewById(R.id.drawer_layout_posts)
         drawerLayout.setScrimColor(Color.TRANSPARENT)
-        drawer = view.findViewById(R.id.tags_drawer_view)
+        drawer = view.findViewById(R.id.right_drawer_view)
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_white_24dp)
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener(this)
         drawerToolbar.setOnClickListener(this)
 
-        tagsDrawerView = view.findViewById(R.id.rv_tags_list)
+        tagsDrawerView = view.findViewById(R.id.drawer_rv_list)
         tagsDrawerView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
         tagsDrawerAdapter = TagsDrawerAdapter(this, null)
         tagsDrawerView.adapter = tagsDrawerAdapter
@@ -166,8 +166,8 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
             }
         }
 
-        val tagsDrawerViewLayout = view.findViewById<LinearLayout>(R.id.rv_tags_list_layout)
-        appBarLayoutTags = view.findViewById(R.id.appbar_layout_tags)
+        val tagsDrawerViewLayout = view.findViewById<LinearLayout>(R.id.drawer_list_layout)
+        appBarLayoutTags = view.findViewById(R.id.appbar_layout_drawer)
         appBarLayoutTags.addView(drawerToolbar)
         ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, insets ->
             val statusBarSize = insets.systemWindowInsetTop
@@ -314,6 +314,7 @@ class PostsFragment : BasePostsFragment(), Toolbar.OnMenuItemClickListener, View
 
     override fun onDestroy() {
         super.onDestroy()
+        mainActivity.drawer.drawerLayout.removeDrawerListener(this)
 //        closeRightDrawer()
     }
 

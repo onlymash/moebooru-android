@@ -10,25 +10,17 @@
   ~
   -->
 
-<im.mash.moebooru.ui.widget.FitWindowFrameLayout
+<android.support.design.widget.NavigationView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_tags_content"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/drawer_width"
+    android:layout_height="match_parent"
+    android:layout_gravity="right"
+    android:orientation="vertical"
+    android:id="@+id/right_drawer_view"
+    tools:ignore="RtlHardcoded"
+    style="@style/NavView">
 
-    <LinearLayout
-        android:id="@+id/rv_tags_list_layout"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <include layout="@layout/layout_drawer_right_content"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rv_tags_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-
-    </LinearLayout>
-
-    <include layout="@layout/layout_appbar_tags"/>
-
-</im.mash.moebooru.ui.widget.FitWindowFrameLayout>
+</android.support.design.widget.NavigationView>

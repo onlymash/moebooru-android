@@ -10,11 +10,25 @@
   ~
   -->
 
-<android.support.design.widget.AppBarLayout
+<im.mash.moebooru.ui.widget.FitWindowFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/appbar_layout_tags"
+    android:id="@+id/drawer_tags_content"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:elevation="0dp"
-    style="@style/AppBar"/>
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/drawer_list_layout"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/drawer_rv_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <include layout="@layout/layout_appbar_drawer"/>
+
+</im.mash.moebooru.ui.widget.FitWindowFrameLayout>

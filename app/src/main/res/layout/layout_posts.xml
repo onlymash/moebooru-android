@@ -20,6 +20,6 @@
 
     <include layout="@layout/layout_posts_content"/>
 
-    <include layout="@layout/layout_drawer_tags"/>
+    <include layout="@layout/layout_drawer_right"/>
 
 </android.support.v4.widget.DrawerLayout>

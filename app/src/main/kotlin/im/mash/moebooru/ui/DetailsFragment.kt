@@ -201,7 +201,7 @@ class DetailsFragment : ToolbarFragment(), ViewPager.OnPageChangeListener {
             }
             tagsView = view.findViewById(R.id.rv_details_tags)
             tagsView.layoutManager = GridLayoutManager(this.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
-            tagsView.hasFixedSize()
+            tagsView.setHasFixedSize(true)
             pos = activity.positionViewModel.getPosition()
             tagsList = activity.items?.get(pos)?.tags?.split(" ")?.toMutableList()
             tagsAdapter = DetailsTagsAdapter(this, tagsList)

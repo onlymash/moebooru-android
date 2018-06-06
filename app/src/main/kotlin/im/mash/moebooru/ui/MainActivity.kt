@@ -56,8 +56,9 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
         private const val DRAWER_ITEM_POSTS = 0L
         private const val DRAWER_ITEM_ACCOUNT = 1L
         private const val DRAWER_ITEM_DOWNLOADS = 2L
-        private const val DRAWER_ITEM_SETTINGS = 3L
-        private const val DRAWER_ITEM_ABOUT = 4L
+        private const val DRAWER_ITEM_LOCAL_GALLERY = 3L
+        private const val DRAWER_ITEM_SETTINGS = 4L
+        private const val DRAWER_ITEM_ABOUT = 5L
         private val builder = getTextDrawableBuilder()
         private fun getTextDrawableBuilder(): TextDrawable.Builder {
             val builder = TextDrawable.builder()
@@ -184,6 +185,11 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
                                 .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_file_download_24dp))
                                 .withIconTintingEnabled(true),
                         PrimaryDrawerItem()
+                                .withIdentifier(DRAWER_ITEM_LOCAL_GALLERY)
+                                .withName(R.string.local_gallery)
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_local_library_24dp))
+                                .withIconTintingEnabled(true),
+                        PrimaryDrawerItem()
                                 .withIdentifier(DRAWER_ITEM_SETTINGS)
                                 .withName(R.string.settings)
                                 .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_settings_24dp))
@@ -242,6 +248,7 @@ class MainActivity : AppCompatActivity(), Drawer.OnDrawerItemClickListener,
                 DRAWER_ITEM_POSTS -> displayFragment(PostsFragment())
                 DRAWER_ITEM_ACCOUNT -> displayFragment(AccountFragment())
                 DRAWER_ITEM_DOWNLOADS -> displayFragment(DownloadsFragment())
+                DRAWER_ITEM_LOCAL_GALLERY -> displayFragment(LocalGalleryFragment())
                 DRAWER_ITEM_SETTINGS -> displayFragment(SettingsFragment())
                 DRAWER_ITEM_ABOUT -> displayFragment(AboutFragment())
             }
