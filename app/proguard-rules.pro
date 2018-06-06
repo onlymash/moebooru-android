@@ -44,7 +44,7 @@
 
 # Gson specific classes
 -dontwarn sun.misc.**
-#-keep class com.google.gson.stream.** { *; }
+-keep class com.google.gson.stream.** { *; }
 
 # Prevent proguard from stripping interface information from TypeAdapterFactory,
 # JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
@@ -54,14 +54,14 @@
 
 -keep class org.jetbrains.anko.** { *; }
 -keep interface org.jetbrains.anko.** { *; }
--keepclassmembers class org.jetbrains.anko.** {
-    *;
- }
+-keepclassmembers class org.jetbrains.anko.** { *; }
 -dontwarn org.jetbrains.anko.**
 
 # Application classes
 -keep class im.mash.moebooru.model.** { *; }
 -keep class im.mash.moebooru.database.** { *; }
+
+-dontwarn com.liulishuo.okdownload.**
 
 # A resource is loaded with a relative path so the package of this class must be preserved.
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
@@ -78,4 +78,3 @@
 }
 # ------- end com.liulishuo.okdownload:sqlite proguard rules ----
 
--ignorewarnings
