@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/card_view"
     android:focusable="true" 
     android:layout_width="match_parent" 
     android:layout_height="wrap_content" 
@@ -38,14 +37,14 @@
                     android:layout_weight="1" />
                 <ImageButton
                     android:id="@+id/btn_download_sample"
-                    android:background="?selectableItemBackgroundBorderless"
+                    android:background="?android:selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
                     android:src="@drawable/ic_action_file_download_white_24dp"
                     android:contentDescription="@null" />
                 <ImageButton
                     android:id="@+id/btn_browser_sample"
-                    android:background="?selectableItemBackgroundBorderless"
+                    android:background="?android:selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
                     android:src="@drawable/ic_action_open_in_browser_white_24dp"
@@ -97,14 +96,14 @@
                     android:layout_weight="1" />
                 <ImageButton
                     android:id="@+id/btn_download_larger"
-                    android:background="?selectableItemBackgroundBorderless"
+                    android:background="?android:selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
                     android:src="@drawable/ic_action_file_download_white_24dp"
                     android:contentDescription="@null" />
                 <ImageButton
                     android:id="@+id/btn_browser_larger"
-                    android:background="?selectableItemBackgroundBorderless"
+                    android:background="?android:selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
                     android:src="@drawable/ic_action_open_in_browser_white_24dp"
@@ -155,14 +154,14 @@
                     android:layout_weight="1" />
                 <ImageButton
                     android:id="@+id/btn_download_origin"
-                    android:background="?selectableItemBackgroundBorderless"
+                    android:background="?android:selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
                     android:src="@drawable/ic_action_file_download_white_24dp"
                     android:contentDescription="@null" />
                 <ImageButton
                     android:id="@+id/btn_browser_origin"
-                    android:background="?selectableItemBackgroundBorderless"
+                    android:background="?android:selectableItemBackgroundBorderless"
                     android:layout_width="@dimen/list_size"
                     android:layout_height="@dimen/list_size"
                     android:src="@drawable/ic_action_open_in_browser_white_24dp"

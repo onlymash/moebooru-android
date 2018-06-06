@@ -25,6 +25,8 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
 
     private var childView: View? = null
 
+    private var position = -1
+
     //内部接口，定义点击方法以及长按方法
     interface OnItemClickListener {
 
@@ -39,8 +41,7 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
                 object : GestureDetector.SimpleOnGestureListener() { //这里选择SimpleOnGestureListener实现类，可以根据需要选择重写的方法
                     //单击事件
                     override fun onSingleTapUp(e: MotionEvent): Boolean {
-                        val position: Int? = childView?.tag as Int
-                        if (position != null && position > -1) {
+                        if (position > -1 && childView != null) {
                             listener.onItemClick(childView, position)
                             return true
                         }
@@ -49,8 +50,7 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
 
                     //长按事件
                     override fun onLongPress(e: MotionEvent) {
-                        val position: Int? = childView?.tag as Int
-                        if (position != null && position > -1) {
+                        if (position > -1 && childView != null) {
                             listener.onItemLongClick(childView, position)
                             //长按振动
                             childView!!.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
@@ -61,6 +61,9 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
 
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
         childView = rv.findChildViewUnder(e.x, e.y)
+        if (childView != null) {
+            position = rv.getChildLayoutPosition(childView)
+        }
         //把事件交给 GestureDetector 处理
         return gestureDetector.onTouchEvent(e)
     }

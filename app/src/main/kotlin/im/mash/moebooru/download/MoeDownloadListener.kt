@@ -1,5 +1,7 @@
 package im.mash.moebooru.download
 
+import android.content.Intent
+import android.net.Uri
 import android.util.SparseArray
 import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.StatusUtil
@@ -7,6 +9,7 @@ import com.liulishuo.okdownload.core.cause.EndCause
 import com.liulishuo.okdownload.core.cause.ResumeFailedCause
 import com.liulishuo.okdownload.core.listener.DownloadListener1
 import com.liulishuo.okdownload.core.listener.assist.Listener1Assist
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import java.lang.Exception
 
@@ -92,6 +95,10 @@ class MoeDownloadListener : DownloadListener1() {
     }
 
     override fun taskEnd(task: DownloadTask, cause: EndCause, realCause: Exception?, model: Listener1Assist.Listener1Model) {
+        if (cause == EndCause.COMPLETED) {
+            val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(task.file))
+            app.sendBroadcast(mediaScanIntent)
+        }
         val status = cause.toString()
         TagUtil.saveStatus(task, status)
         val listener = listeners.get(task.id) ?: return

@@ -87,9 +87,9 @@ class DetailsTagsAdapter internal constructor(private val tagsFragment: DetailsF
     }
 
     inner class DetailsTagsViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        val tagName = itemView.findViewById<TextView>(R.id.tag_name)
-        val tagAddNegated = itemView.findViewById<ImageButton>(R.id.tag_add_negated)
-        val tagAdd = itemView.findViewById<ImageButton>(R.id.tag_add)
+        val tagName = itemView.findViewById<TextView>(R.id.tag_name)!!
+        val tagAddNegated = itemView.findViewById<ImageButton>(R.id.tag_add_negated)!!
+        val tagAdd = itemView.findViewById<ImageButton>(R.id.tag_add)!!
     }
 
 }

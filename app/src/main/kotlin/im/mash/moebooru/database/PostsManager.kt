@@ -11,7 +11,6 @@
 
 package im.mash.moebooru.database
 
-import android.util.Log
 import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.utils.PostsTable
 import org.jetbrains.anko.db.MapRowParser

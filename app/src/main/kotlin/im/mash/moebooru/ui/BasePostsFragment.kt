@@ -11,17 +11,14 @@
 
 package im.mash.moebooru.ui
 
-import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.*
-import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
@@ -29,14 +26,14 @@ import im.mash.moebooru.model.RawPost
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.ui.listener.LastItemListener
 import im.mash.moebooru.ui.listener.RecyclerViewClickListener
-import im.mash.moebooru.utils.*
+import im.mash.moebooru.utils.Key
+import im.mash.moebooru.utils.TableType
+import im.mash.moebooru.utils.getViewModel
 import im.mash.moebooru.viewmodel.PostsViewModel
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
 abstract class BasePostsFragment : ToolbarFragment(), SwipeRefreshLayout.OnRefreshListener {
-
-    private val TAG = this.javaClass.simpleName
 
     internal lateinit var toolbar: Toolbar
     internal lateinit var postsView: RecyclerView
@@ -112,7 +109,7 @@ abstract class BasePostsFragment : ToolbarFragment(), SwipeRefreshLayout.OnRefre
                 val intent =  Intent(context, DetailsActivity().javaClass)
                 val bundle = Bundle()
                 bundle.putInt(Key.ITEM_POS, position)
-                bundle.putInt(Key.ITEM_ID, items!![position].id!!.toInt())
+                bundle.putInt(Key.ITEM_ID, items!![position].id.toInt())
                 bundle.putString(Key.TYPE, type)
                 if (type == TableType.SEARCH) {
                     bundle.putString(Key.TAGS_SEARCH, tags)

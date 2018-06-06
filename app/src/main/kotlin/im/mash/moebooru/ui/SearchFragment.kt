@@ -25,8 +25,6 @@ import im.mash.moebooru.R
 import im.mash.moebooru.ui.adapter.PostsAdapter
 import im.mash.moebooru.utils.Key
 import im.mash.moebooru.utils.TableType
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 
 class SearchFragment : BasePostsFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 

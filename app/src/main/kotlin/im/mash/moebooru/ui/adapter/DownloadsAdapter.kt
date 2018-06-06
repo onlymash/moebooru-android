@@ -12,13 +12,11 @@ import com.bumptech.glide.load.model.GlideUrl
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.download.MoeDownloadController
-import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.download.MoeStatusChangeListener
 import im.mash.moebooru.download.ProgressUtil
 import im.mash.moebooru.glide.GlideApp
-import im.mash.moebooru.model.DownloadPost
+import im.mash.moebooru.ui.widget.FixedImageView
 import im.mash.moebooru.utils.glideHeader
-import java.time.Instant
 
 class DownloadsAdapter(private val controller: MoeDownloadController,
                        private var size: Int) : RecyclerView.Adapter<DownloadsAdapter.DownloadsViewHolder>() {

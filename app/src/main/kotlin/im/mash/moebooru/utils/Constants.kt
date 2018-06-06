@@ -11,9 +11,6 @@
 
 package im.mash.moebooru.utils
 
-import android.webkit.WebView
-import im.mash.moebooru.App.Companion.app
-
 object Key {
     const val NIGHT_MODE = "night_mode"
     const val NIGHT_MODE_SYSTEM = "system"

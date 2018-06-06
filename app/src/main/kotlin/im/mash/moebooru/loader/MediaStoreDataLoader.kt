@@ -1,4 +1,4 @@
-package im.mash.moebooru.utils
+package im.mash.moebooru.loader
 
 import android.content.Context
 import android.net.Uri

@@ -13,7 +13,6 @@ package im.mash.moebooru.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
 import android.support.v4.view.ViewCompat
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
@@ -22,20 +21,17 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.liulishuo.okdownload.DownloadTask
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
-import im.mash.moebooru.content.UriRetriever.getUriFromFilePath
-import im.mash.moebooru.download.MoeDownloadListener
 import im.mash.moebooru.model.DownloadPost
 import im.mash.moebooru.model.RawPost
-import im.mash.moebooru.utils.*
+import im.mash.moebooru.utils.Key
+import im.mash.moebooru.utils.TableType
+import im.mash.moebooru.utils.getViewModel
+import im.mash.moebooru.utils.mayRequestStoragePermission
 import im.mash.moebooru.viewmodel.DetailsPositionViewModel
 import im.mash.moebooru.viewmodel.PostsViewModel
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
-import java.io.File
-import java.lang.Exception
 import java.net.URL
 
 class DetailsActivity : BaseActivity() {

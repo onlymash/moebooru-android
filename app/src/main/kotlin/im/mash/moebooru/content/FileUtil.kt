@@ -2,7 +2,6 @@ package im.mash.moebooru.content
 
 import android.os.Environment
 import android.util.Log
-import im.mash.moebooru.App.Companion.app
 import java.io.File
 
 private const val TAG = "FileUtil"

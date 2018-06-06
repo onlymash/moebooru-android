@@ -25,8 +25,9 @@ import im.mash.moebooru.R
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.GlideRequests
 import im.mash.moebooru.model.MediaStoreData
-import im.mash.moebooru.utils.MediaStoreDataLoader
+import im.mash.moebooru.loader.MediaStoreDataLoader
 import im.mash.moebooru.ui.adapter.LocalGalleryAdapter
+import im.mash.moebooru.ui.listener.RecyclerViewClickListener
 import im.mash.moebooru.utils.mayRequestStoragePermission
 import java.io.File
 
@@ -36,6 +37,7 @@ class LocalGalleryFragment : ToolbarFragment(), DrawerLayout.DrawerListener,
 
     companion object {
         private const val TAG = "LocalGalleryFragment"
+        var mediaStoreDataList: MutableList<MediaStoreData> = mutableListOf()
     }
 
     private lateinit var toolbar: Toolbar
@@ -77,6 +79,18 @@ class LocalGalleryFragment : ToolbarFragment(), DrawerLayout.DrawerListener,
         setInsetsListener(toolbar)
         initRightDrawer(view)
 //        loaderManager.restartLoader(R.id.loader_id_media_store_data, null, this)
+
+        val itemClickListener = object : RecyclerViewClickListener.OnItemClickListener {
+            override fun onItemClick(itemView: View?, position: Int) {
+
+            }
+
+            override fun onItemLongClick(itemView: View?, position: Int) {
+
+            }
+        }
+        val itemTouchListener = RecyclerViewClickListener(this.requireContext(), itemClickListener)
+        recyclerView.addOnItemTouchListener(itemTouchListener)
     }
 
     private fun initRightDrawer(view: View) {
@@ -107,6 +121,7 @@ class LocalGalleryFragment : ToolbarFragment(), DrawerLayout.DrawerListener,
     override fun onLoadFinished(loader: Loader<MutableList<MediaStoreData>>,
                                 data: MutableList<MediaStoreData>) {
         Log.i(TAG, "onLoadFinished")
+        mediaStoreDataList = data
         val glideRequests: GlideRequests = GlideApp.with(this)
         localGalleryAdapter = LocalGalleryAdapter(this.requireContext(), data, glideRequests)
         val preloader = RecyclerViewPreloader(glideRequests, localGalleryAdapter, localGalleryAdapter, 3)

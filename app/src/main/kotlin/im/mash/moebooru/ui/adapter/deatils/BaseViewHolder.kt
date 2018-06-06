@@ -12,7 +12,6 @@
 package im.mash.moebooru.ui.adapter.deatils
 
 import android.support.v7.widget.RecyclerView
-import android.util.SparseArray
 import android.view.View
 
 abstract class BaseViewHolder<in T>(internal var itemView: View) : RecyclerView.ViewHolder(itemView) {

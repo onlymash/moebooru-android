@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/card_view"
     android:focusable="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -220,7 +219,7 @@
                 android:layout_weight="1" />
             <ImageButton
                 android:id="@+id/btn_parent_id"
-                android:background="?selectableItemBackgroundBorderless"
+                android:background="?android:selectableItemBackgroundBorderless"
                 android:layout_width="@dimen/list_size"
                 android:layout_height="@dimen/list_size"
                 android:src="@drawable/ic_action_search_white_24dp"
