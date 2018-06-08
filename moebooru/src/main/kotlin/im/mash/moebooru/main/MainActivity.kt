@@ -2,9 +2,13 @@ package im.mash.moebooru.main
 
 import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.v4.widget.DrawerLayout
 import android.util.Log
-import android.widget.Button
-import android.widget.TextView
+import com.mikepenz.materialdrawer.AccountHeader
+import com.mikepenz.materialdrawer.AccountHeaderBuilder
+import com.mikepenz.materialdrawer.Drawer
+import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Post
@@ -21,7 +25,19 @@ class MainActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val DRAWER_ITEM_POSTS = 0L
+        private const val DRAWER_ITEM_ACCOUNT = 1L
+        private const val DRAWER_ITEM_DOWNLOADS = 2L
+        private const val DRAWER_ITEM_LOCAL_GALLERY = 3L
+        private const val DRAWER_ITEM_SETTINGS = 4L
+        private const val DRAWER_ITEM_ABOUT = 5L
     }
+
+    internal lateinit var drawer: Drawer
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var header: AccountHeader
+    private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
+    private var previousSelectedDrawer: Long = 0L    // it's actually lateinit
 
     private val component by lazy { MoeDH.mainComponent() }
 
@@ -31,28 +47,33 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_moebooru)
         Log.i(TAG, "This is MainActivity")
         component.inject(this)
+
+        profileSettingDrawerItem = ProfileSettingDrawerItem()
+                .withName(R.string.edit)
+                .withIcon(R.drawable.ic_drawer_settings_24dp)
+
+        header = AccountHeaderBuilder()
+                .withActivity(this)
+                .withHeaderBackground(R.drawable.background_header)
+                .withOnAccountHeaderListener { _, profile, _ ->
+                    if (profile.identifier != profileSettingDrawerItem.identifier) {
+                        app.settings.activeProfile = profile.identifier
+                    } else {
+
+                    }
+                    false
+                }
+                .build()
+
+
         val httpUrlBuilder = HttpUrl.Builder()
                 .scheme("https")
                 .host("konachan.com")
                 .addPathSegments("post.json")
-        val buttonLoad = findViewById<Button>(R.id.btn_load)
-        val buttonRefresh = findViewById<Button>(R.id.btn_refresh)
-        val buttonLoadMore = findViewById<Button>(R.id.btn_load_more)
-        val textView = findViewById<TextView>(R.id.tv_info)
-        buttonLoad.setOnClickListener {
-            viewModel.loadPosts(httpUrlBuilder.addQueryParameter("page", "1").build())
-        }
-        buttonRefresh.setOnClickListener {
-            viewModel.refreshPosts(httpUrlBuilder.addQueryParameter("page", "1").build())
-        }
-        var page = 1
-        buttonLoadMore.setOnClickListener {
-            page += 1
-            viewModel.loadMorePosts(httpUrlBuilder.addQueryParameter("page", "$page").build())
-        }
+
         viewModel.postsOutcome.observe(this, Observer<Outcome<MutableList<Post>>> { outcome  ->
             when (outcome) {
                 is Outcome.Progress -> {
@@ -60,12 +81,10 @@ class MainActivity : BaseActivity() {
                 }
                 is Outcome.Success -> {
                     Log.i(TAG, "Outcome.Success")
-                    textView.text = outcome.data.size.toString()
                 }
                 is Outcome.Failure -> {
                     if (outcome.e is IOException) {
                         outcome.e.printStackTrace()
-                        textView.text = outcome.e.message
                     } else {
                         Log.i(TAG, "Outcome.Failure")
                     }

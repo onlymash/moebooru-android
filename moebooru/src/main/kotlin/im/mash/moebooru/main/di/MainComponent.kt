@@ -46,11 +46,11 @@ class MainModule {
 
     @Provides
     @MainScope
-    fun remoteData(postService: PostService): PostDataContract.Remote = RemoteData(postService)
+    fun remotePostData(postService: PostService): PostDataContract.Remote = RemoteData(postService)
 
     @Provides
     @MainScope
-    fun localData(database: MoeDatabase, scheduler: Scheduler): PostDataContract.Local = PostLocalData(database, scheduler)
+    fun localPostData(database: MoeDatabase, scheduler: Scheduler): PostDataContract.Local = PostLocalData(database, scheduler)
 
     @Provides
     @MainScope
@@ -65,4 +65,13 @@ class MainModule {
     @Provides
     @MainScope
     fun postService(retrofit: Retrofit): PostService = retrofit.create(PostService::class.java)
+
+    @Provides
+    @MainScope
+    fun booruRepo(local: BooruDataContract.Local, scheduler: Scheduler, compositeDisposable: CompositeDisposable) : BooruDataContract.Repository
+            = BooruRepository(local, scheduler, compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun localBooruData(database: MoeDatabase, scheduler: Scheduler): BooruDataContract.Local = BooruLocalData(database, scheduler)
 }
