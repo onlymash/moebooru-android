@@ -13,6 +13,10 @@ buildscript {
         glide_version = '4.7.1'
         firebase_version = '16.0.0'
         okdownload_version = '1.0.3'
+        okhttp3_version = '3.10.0'
+        retrofit2_version = '2.4.0'
+        room_version = '1.1.0'
+        dagger_version = '2.16'
     }
     repositories {
         google()
@@ -24,8 +28,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.2.0-alpha16'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.gms:google-services:3.3.1'
-        classpath 'io.fabric.tools:gradle:1.25.4'
+//        classpath 'com.google.gms:google-services:3.2.1'
+//        classpath 'io.fabric.tools:gradle:1.25.4'
     }
 }
 
