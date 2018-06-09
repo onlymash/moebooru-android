@@ -10,7 +10,7 @@
     android:paddingTop="3dp"
     android:paddingBottom="3dp">
 
-    <im.mash.moebooru.core.application.widget.FixedImageView
+    <im.mash.moebooru.core.widget.FixedImageView
         android:id="@+id/preview"
         android:layout_width="68dp"
         android:layout_height="68dp"

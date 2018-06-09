@@ -9,7 +9,7 @@
  *
  */
 
-package im.mash.moebooru.core.application.widget
+package im.mash.moebooru.core.widget
 
 import android.content.Context
 import android.support.v7.widget.AppCompatImageView

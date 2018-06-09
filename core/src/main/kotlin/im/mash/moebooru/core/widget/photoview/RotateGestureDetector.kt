@@ -1,4 +1,4 @@
-package im.mash.moebooru.core.application.widget.photoview
+package im.mash.moebooru.core.widget.photoview
 
 import android.view.MotionEvent
 

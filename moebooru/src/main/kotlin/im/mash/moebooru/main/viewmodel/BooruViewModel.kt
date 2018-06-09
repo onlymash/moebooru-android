@@ -2,6 +2,7 @@ package im.mash.moebooru.main.viewmodel
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Booru
 import im.mash.moebooru.core.extensions.toLiveData
@@ -12,18 +13,25 @@ import io.reactivex.disposables.CompositeDisposable
 class BooruViewModel(private val repo: BooruDataContract.Repository,
                      private val compositeDisposable: CompositeDisposable) : ViewModel() {
 
+    companion object {
+        private const val TAG = "BooruViewModel"
+    }
     val booruOutcome: LiveData<Outcome<MutableList<Booru>>> by lazy {
         repo.booruFetchOutcome.toLiveData(compositeDisposable)
     }
 
     fun loadBoorus() {
-        if (booruOutcome.value == null) {
-            repo.loadBoorus()
-        }
+        Log.i(TAG, "LoadBoorus")
+        repo.loadBoorus()
     }
 
-    fun reLoadBoorus() {
-        repo.loadBoorus()
+    fun addBooru(booru: Booru) {
+        Log.i(TAG, "AddBooru")
+        repo.addBooru(booru)
+    }
+
+    fun addBoorus(boorus: MutableList<Booru>) {
+        repo.addBoorus(boorus)
     }
 
     override fun onCleared() {

@@ -12,7 +12,9 @@ import im.mash.moebooru.core.module.CoreComponent
 import im.mash.moebooru.core.network.Scheduler
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.model.*
+import im.mash.moebooru.main.viewmodel.BooruViewModelFactory
 import im.mash.moebooru.main.viewmodel.PostViewModelFactory
+import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
 import retrofit2.Retrofit
 
@@ -24,20 +26,20 @@ interface MainComponent {
     fun database(): MoeDatabase
     fun postService(): PostService
     fun scheduler(): Scheduler
-    fun inject(MainActivity: MainActivity)
+    fun inject(mainActivity: MainActivity)
 }
 
 @Module
 class MainModule {
 
-    /*ViewModel*/
+    /*PostViewModel*/
     @Provides
     @MainScope
     fun postViewModelFactory(repository: PostDataContract.Repository,
                              compositeDisposable: CompositeDisposable): PostViewModelFactory
             = PostViewModelFactory(repository,compositeDisposable)
 
-    /*Repository*/
+    /*PostRepository*/
     @Provides
     @MainScope
     fun postRepo(local: PostDataContract.Local, remote: PostDataContract.Remote, scheduler: Scheduler,
@@ -66,6 +68,13 @@ class MainModule {
     @MainScope
     fun postService(retrofit: Retrofit): PostService = retrofit.create(PostService::class.java)
 
+    /*BooruViewModel*/
+    @Provides
+    @MainScope
+    fun booruViewModelFactory(repository: BooruDataContract.Repository,
+                             compositeDisposable: CompositeDisposable): BooruViewModelFactory
+            = BooruViewModelFactory(repository,compositeDisposable)
+
     @Provides
     @MainScope
     fun booruRepo(local: BooruDataContract.Local, scheduler: Scheduler, compositeDisposable: CompositeDisposable) : BooruDataContract.Repository
@@ -74,4 +83,20 @@ class MainModule {
     @Provides
     @MainScope
     fun localBooruData(database: MoeDatabase, scheduler: Scheduler): BooruDataContract.Local = BooruLocalData(database, scheduler)
+
+    /*TagViewModel*/
+    @Provides
+    @MainScope
+    fun tagViewModelFactory(repository: TagDataContract.Repository,
+                             compositeDisposable: CompositeDisposable): TagViewModelFactory
+            = TagViewModelFactory(repository,compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun tagRepo(local: TagDataContract.Local, scheduler: Scheduler, compositeDisposable: CompositeDisposable) : TagDataContract.Repository
+            = TagRepository(local, scheduler, compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun localTagData(database: MoeDatabase, scheduler: Scheduler): TagDataContract.Local = TagLocalData(database, scheduler)
 }

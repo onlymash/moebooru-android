@@ -1,4 +1,4 @@
-package im.mash.moebooru.util
+package im.mash.moebooru.helper
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider

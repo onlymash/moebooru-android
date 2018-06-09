@@ -25,6 +25,10 @@
         {
           "client_id": "528191874988-15ir59bgugviblm0psv5bqepgm26ndba.apps.googleusercontent.com",
           "client_type": 3
+        },
+        {
+          "client_id": "528191874988-15ir59bgugviblm0psv5bqepgm26ndba.apps.googleusercontent.com",
+          "client_type": 3
         }
       ],
       "api_key": [
@@ -73,6 +77,10 @@
             "package_name": "im.mash.moebooru.debug",
             "certificate_hash": "a96d1bd5f3a9fc4f82dff8ee91865184284ecdc8"
           }
+        },
+        {
+          "client_id": "528191874988-15ir59bgugviblm0psv5bqepgm26ndba.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "528191874988-15ir59bgugviblm0psv5bqepgm26ndba.apps.googleusercontent.com",

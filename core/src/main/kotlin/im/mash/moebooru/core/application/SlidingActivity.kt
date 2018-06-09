@@ -6,7 +6,7 @@ import android.support.v4.widget.SlidingPaneLayout
 import android.view.View
 import android.view.ViewGroup
 import im.mash.moebooru.core.R
-import im.mash.moebooru.core.application.widget.PagerEnabledSlidingPaneLayout
+import im.mash.moebooru.core.widget.PagerEnabledSlidingPaneLayout
 
 abstract class SlidingActivity : BaseActivity(), SlidingPaneLayout.PanelSlideListener {
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -34,6 +34,10 @@ class PostLocalData(private val database: MoeDatabase,
     }
 
     override fun deletePosts(site: String) {
-        database.postDao().deletePosts(site)
+        Completable.fromAction{
+            database.postDao().deletePosts(site)
+        }
+                .performOnBack(scheduler)
+                .subscribe()
     }
 }

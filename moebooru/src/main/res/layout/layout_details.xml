@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:background="@color/black"/>
 
-    <im.mash.moebooru.core.application.widget.VerticalViewPager
+    <im.mash.moebooru.core.widget.VerticalViewPager
         android:id="@+id/post_page_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

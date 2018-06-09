@@ -9,6 +9,8 @@ interface BooruDataContract {
     interface Repository {
         val booruFetchOutcome: PublishSubject<Outcome<MutableList<Booru>>>
         fun loadBoorus()
+        fun addBooru(booru: Booru)
+        fun addBoorus(boorus: MutableList<Booru>)
         fun deleteBooru(booru: Booru)
         fun handleError(error: Throwable)
     }

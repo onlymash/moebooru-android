@@ -14,7 +14,6 @@ package im.mash.moebooru
 import android.content.Context
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatDelegate
-import im.mash.moebooru.core.module.StorageModule
 
 class Settings(ctx: Context) {
 
@@ -35,7 +34,9 @@ class Settings(ctx: Context) {
         const val POST_SIZE_ORIGIN = "origin"
         const val CACHE_MEMORY = "cache_memory"
         const val CACHE_DISK = "cache_disk"
-        const val ACTIVE_PROFILE = "active_profile"
+        const val ACTIVE_PROFILE_ID = "active_profile_id"
+        const val ACTIVE_PROFILE_SCHEME = "active_profile_scheme"
+        const val ACTIVE_PROFILE_HOST = "active_profile_host"
         const val SPAN_COUNT = "span_count"
         const val IS_NOT_MORE_DATA = "not_more_data"
         const val IS_CHANGED_NIGHT_MODE = "changed_night_mode"
@@ -50,7 +51,7 @@ class Settings(ctx: Context) {
         const val ENABLE_CRASH_REPORT = "enable_crash_report"
     }
 
-    private val sp: SharedPreferences = StorageModule().providesSharedPreferences(ctx)
+    private val sp: SharedPreferences = App.coreComponent.sharedPreferences()
 
     private val editor: SharedPreferences.Editor = sp.edit()
 
@@ -83,9 +84,18 @@ class Settings(ctx: Context) {
         get() = sp.getString(CACHE_DISK, "256").toInt()
         set(value) = editor.putString(CACHE_DISK, value.toString()).apply()
 
-    var activeProfile: Long
-        get() = sp.getLong(ACTIVE_PROFILE, 0L)
-        set(value) = editor.putLong(ACTIVE_PROFILE, value).apply()
+    var activeProfileId: Long
+        get() = sp.getLong(ACTIVE_PROFILE_ID, 0L)
+        set(value) = editor.putLong(ACTIVE_PROFILE_ID, value).apply()
+
+
+    var activeProfileHost: String
+        get() = sp.getString(ACTIVE_PROFILE_HOST, "")
+        set(value) = editor.putString(ACTIVE_PROFILE_HOST, value).apply()
+
+    var activeProfileScheme: String
+        get() = sp.getString(ACTIVE_PROFILE_SCHEME, "")
+        set(value) = editor.putString(ACTIVE_PROFILE_SCHEME, value).apply()
 
     var spanCountInt: Int
         get() = sp.getInt(SPAN_COUNT, 3)

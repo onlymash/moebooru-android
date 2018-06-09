@@ -10,7 +10,7 @@
   ~
   -->
 
-<im.mash.moebooru.core.application.widget.FitWindowFrameLayout
+<im.mash.moebooru.core.widget.FitWindowFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fragment_moebooru"
     android:layout_width="match_parent"

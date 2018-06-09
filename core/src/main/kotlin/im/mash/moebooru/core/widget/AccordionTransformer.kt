@@ -1,4 +1,4 @@
-package im.mash.moebooru.core.application.widget
+package im.mash.moebooru.core.widget
 
 import android.view.View
 

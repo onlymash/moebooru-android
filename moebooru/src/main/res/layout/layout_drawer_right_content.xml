@@ -10,17 +10,29 @@
   ~
   -->
 
-<im.mash.moebooru.core.application.widget.FitWindowFrameLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/drawer_tags_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_right_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <android.support.design.widget.AppBarLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/appbar_layout_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:elevation="0dp"
+        style="@style/AppBar"/>
 
     <LinearLayout
         android:id="@+id/drawer_list_layout"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/appbar_layout_drawer"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/drawer_rv_list"
@@ -29,6 +41,4 @@
 
     </LinearLayout>
 
-    <include layout="@layout/layout_appbar_drawer"/>
-
-</im.mash.moebooru.core.application.widget.FitWindowFrameLayout>
+</android.support.constraint.ConstraintLayout>

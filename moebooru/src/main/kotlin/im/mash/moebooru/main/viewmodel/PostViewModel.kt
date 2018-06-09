@@ -39,6 +39,5 @@ class PostViewModel(private val repo: PostDataContract.Repository,
         super.onCleared()
         //clear the disposables when the viewmodel is cleared
         compositeDisposable.clear()
-        MoeDH.destroyMainComponent()
     }
 }
