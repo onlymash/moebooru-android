@@ -34,6 +34,10 @@ class BooruViewModel(private val repo: BooruDataContract.Repository,
         repo.addBoorus(boorus)
     }
 
+    fun clear() {
+        compositeDisposable.clear()
+    }
+
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.clear()

@@ -25,6 +25,10 @@ class TagViewModel(private val repo: TagDataContract.Repository,
         repo.getTags(site)
     }
 
+    fun clear() {
+        compositeDisposable.clear()
+    }
+
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.clear()

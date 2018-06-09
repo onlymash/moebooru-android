@@ -13,7 +13,7 @@ interface PostDao {
     @Query("SELECT * FROM posts WHERE site = :site AND id = :id")
     fun getPost(site: String, id: Int): Flowable<Post>
 
-    @Query("SELECT * FROM posts WHERE site = :site")
+    @Query("SELECT * FROM posts WHERE site = :site ORDER BY id DESC")
     fun getPosts(site: String): Flowable<MutableList<Post>>
 
     @Query("DELETE FROM posts WHERE site = :site")

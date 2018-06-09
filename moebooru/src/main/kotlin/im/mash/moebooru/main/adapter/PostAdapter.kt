@@ -13,7 +13,7 @@ import im.mash.moebooru.core.widget.FixedImageView
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.util.*
 
-class PostAdapter(private val context: Context) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+class PostAdapter(private val context: Context, private var gridMode: String) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     companion object {
         private const val TAG = "PostAdapter"
@@ -23,7 +23,6 @@ class PostAdapter(private val context: Context) : RecyclerView.Adapter<PostAdapt
     private var posts = mutableListOf<Post>()
     private var spanCount = context.screenWidth/context.resources.getDimension(R.dimen.item_width).toInt()
     private val padding = context.resources.getDimension(R.dimen.item_padding).toInt()
-    private var gridMode = Settings.GRID_MODE_STAGGERED_GRID
 
     fun updateData(posts: MutableList<Post>) {
         this.posts = posts
@@ -53,15 +52,17 @@ class PostAdapter(private val context: Context) : RecyclerView.Adapter<PostAdapt
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         if (position in 0 until spanCount) {
             holder.itemView.setPadding(padding, padding + context.toolbarHeight + statusBarHeight, padding, padding)
+        } else {
+            holder.itemView.setPadding(padding, padding, padding, padding)
         }
         val placeHolderId = when (posts[position].rating) {
             "q" -> R.drawable.background_rating_q
             "e" -> R.drawable.background_rating_e
             else -> R.drawable.background_rating_s
         }
-
         when (gridMode) {
             Settings.GRID_MODE_GRID -> {
+                holder.fixedImageView.setWidthAndHeightWeight(1, 1)
                 GlideApp.with(context)
                         .load(GlideUrl(posts[position].preview_url, header))
                         .centerCrop()

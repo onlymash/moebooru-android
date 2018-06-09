@@ -19,6 +19,8 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.App.Companion.coreComponent
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
+import im.mash.moebooru.common.base.LastItemListener
+import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.network.Outcome
@@ -51,9 +53,9 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private var page = 1
     private var posts = mutableListOf<Post>()
 
-    private var isLoad = true
-    private var isLoadMore = false
-    private var isNotMore = false
+    private var loading = true
+    private var loadingMore = false
+    private var notMore = false
 
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -76,7 +78,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     private fun initRefresh(view: View) {
         refreshLayout = view.findViewById(R.id.refresh)
-        refreshLayout.setProgressViewOffset(true, toolbar.minimumHeight, toolbar.minimumHeight + 150)
+        refreshLayout.setProgressViewOffset(true, toolbar.minimumHeight, toolbar.minimumHeight + 170)
         refreshLayout.setColorSchemeResources(
                 R.color.blue,
                 R.color.purple,
@@ -85,11 +87,13 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 R.color.red
         )
         refreshLayout.setOnRefreshListener {
-            refreshLayout.isRefreshing = true
-            isLoad = true
-            isNotMore = false
-            page = 1
-            (activity as MainActivity).postViewModel.refreshPosts(getHttpUrl())
+            if (!loading && !loadingMore) {
+                refreshLayout.isRefreshing = true
+                loading = true
+                notMore = false
+                page = 1
+                (activity as MainActivity).postViewModel.refreshPosts(getHttpUrl())
+            }
         }
     }
 
@@ -105,22 +109,44 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     private fun initPostList(view: View) {
         postView = view.findViewById(R.id.posts_list)
+        postView.itemAnimator = DefaultItemAnimator()
         postView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postView.setItemViewCacheSize(20)
         postView.isDrawingCacheEnabled = true
         postView.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
         when (app.settings.gridModeString) {
             Settings.GRID_MODE_GRID -> {
-                postView.layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                val layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                postView.layoutManager = layoutManager
                 postView.setHasFixedSize(true)
             }
             else -> {
-                postView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                val layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                postView.layoutManager = layoutManager
                 postView.setHasFixedSize(false)
             }
         }
-        postAdapter = PostAdapter(this.requireContext())
+        postAdapter = PostAdapter(this.requireContext(), app.settings.gridModeString)
         postView.adapter = postAdapter
+
+        postView.addOnScrollListener(object : LastItemListener() {
+            override fun onLastItemVisible() {
+                loadMoreData()
+            }
+        })
+
+        postView.addOnItemTouchListener(RecyclerViewClickListener(this.requireContext(),
+                object : RecyclerViewClickListener.OnItemClickListener {
+                    override fun onItemClick(itemView: View?, position: Int) {
+
+                    }
+
+                    override fun onItemLongClick(itemView: View?, position: Int) {
+                        Log.i(TAG, "Long click item: $position")
+                    }
+                }))
+
 
         val activity = activity as MainActivity
 
@@ -133,24 +159,37 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     Log.i(TAG, "postViewModel Outcome.Success")
                     refreshLayout.isRefreshing = false
                     val data = outcome.data
-                    if (isLoad) {
-                        isLoad = false
-                        if ((posts.size > 0 && data[0].id > posts[0].id ) || posts.size != data.size) {
-                            posts = data
-                            postAdapter.updateData(posts)
+                    when (true) {
+                        loading -> {
+                            if (posts.size > 0 && posts.size == data.size && data[0].id == posts[0].id) {
+                                loading = false
+                            } else {
+                                posts = data
+                                postAdapter.updateData(mutableListOf())
+                                postAdapter.updateData(posts)
+                                loading = false
+                            }
                         }
-                        isLoad = false
-                    } else if (isLoadMore) {
-                        if (data.size > 0) {
-                            posts.addAll(data)
-                            postAdapter.addData(posts)
-                        } else {
-                            isNotMore = true
+                        loadingMore -> {
+                            when (data.size > posts.size) {
+                                true -> {
+                                    posts = data
+                                    postAdapter.addData(posts)
+                                    notMore = false
+                                }
+                                else -> {
+                                    notMore = true
+                                }
+                            }
+                            loadingMore = false
                         }
                     }
                 }
                 is Outcome.Failure -> {
                     refreshLayout.isRefreshing = false
+                    loading = false
+                    loadingMore = false
+                    notMore = false
                     if (outcome.e is IOException) {
                         outcome.e.printStackTrace()
                     } else {
@@ -206,13 +245,24 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     }
 
     private fun initToolbar() {
+        appBarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
         toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
         toolbar.setTitle(R.string.posts)
         toolbar.inflateMenu(R.menu.menu_main)
         toolbar.setOnMenuItemClickListener {item: MenuItem? ->
             when (item?.itemId) {
-                R.id.action_grid -> app.settings.gridModeString = Settings.GRID_MODE_GRID
-                R.id.action_staggered_grid -> app.settings.gridModeString = Settings.GRID_MODE_STAGGERED_GRID
+                R.id.action_grid -> {
+                    if (!toolbar.menu.findItem(R.id.action_grid).isChecked) {
+                        toolbar.menu.findItem(R.id.action_grid).isChecked = true
+                        app.settings.gridModeString = Settings.GRID_MODE_GRID
+                    }
+                }
+                R.id.action_staggered_grid -> {
+                    if (!toolbar.menu.findItem(R.id.action_staggered_grid).isChecked) {
+                        toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
+                        app.settings.gridModeString = Settings.GRID_MODE_STAGGERED_GRID
+                    }
+                }
                 R.id.action_search_open -> openRightDrawer()
             }
             return@setOnMenuItemClickListener true
@@ -257,6 +307,15 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     }
 
+    private fun loadMoreData() {
+        if (!loading && !loadingMore && !notMore) {
+            refreshLayout.isRefreshing = true
+            loadingMore = true
+            page = posts.size/app.settings.postLimitInt + 1
+            (activity as MainActivity).postViewModel.loadMorePosts(getHttpUrl())
+        }
+    }
+
     private fun closeRightDrawer() {
         if (drawerLayout.isDrawerOpen(Gravity.RIGHT)) {
             drawerLayout.closeDrawer(Gravity.RIGHT)
@@ -274,12 +333,28 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             Settings.GRID_MODE -> {
                 when (app.settings.gridModeString) {
                     Settings.GRID_MODE_GRID -> {
-                        toolbar.menu.findItem(R.id.action_grid).isChecked = true
+                        postView.layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                        postView.setHasFixedSize(true)
+                        postAdapter.setGridMode(Settings.GRID_MODE_GRID)
+                        postAdapter.updateData(mutableListOf())
+                        postAdapter.updateData(posts)
                     }
                     Settings.GRID_MODE_STAGGERED_GRID -> {
-                        toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
+                        postView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                        postView.setHasFixedSize(false)
+                        postAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
+                        postAdapter.updateData(mutableListOf())
+                        postAdapter.updateData(posts)
                     }
                 }
+            }
+            Settings.ACTIVE_PROFILE_HOST -> {
+                posts.clear()
+                postAdapter.updateData(posts)
+                refreshLayout.isRefreshing = true
+                loading = true
+                notMore = false
+                (activity as MainActivity).postViewModel.reLoadPosts(getHttpUrl())
             }
         }
     }

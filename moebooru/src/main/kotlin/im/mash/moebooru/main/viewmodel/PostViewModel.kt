@@ -35,6 +35,10 @@ class PostViewModel(private val repo: PostDataContract.Repository,
         repo.loadMorePosts(httpUrl)
     }
 
+    fun clear() {
+        compositeDisposable.clear()
+    }
+
     override fun onCleared() {
         super.onCleared()
         //clear the disposables when the viewmodel is cleared
