@@ -13,6 +13,8 @@ interface PostDataContract {
         fun fetchPosts(httpUrl: HttpUrl)
         fun refreshPosts(httpUrl: HttpUrl)
         fun loadMorePosts(httpUrl: HttpUrl)
+        fun addPosts(posts: MutableList<Post>)
+        fun deletePosts(site: String)
         fun handleError(error: Throwable)
     }
     interface Local {

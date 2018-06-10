@@ -15,6 +15,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
@@ -63,7 +64,9 @@ class NetworkModule {
     @Singleton
     fun providesOkhttpCache(context: Context): Cache {
         val cacheSize = 20 * 1024 * 1024 // 20 MB
-        return Cache(context.cacheDir, cacheSize.toLong())
+        val cache = File(context.cacheDir, "okhttp_cache")
+        if (!cache.exists()) cache.mkdirs()
+        return Cache(cache, cacheSize.toLong())
     }
 
     @Provides

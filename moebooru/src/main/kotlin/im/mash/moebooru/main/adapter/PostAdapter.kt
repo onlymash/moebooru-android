@@ -37,6 +37,11 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
         notifyItemRangeInserted(countBefore, itemCount)
     }
 
+    fun clearData() {
+        posts.clear()
+        notifyDataSetChanged()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val itemView: View = LayoutInflater.from(parent.context)
                 .inflate(R.layout.layout_post_item, parent, false)

@@ -34,7 +34,7 @@ import okhttp3.HttpUrl
 import java.io.IOException
 
 @SuppressLint("RtlHardcoded")
-class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChangeListener, SwipeRefreshLayout.OnRefreshListener {
+class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     companion object {
         private const val TAG = "PostFragment"
@@ -54,7 +54,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private var page = 1
     private var posts = mutableListOf<Post>()
 
-    private var loading = true
+    private var refreshing = false
     private var loadingMore = false
     private var notiNotMore = true
     private var limit = 50
@@ -80,6 +80,39 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         limit = app.settings.postLimitInt
         initRefresh(view)
         initPostList(view)
+        mainActivity.postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
+            when (outcome) {
+                is Outcome.Progress -> {
+                    Log.i(TAG, "postViewModel Outcome.Progress")
+                }
+                is Outcome.Success -> {
+                    refreshLayout.isRefreshing = false
+                    val data = outcome.data
+                    Log.i(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
+                    if (loadingMore) {
+                        posts = data
+                        postAdapter.addData(posts)
+                        loadingMore = false
+                    } else {
+                        posts = data
+                        postAdapter.updateData(posts)
+                        refreshing = false
+                    }
+                }
+                is Outcome.Failure -> {
+                    refreshLayout.isRefreshing = false
+                    loadingMore = false
+                    if (outcome.e is IOException) {
+                        outcome.e.printStackTrace()
+                    }
+                    Log.i(TAG, "postViewModel Outcome.Failure")
+                }
+            }
+        })
+        if (savedInstanceState == null) {
+            refreshLayout.isRefreshing = true
+            mainActivity.postViewModel.loadPosts(getHttpUrl())
+        }
     }
 
     private fun initRefresh(view: View) {
@@ -92,7 +125,14 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 R.color.orange,
                 R.color.red
         )
-        refreshLayout.setOnRefreshListener(this)
+        refreshLayout.setOnRefreshListener {
+            if (!loadingMore && !refreshing) {
+                notiNotMore = true
+                page = 1
+                refreshing = true
+                mainActivity.postViewModel.refreshPosts(getHttpUrl())
+            }
+        }
     }
 
     private fun getHttpUrl(): HttpUrl {
@@ -145,48 +185,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                         Log.i(TAG, "Long click item: $position")
                     }
                 }))
-
-        mainActivity.postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
-            when (outcome) {
-                is Outcome.Progress -> {
-                    Log.i(TAG, "postViewModel Outcome.Progress")
-                }
-                is Outcome.Success -> {
-                    refreshLayout.isRefreshing = false
-                    val data = outcome.data
-                    Log.i(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
-                    when (true) {
-                        loading -> {
-                            if (!(posts.size > 0 && posts.size == data.size && data[0].id == posts[0].id)) {
-                                posts = data
-                                postAdapter.updateData(mutableListOf())
-                                postAdapter.updateData(posts)
-                            }
-                            loading = false
-                        }
-                        loadingMore -> {
-                            posts = data
-                            postAdapter.addData(posts)
-                            loadingMore = false
-                        }
-                    }
-                    Log.i(TAG, " mainActivity.postViewModel.notMore: " + mainActivity.postViewModel.isNotMore().toString())
-                }
-                is Outcome.Failure -> {
-                    refreshLayout.isRefreshing = false
-                    loading = false
-                    loadingMore = false
-                    if (outcome.e is IOException) {
-                        outcome.e.printStackTrace()
-                    }
-                    Log.i(TAG, "postViewModel Outcome.Failure")
-                }
-            }
-        })
-
-        refreshLayout.isRefreshing = true
-        mainActivity.postViewModel.loadPosts(getHttpUrl())
-
     }
 
     private fun initDrawerListener() {
@@ -307,8 +305,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             }
             Settings.ACTIVE_PROFILE_HOST -> {
                 posts.clear()
-                postAdapter.updateData(posts)
-                loadData()
+                postAdapter.clearData()
+//                loadData()
             }
             Settings.POST_LIMIT -> {
                 limit = app.settings.postLimitInt
@@ -316,20 +314,9 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         }
     }
 
-    override fun onRefresh() {
-        if (!loading && !loadingMore) {
-            refreshLayout.isRefreshing = true
-            loading = true
-            notiNotMore = true
-            page = 1
-            mainActivity.postViewModel.refreshPosts(getHttpUrl())
-        }
-    }
-
     private fun loadData() {
-        if (!loadingMore && !loading) {
+        if (!loadingMore && !refreshLayout.isRefreshing) {
             refreshLayout.isRefreshing = true
-            loading = true
             notiNotMore = true
             mainActivity.postViewModel.reLoadPosts(getHttpUrl())
         }
@@ -337,7 +324,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     private fun loadMoreData() {
         val isNotMore = mainActivity.postViewModel.isNotMore()
-        if (!loading && !loadingMore && !isNotMore) {
+        if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
             Log.i(TAG, "loadMoreData()")
             refreshLayout.isRefreshing = true
             loadingMore = true

@@ -45,8 +45,8 @@ class PostRepository(private val local: PostDataContract.Local,
     }
 
     override fun refreshPosts(httpUrl: HttpUrl) {
+        Log.i(TAG, "refreshPosts")
         notMore = false
-        postFetchOutcome.loading(true)
         remote.getPosts(httpUrl)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe(
@@ -54,17 +54,17 @@ class PostRepository(private val local: PostDataContract.Local,
                             posts.forEach { post ->
                                 post.site = httpUrl.host()
                             }
-                            local.savePosts(httpUrl.host(), posts)
+                            local.deletePosts(httpUrl.host())
+                            addPosts(posts)
                         },
                         { error -> handleError(error) })
+                .addTo(compositeDisposable)
     }
 
     override fun loadMorePosts(httpUrl: HttpUrl) {
         if (notMore) {
             return
         }
-        postFetchOutcome.loading(true)
-        remote.getPosts(httpUrl)
         remote.getPosts(httpUrl)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe(
@@ -75,13 +75,22 @@ class PostRepository(private val local: PostDataContract.Local,
                                 posts.forEach { post ->
                                     post.site = httpUrl.host()
                                 }
-                                local.addPosts(posts)
+                                addPosts(posts)
                             }
                             if (size < limit) {
                                 notMore = true
                             }
                         },
                         { error -> handleError(error) })
+                .addTo(compositeDisposable)
+    }
+
+    override fun deletePosts(site: String) {
+        local.deletePosts(site)
+    }
+
+    override fun addPosts(posts: MutableList<Post>) {
+        local.addPosts(posts)
     }
 
     override fun handleError(error: Throwable) {
