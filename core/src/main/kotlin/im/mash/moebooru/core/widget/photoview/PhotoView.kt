@@ -1310,7 +1310,7 @@ class PhotoView : AppCompatImageView {
 
             mTranslate.withTranslate(0, 0, (tcx - mScaleCenter.x).toInt(), (tcy - mScaleCenter.y).toInt())
             mTranslate.withScale(mScale, scale)
-            mTranslate.withRotate(mDegrees.toInt(), info.degrees as Int, animaDuring * 2 / 3)
+            mTranslate.withRotate(mDegrees.toInt(), info.degrees.toInt(), animaDuring * 2 / 3)
 
             if (info.widget.width() < info.rect.width() || info.widget.height() < info.rect.height()) {
                 var clipX = info.widget.width() / info.rect.width()

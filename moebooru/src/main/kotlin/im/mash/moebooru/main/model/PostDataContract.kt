@@ -9,6 +9,7 @@ import okhttp3.HttpUrl
 interface PostDataContract {
     interface Repository {
         val postFetchOutcome: PublishSubject<Outcome<MutableList<Post>>>
+        fun isNotMore(): Boolean
         fun fetchPosts(httpUrl: HttpUrl)
         fun refreshPosts(httpUrl: HttpUrl)
         fun loadMorePosts(httpUrl: HttpUrl)

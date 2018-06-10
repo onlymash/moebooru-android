@@ -11,11 +11,10 @@
 
 package im.mash.moebooru
 
-import android.content.Context
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatDelegate
 
-class Settings(ctx: Context) {
+class Settings(private val sp: SharedPreferences) {
 
     companion object {
         const val NIGHT_MODE = "night_mode"
@@ -51,8 +50,6 @@ class Settings(ctx: Context) {
         const val ENABLE_CRASH_REPORT = "enable_crash_report"
     }
 
-    private val sp: SharedPreferences = App.coreComponent.sharedPreferences()
-
     private val editor: SharedPreferences.Editor = sp.edit()
 
     var nightModeString: String
@@ -73,7 +70,7 @@ class Settings(ctx: Context) {
         set(value) = editor.putString(GRID_MODE, value).apply()
 
     var postLimitInt: Int
-        get() = sp.getString(POST_LIMIT, "30").toInt()
+        get() = sp.getString(POST_LIMIT, "50").toInt()
         set(value) = editor.putString(POST_LIMIT, value.toString()).apply()
 
     var cacheMemoryInt: Int
@@ -90,11 +87,11 @@ class Settings(ctx: Context) {
 
 
     var activeProfileHost: String
-        get() = sp.getString(ACTIVE_PROFILE_HOST, "")
+        get() = sp.getString(ACTIVE_PROFILE_HOST, "mash.im")
         set(value) = editor.putString(ACTIVE_PROFILE_HOST, value).apply()
 
     var activeProfileScheme: String
-        get() = sp.getString(ACTIVE_PROFILE_SCHEME, "")
+        get() = sp.getString(ACTIVE_PROFILE_SCHEME, "https")
         set(value) = editor.putString(ACTIVE_PROFILE_SCHEME, value).apply()
 
     var spanCountInt: Int
@@ -108,14 +105,6 @@ class Settings(ctx: Context) {
     var isChangedNightMode: Boolean
         get() = sp.getBoolean(IS_CHANGED_NIGHT_MODE, false)
         set(value) = editor.putBoolean(IS_CHANGED_NIGHT_MODE, value).apply()
-
-//    var statusBarHeightInt: Int
-//        get() = sp.getInt(STATUS_BAR_HEIGHT, statusBarHeight)
-//        set(value) = editor.putInt(STATUS_BAR_HEIGHT, value).apply()
-
-//    var userAgentWebView: String
-//        get() = sp.getString(USER_AGENT_WEB_VIEW, userAgent)
-//        set(value) = editor.putString(USER_AGENT_WEB_VIEW, value).apply()
 
     var enabledCrashReport: Boolean
         get() = sp.getBoolean(ENABLE_CRASH_REPORT, true)

@@ -20,7 +20,7 @@ class App : Application() {
         lateinit var coreComponent: CoreComponent
     }
 
-    internal val settings: Settings by lazy { Settings(this) }
+    internal val settings: Settings by lazy { Settings(coreComponent.sharedPreferences()) }
     private val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
 
     override fun onCreate() {

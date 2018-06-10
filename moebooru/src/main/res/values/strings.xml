@@ -41,7 +41,7 @@
 
     <string name="more_options">More options</string>
 
-    <string name="post_limit_default">40 (Default)</string>
+    <string name="post_limit_default">50 (Default)</string>
     <string name="cache_memory_default">256 MiB (Default)</string>
     <string name="disk_memory_default">256 MiB (Default)</string>
 

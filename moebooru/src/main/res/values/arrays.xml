@@ -50,10 +50,8 @@
     </string-array>
 
     <string-array name="post_limit">
-        <item>20</item>
-        <item>30</item>
+        <item>40</item>
         <item>@string/post_limit_default</item>
-        <item>50</item>
         <item>60</item>
         <item>70</item>
         <item>80</item>
@@ -62,8 +60,6 @@
     </string-array>
 
     <string-array name="post_limit_values">
-        <item>20</item>
-        <item>30</item>
         <item>40</item>
         <item>50</item>
         <item>60</item>

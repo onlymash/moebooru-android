@@ -7,6 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.Url
 
 interface PostService {
+
     @GET
     fun getPosts(@Url url: HttpUrl): Flowable<MutableList<Post>>
 }

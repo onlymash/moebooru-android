@@ -39,7 +39,7 @@ class FitWindowFrameLayout : FrameLayout {
                 ViewCompat.requestApplyInsets(this@FitWindowFrameLayout)
             }
         })
-        ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(this) { _, insets ->
             val childCount = childCount
             for (index in 0 until childCount) {
                 ViewCompat.dispatchApplyWindowInsets(getChildAt(index), WindowInsetsCompat(insets))

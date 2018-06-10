@@ -19,7 +19,11 @@ class PostRepository(private val local: PostDataContract.Local,
     }
 
     //Need to perform a remoteFetch or not?
-    var remoteFetch = true
+    private var remoteFetch = true
+
+    private var notMore = false
+
+    override fun isNotMore(): Boolean = notMore
 
     override val postFetchOutcome: PublishSubject<Outcome<MutableList<Post>>> = PublishSubject.create<Outcome<MutableList<Post>>>()
 
@@ -41,6 +45,7 @@ class PostRepository(private val local: PostDataContract.Local,
     }
 
     override fun refreshPosts(httpUrl: HttpUrl) {
+        notMore = false
         postFetchOutcome.loading(true)
         remote.getPosts(httpUrl)
                 .performOnBackOutOnMain(scheduler)
@@ -55,16 +60,26 @@ class PostRepository(private val local: PostDataContract.Local,
     }
 
     override fun loadMorePosts(httpUrl: HttpUrl) {
+        if (notMore) {
+            return
+        }
         postFetchOutcome.loading(true)
         remote.getPosts(httpUrl)
         remote.getPosts(httpUrl)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe(
                         { posts ->
-                            posts.forEach { post ->
-                                post.site = httpUrl.host()
+                            val limit = httpUrl.queryParameter("limit")!!.toInt()
+                            val size = posts.size
+                            if (size > 0) {
+                                posts.forEach { post ->
+                                    post.site = httpUrl.host()
+                                }
+                                local.addPosts(posts)
                             }
-                            local.addPosts(posts)
+                            if (size < limit) {
+                                notMore = true
+                            }
                         },
                         { error -> handleError(error) })
     }
@@ -72,5 +87,4 @@ class PostRepository(private val local: PostDataContract.Local,
     override fun handleError(error: Throwable) {
         postFetchOutcome.failed(error)
     }
-
 }

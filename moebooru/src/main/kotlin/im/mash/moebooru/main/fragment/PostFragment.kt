@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
@@ -33,7 +34,7 @@ import okhttp3.HttpUrl
 import java.io.IOException
 
 @SuppressLint("RtlHardcoded")
-class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
+class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChangeListener, SwipeRefreshLayout.OnRefreshListener {
 
     companion object {
         private const val TAG = "PostFragment"
@@ -55,7 +56,12 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     private var loading = true
     private var loadingMore = false
-    private var notMore = false
+    private var notiNotMore = true
+    private var limit = 50
+
+    private var paddingBottom = 0
+
+    private val mainActivity by lazy { activity as MainActivity }
 
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -65,15 +71,15 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val activity = activity as MainActivity
-        view.setBackgroundColor(ContextCompat.getColor(activity, R.color.window_background))
+        coreComponent.sharedPreferences().registerOnSharedPreferenceChangeListener(this)
+        view.setBackgroundColor(ContextCompat.getColor(mainActivity, R.color.window_background))
         initToolbar()
         initRightDrawer(view)
         initDrawerListener()
-        spanCount = activity.screenWidth/activity.resources.getDimension(R.dimen.item_width).toInt()
+        spanCount = mainActivity.screenWidth/mainActivity.resources.getDimension(R.dimen.item_width).toInt()
+        limit = app.settings.postLimitInt
         initRefresh(view)
         initPostList(view)
-        coreComponent.sharedPreferences().registerOnSharedPreferenceChangeListener(this)
     }
 
     private fun initRefresh(view: View) {
@@ -86,15 +92,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 R.color.orange,
                 R.color.red
         )
-        refreshLayout.setOnRefreshListener {
-            if (!loading && !loadingMore) {
-                refreshLayout.isRefreshing = true
-                loading = true
-                notMore = false
-                page = 1
-                (activity as MainActivity).postViewModel.refreshPosts(getHttpUrl())
-            }
-        }
+        refreshLayout.setOnRefreshListener(this)
     }
 
     private fun getHttpUrl(): HttpUrl {
@@ -102,8 +100,9 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 .scheme(app.settings.activeProfileScheme)
                 .host(app.settings.activeProfileHost)
                 .addPathSegment("post.json")
-                .addQueryParameter("limit", app.settings.postLimitInt.toString())
+                .addQueryParameter("limit", limit.toString())
                 .addQueryParameter("page", page.toString())
+                .addQueryParameter("tags", "")
                 .build()
     }
 
@@ -147,18 +146,15 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     }
                 }))
 
-
-        val activity = activity as MainActivity
-
-        activity.postViewModel.postsOutcome.observe(this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
+        mainActivity.postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
             when (outcome) {
                 is Outcome.Progress -> {
                     Log.i(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    Log.i(TAG, "postViewModel Outcome.Success")
                     refreshLayout.isRefreshing = false
                     val data = outcome.data
+                    Log.i(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
                     when (true) {
                         loading -> {
                             if (posts.size > 0 && posts.size == data.size && data[0].id == posts[0].id) {
@@ -171,56 +167,28 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                             }
                         }
                         loadingMore -> {
-                            when (data.size > posts.size) {
-                                true -> {
-                                    posts = data
-                                    postAdapter.addData(posts)
-                                    notMore = false
-                                }
-                                else -> {
-                                    notMore = true
-                                }
-                            }
+                            posts = data
+                            postAdapter.addData(posts)
                             loadingMore = false
                         }
                     }
+                    Log.i(TAG, " mainActivity.postViewModel.notMore: " + mainActivity.postViewModel.isNotMore().toString())
                 }
                 is Outcome.Failure -> {
                     refreshLayout.isRefreshing = false
                     loading = false
                     loadingMore = false
-                    notMore = false
                     if (outcome.e is IOException) {
                         outcome.e.printStackTrace()
-                    } else {
-                        Log.i(TAG, "postViewModel Outcome.Failure")
                     }
+                    Log.i(TAG, "postViewModel Outcome.Failure")
                 }
             }
         })
 
         refreshLayout.isRefreshing = true
-        activity.postViewModel.loadPosts(getHttpUrl())
-//
-//        activity.tagViewModel.tagOutcome.observe(this, Observer<Outcome<MutableList<Tag>>> { outcome: Outcome<MutableList<Tag>>? ->
-//            when (outcome) {
-//                is Outcome.Progress -> {
-//                    Log.i(TAG, "tagViewModel Outcome.Progress")
-//                }
-//                is Outcome.Success -> {
-//                    Log.i(TAG, "tagViewModel Outcome.Success")
-//                }
-//                is Outcome.Failure -> {
-//                    if (outcome.e is IOException) {
-//                        outcome.e.printStackTrace()
-//                    } else {
-//                        Log.i(TAG, "tagViewModel Outcome.Failure")
-//                    }
-//                }
-//            }
-//        })
-//
-//        activity.tagViewModel.loadTags(httpUrl.host())
+        mainActivity.postViewModel.loadPosts(getHttpUrl())
+
     }
 
     private fun initDrawerListener() {
@@ -241,7 +209,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
             }
         }
-        (activity as MainActivity).drawer.drawerLayout.addDrawerListener(drawerListener)
+        mainActivity.drawer.drawerLayout.addDrawerListener(drawerListener)
     }
 
     private fun initToolbar() {
@@ -295,7 +263,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         drawerAppBarLayout.addView(drawerToolbar)
         ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) {_, insets ->
             val paddingTop = insets.systemWindowInsetTop
-            val paddingBottom = insets.systemWindowInsetBottom
+            paddingBottom = insets.systemWindowInsetBottom
             val toolbarHeight = this.requireContext().toolbarHeight
             drawerViewLayout.setPadding(0, 0, 0, paddingBottom)
             drawerToolbar.setPadding(0, paddingTop, 0, 0)
@@ -305,15 +273,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             insets
         }
 
-    }
-
-    private fun loadMoreData() {
-        if (!loading && !loadingMore && !notMore) {
-            refreshLayout.isRefreshing = true
-            loadingMore = true
-            page = posts.size/app.settings.postLimitInt + 1
-            (activity as MainActivity).postViewModel.loadMorePosts(getHttpUrl())
-        }
     }
 
     private fun closeRightDrawer() {
@@ -351,17 +310,53 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             Settings.ACTIVE_PROFILE_HOST -> {
                 posts.clear()
                 postAdapter.updateData(posts)
-                refreshLayout.isRefreshing = true
-                loading = true
-                notMore = false
-                (activity as MainActivity).postViewModel.reLoadPosts(getHttpUrl())
+                loadData()
             }
+            Settings.POST_LIMIT -> {
+                limit = app.settings.postLimitInt
+            }
+        }
+    }
+
+    override fun onRefresh() {
+        if (!loading && !loadingMore) {
+            refreshLayout.isRefreshing = true
+            loading = true
+            notiNotMore = true
+            page = 1
+            mainActivity.postViewModel.refreshPosts(getHttpUrl())
+        }
+    }
+
+    private fun loadData() {
+        if (!loadingMore && !loading) {
+            refreshLayout.isRefreshing = true
+            loading = true
+            notiNotMore = true
+            mainActivity.postViewModel.reLoadPosts(getHttpUrl())
+        }
+    }
+
+    private fun loadMoreData() {
+        val isNotMore = mainActivity.postViewModel.isNotMore()
+        if (!loading && !loadingMore && !isNotMore) {
+            Log.i(TAG, "loadMoreData()")
+            refreshLayout.isRefreshing = true
+            loadingMore = true
+            page = posts.size/(limit-1) + 1
+            mainActivity.postViewModel.loadMorePosts(getHttpUrl())
+        }
+        if (isNotMore && notiNotMore) {
+            notiNotMore = false
+            val snackbar: Snackbar = Snackbar.make(this.view!!, "Not more data.", Snackbar.LENGTH_SHORT)
+            snackbar.view.setPadding(0, 0, 0, paddingBottom)
+            snackbar.show()
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        (activity as MainActivity).drawer.drawerLayout.removeDrawerListener(drawerListener)
+        mainActivity.drawer.drawerLayout.removeDrawerListener(drawerListener)
         coreComponent.sharedPreferences().unregisterOnSharedPreferenceChangeListener(this)
     }
 }

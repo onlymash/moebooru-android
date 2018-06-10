@@ -13,7 +13,6 @@ package im.mash.moebooru.glide
 
 import android.content.Context
 import com.bumptech.glide.Glide
-
 import com.bumptech.glide.GlideBuilder
 import com.bumptech.glide.Registry
 import com.bumptech.glide.annotation.GlideModule
@@ -24,15 +23,15 @@ import com.bumptech.glide.load.engine.cache.LruResourceCache
 import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.module.AppGlideModule
 import com.bumptech.glide.request.RequestOptions
-import okhttp3.OkHttpClient
+import im.mash.moebooru.App.Companion.app
+import im.mash.moebooru.App.Companion.coreComponent
 import java.io.InputStream
-import java.util.concurrent.TimeUnit
 
 @GlideModule
 class MoeGlideModule : AppGlideModule() {
     override fun applyOptions(context: Context, builder: GlideBuilder) {
-        val memoryCacheSizeBytes: Int = 1024 * 1024 * 256
-        val diskCacheSizeBytes: Int = 1024 * 1024 * 256
+        val memoryCacheSizeBytes: Int = 1024 * 1024 * app.settings.cacheMemoryInt
+        val diskCacheSizeBytes: Int = 1024 * 1024 * app.settings.cacheDiskInt
         builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes.toLong()))
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
         builder.setDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
@@ -40,10 +39,7 @@ class MoeGlideModule : AppGlideModule() {
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {
 
-        val client = OkHttpClient.Builder()
-                .readTimeout(20, TimeUnit.SECONDS)
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .build()
+        val client = coreComponent.httpClient()
 
         val factory = OkHttpUrlLoader.Factory(client)
 

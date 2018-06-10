@@ -2,7 +2,6 @@ package im.mash.moebooru.main.viewmodel
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
-import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.extensions.toLiveData
 import im.mash.moebooru.core.network.Outcome
@@ -16,6 +15,10 @@ class PostViewModel(private val repo: PostDataContract.Repository,
     val postsOutcome: LiveData<Outcome<MutableList<Post>>> by lazy {
         //Convert publish subject to livedata
         repo.postFetchOutcome.toLiveData(compositeDisposable)
+    }
+
+    fun isNotMore(): Boolean {
+        return repo.isNotMore()
     }
 
     fun loadPosts(httpUrl: HttpUrl) {

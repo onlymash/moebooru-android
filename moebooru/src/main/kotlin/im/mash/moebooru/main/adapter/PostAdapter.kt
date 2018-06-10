@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.bumptech.glide.load.model.GlideUrl
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.data.local.entity.Post
@@ -19,7 +18,6 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
         private const val TAG = "PostAdapter"
     }
 
-    private val header = context.glideHeader
     private var posts = mutableListOf<Post>()
     private var spanCount = context.screenWidth/context.resources.getDimension(R.dimen.item_width).toInt()
     private val padding = context.resources.getDimension(R.dimen.item_padding).toInt()
@@ -64,7 +62,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
             Settings.GRID_MODE_GRID -> {
                 holder.fixedImageView.setWidthAndHeightWeight(1, 1)
                 GlideApp.with(context)
-                        .load(GlideUrl(posts[position].preview_url, header))
+                        .load(posts[position].preview_url)
                         .centerCrop()
                         .placeholder(placeHolderId)
                         .into(holder.fixedImageView)
@@ -72,7 +70,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
             else -> {
                 holder.fixedImageView.setWidthAndHeightWeight(posts[position].width, posts[position].height)
                 GlideApp.with(context)
-                        .load(GlideUrl(posts[position].preview_url, header))
+                        .load(posts[position].preview_url)
                         .fitCenter()
                         .placeholder(placeHolderId)
                         .into(holder.fixedImageView)
