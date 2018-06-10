@@ -25,9 +25,11 @@ import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.PostAdapter
 import im.mash.moebooru.main.adapter.TagsDrawerAdapter
+import im.mash.moebooru.main.viewmodel.PostViewModel
 import im.mash.moebooru.util.screenWidth
 import im.mash.moebooru.util.toolbarHeight
 import okhttp3.HttpUrl
@@ -60,8 +62,10 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private var limit = 50
 
     private var paddingBottom = 0
-
+    
     private val mainActivity by lazy { activity as MainActivity }
+    
+    private val postViewModel: PostViewModel by lazy { this.getViewModel<PostViewModel>(mainActivity.postViewModelFactory) }
 
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -80,7 +84,15 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         limit = app.settings.postLimitInt
         initRefresh(view)
         initPostList(view)
-        mainActivity.postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
+        observePosts()
+        if (savedInstanceState == null) {
+            refreshLayout.isRefreshing = true
+            postViewModel.loadPosts(getHttpUrl())
+        }
+    }
+
+    private fun observePosts() {
+        postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
             when (outcome) {
                 is Outcome.Progress -> {
                     Log.i(TAG, "postViewModel Outcome.Progress")
@@ -109,10 +121,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 }
             }
         })
-        if (savedInstanceState == null) {
-            refreshLayout.isRefreshing = true
-            mainActivity.postViewModel.loadPosts(getHttpUrl())
-        }
     }
 
     private fun initRefresh(view: View) {
@@ -130,7 +138,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 notiNotMore = true
                 page = 1
                 refreshing = true
-                mainActivity.postViewModel.refreshPosts(getHttpUrl())
+                postViewModel.refreshPosts(getHttpUrl())
             }
         }
     }
@@ -307,6 +315,9 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 posts.clear()
                 postAdapter.clearData()
 //                loadData()
+                mainActivity.supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_moebooru, PostFragment())
+                        .commitAllowingStateLoss()
             }
             Settings.POST_LIMIT -> {
                 limit = app.settings.postLimitInt
@@ -318,18 +329,18 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         if (!loadingMore && !refreshLayout.isRefreshing) {
             refreshLayout.isRefreshing = true
             notiNotMore = true
-            mainActivity.postViewModel.reLoadPosts(getHttpUrl())
+            postViewModel.reLoadPosts(getHttpUrl())
         }
     }
 
     private fun loadMoreData() {
-        val isNotMore = mainActivity.postViewModel.isNotMore()
+        val isNotMore = postViewModel.isNotMore()
         if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
             Log.i(TAG, "loadMoreData()")
             refreshLayout.isRefreshing = true
             loadingMore = true
             page = posts.size/(limit-1) + 1
-            mainActivity.postViewModel.loadMorePosts(getHttpUrl())
+            postViewModel.loadMorePosts(getHttpUrl())
         }
         if (isNotMore && notiNotMore) {
             notiNotMore = false

@@ -84,11 +84,9 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     @Inject
     lateinit var postViewModelFactory: PostViewModelFactory
-    internal val postViewModel: PostViewModel by lazy { this.getViewModel<PostViewModel>(postViewModelFactory) }
 
     @Inject
     lateinit var tagViewModelFactory: TagViewModelFactory
-    internal val tagViewModel: TagViewModel by lazy { this.getViewModel<TagViewModel>(tagViewModelFactory) }
 
     internal var boorus: MutableList<Booru> = mutableListOf()
 
