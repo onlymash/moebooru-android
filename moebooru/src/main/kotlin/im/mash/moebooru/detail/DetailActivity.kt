@@ -1,19 +1,51 @@
 package im.mash.moebooru.detail
 
 import android.annotation.SuppressLint
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import im.mash.moebooru.R
+import im.mash.moebooru.common.MoeDH
+import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.application.SlidingActivity
+import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.detail.viewmodel.DetailViewModel
+import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
+import im.mash.moebooru.helper.getViewModel
+import javax.inject.Inject
 
 class DetailActivity : SlidingActivity() {
+
+    companion object {
+        private const val TAG = "DetailActivity"
+    }
+
+    private val component by lazy { MoeDH.detailComponent() }
+
+    @Inject
+    lateinit var detailViewModelFactory: DetailViewModelFactory
+    private val detailViewModel: DetailViewModel by lazy { this.getViewModel<DetailViewModel>(detailViewModelFactory) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
+        component.inject(this)
         initView()
+        detailViewModel.postOutcome.observe(this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
+            when (outcome) {
+                is Outcome.Progress -> {
+
+                }
+                is Outcome.Success -> {
+
+                }
+                is Outcome.Failure -> {
+
+                }
+            }
+        })
     }
 
     @SuppressLint("InflateParams")
