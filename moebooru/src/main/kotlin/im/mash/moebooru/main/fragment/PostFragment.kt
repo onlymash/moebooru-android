@@ -157,14 +157,12 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     Log.i(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
                     when (true) {
                         loading -> {
-                            if (posts.size > 0 && posts.size == data.size && data[0].id == posts[0].id) {
-                                loading = false
-                            } else {
+                            if (!(posts.size > 0 && posts.size == data.size && data[0].id == posts[0].id)) {
                                 posts = data
                                 postAdapter.updateData(mutableListOf())
                                 postAdapter.updateData(posts)
-                                loading = false
                             }
+                            loading = false
                         }
                         loadingMore -> {
                             posts = data

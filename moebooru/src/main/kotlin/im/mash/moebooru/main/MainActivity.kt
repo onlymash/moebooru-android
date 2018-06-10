@@ -205,6 +205,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                         header.setActiveProfile(activeProfileId)
                         app.settings.activeProfileScheme = boorus[activeProfileId.toInt()].scheme
                         app.settings.activeProfileHost = boorus[activeProfileId.toInt()].host
+                        displayFragment(PostFragment())
                     }
                 }
                 is Outcome.Failure -> {
@@ -222,7 +223,9 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         booruViewModel.loadBoorus()
 
         if (savedInstanceState == null) {
-            displayFragment(PostFragment())
+            if (boorus.size > 0) {
+
+            }
         } else {
             if (app.settings.isChangedNightMode) {
                 drawer.setSelection(DRAWER_ITEM_SETTINGS)

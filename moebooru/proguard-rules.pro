@@ -25,22 +25,12 @@
 -dontwarn okio.**
 -dontwarn org.conscrypt.**
 
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep public class * extends com.bumptech.glide.module.AppGlideModule
--keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
-  **[] $VALUES;
-  public *;
-}
-
 # This is for Kotlin
 -dontwarn kotlin.**
 
 # Gson uses generic type information stored in a class file when working with fields. Proguard
 # removes such information by default, so configure it to keep all of it.
--keepattributes Signature
-
-# For using GSON @Expose annotation
--keepattributes *Annotation*
+-keepattributes Signature, *Annotation*, Exceptions
 
 # Gson specific classes
 -dontwarn sun.misc.**
@@ -52,14 +42,31 @@
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
 
--keep class org.jetbrains.anko.** { *; }
--keep interface org.jetbrains.anko.** { *; }
--keepclassmembers class org.jetbrains.anko.** { *; }
--dontwarn org.jetbrains.anko.**
+-keepclasseswithmembers class * {
+    @retrofit.http.* <methods>;
+}
+
+# Retain service method parameters.
+-keepclassmembernames,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+# Ignore annotation used for build tooling.
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+
+-keep class android.arch.persistence.room.** { *; }
+
+-keep public class * implements com.bumptech.glide.module.GlideModule
+-keep public class * extends com.bumptech.glide.module.AppGlideModule
+-keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
+  **[] $VALUES;
+  public *;
+}
+
+# This is for Kotlin
+-dontwarn kotlin.**
 
 # Application classes
--keep class im.mash.moebooru.model.** { *; }
--keep class im.mash.moebooru.database.** { *; }
+-keep class im.mash.moebooru.common.data.** { *; }
 
 -dontwarn com.liulishuo.okdownload.**
 
@@ -77,4 +84,3 @@
         public com.liulishuo.okdownload.core.breakpoint.BreakpointStoreOnSQLite(android.content.Context);
 }
 # ------- end com.liulishuo.okdownload:sqlite proguard rules ----
-
