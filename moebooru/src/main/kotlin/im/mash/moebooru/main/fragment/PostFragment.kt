@@ -189,6 +189,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 object : RecyclerViewClickListener.OnItemClickListener {
                     override fun onItemClick(itemView: View?, position: Int) {
                         val intent = Intent(mainActivity, DetailActivity::class.java)
+                        intent.putExtra("tags", "")
                         startActivity(intent)
                     }
 
