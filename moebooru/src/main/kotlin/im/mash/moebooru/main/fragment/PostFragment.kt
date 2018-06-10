@@ -2,6 +2,7 @@ package im.mash.moebooru.main.fragment
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
@@ -25,6 +26,7 @@ import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.PostAdapter
@@ -186,7 +188,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postView.addOnItemTouchListener(RecyclerViewClickListener(this.requireContext(),
                 object : RecyclerViewClickListener.OnItemClickListener {
                     override fun onItemClick(itemView: View?, position: Int) {
-
+                        val intent = Intent(mainActivity, DetailActivity::class.java)
+                        startActivity(intent)
                     }
 
                     override fun onItemLongClick(itemView: View?, position: Int) {
