@@ -20,6 +20,8 @@ import im.mash.moebooru.detail.fragment.InfoFragment
 import im.mash.moebooru.detail.fragment.PagerFragment
 import im.mash.moebooru.detail.viewmodel.DetailViewModel
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
+import im.mash.moebooru.detail.viewmodel.PositionViewModel
+import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.helper.getViewModel
 import javax.inject.Inject
 
@@ -41,12 +43,24 @@ class DetailActivity : SlidingActivity() {
     lateinit var detailViewModelFactory: DetailViewModelFactory
     private val detailViewModel: DetailViewModel by lazy { this.getViewModel<DetailViewModel>(detailViewModelFactory) }
 
+    @Inject
+    lateinit var positionViewModelFactory: PositionViewModelFactory
+    internal val positionViewModel: PositionViewModel by lazy { this.getViewModel<PositionViewModel>(positionViewModelFactory) }
+
+    internal var posts: MutableList<Post> = mutableListOf()
+    internal var postsSearch: MutableList<PostSearch> = mutableListOf()
+
+    internal var type = "post"
+    internal var position = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         component.inject(this)
         initView()
         val tags = intent.extras["tags"].toString()
+        position = intent.extras["position"].toString().toInt()
+        positionViewModel.setPosition(position)
         initViewModel(tags)
     }
 
@@ -80,14 +94,14 @@ class DetailActivity : SlidingActivity() {
 
     private fun initViewModel(tags: String) {
         if (tags == "") {
-            Log.i(TAG, "tags == \"\"")
+            type = "post"
             detailViewModel.postOutcome.observe(this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
                 when (outcome) {
                     is Outcome.Progress -> {
 
                     }
                     is Outcome.Success -> {
-                        val data = outcome.data
+                        posts = outcome.data
                         initDetailPager()
                     }
                     is Outcome.Failure -> {
@@ -97,12 +111,14 @@ class DetailActivity : SlidingActivity() {
             })
             detailViewModel.loadPosts(app.settings.activeProfileHost)
         } else {
+            type = "search"
             detailViewModel.postSearchOutcome.observe(this, Observer<Outcome<MutableList<PostSearch>>> { outcome: Outcome<MutableList<PostSearch>>? ->
                 when (outcome) {
                     is Outcome.Progress -> {
 
                     }
                     is Outcome.Success -> {
+                        postsSearch = outcome.data
                         initDetailPager()
                     }
                     is Outcome.Failure -> {

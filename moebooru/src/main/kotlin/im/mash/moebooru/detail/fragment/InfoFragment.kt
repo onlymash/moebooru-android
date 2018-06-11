@@ -1,7 +1,10 @@
 package im.mash.moebooru.detail.fragment
 
+import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.format.DateFormat
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +13,11 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import im.mash.moebooru.R
+import im.mash.moebooru.common.data.local.entity.Post
+import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.util.toolbarHeight
+import java.util.*
 
 
 class InfoFragment : Fragment() {
@@ -51,6 +57,10 @@ class InfoFragment : Fragment() {
 
     private val detailActivity by lazy { activity as DetailActivity }
 
+    private var type = "post"
+    private var post: Post? = null
+    private var postSearch: PostSearch? = null
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_details_info, container, false)
     }
@@ -58,6 +68,80 @@ class InfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView(view)
+        initInfo(detailActivity.position)
+        type = detailActivity.type
+        detailActivity.positionViewModel.getPosition().observe(this, Observer { position ->
+            if (position != null) {
+                initInfo(position)
+            }
+        })
+    }
+
+    private fun initInfo(position: Int) {
+        when (type) {
+            "post" -> {
+                post = detailActivity.posts[position]
+                if (post == null) {
+                    return
+                }
+                id.text = post!!.id.toString()
+                author.text = post!!.author
+                val cal = Calendar.getInstance(Locale.getDefault())
+                cal.timeInMillis = (post!!.created_at * 1000).toLong()
+                createdAt.text = DateFormat.format("yyyy-MM-dd HH:mm", cal)
+                creatorId.text = post!!.creator_id.toString()
+                val hw = "${post!!.height} x ${post!!.width}"
+                heightWidth.text = hw
+                if (post!!.source != null) {
+                    source.text = post!!.source
+                } else {
+                    source.text = ""
+                }
+                rating.text = post!!.rating
+                score.text = post!!.score.toString()
+                if (post!!.parent_id != null) {
+                    parentIdLayout.visibility = View.VISIBLE
+                } else {
+                    parentIdLayout.visibility = View.GONE
+                }
+                sampleSize.text = Formatter.formatFileSize(detailActivity, post!!.sample_file_size.toLong())
+
+                largerSize.text = Formatter.formatFileSize(detailActivity, post!!.jpeg_file_size.toLong())
+
+                originSize.text = Formatter.formatFileSize(detailActivity, post!!.file_size.toLong())
+            }
+            else -> {
+                postSearch = detailActivity.postsSearch[position]
+                if (postSearch == null) {
+                    return
+                }
+                id.text = postSearch!!.id.toString()
+                author.text = postSearch!!.author
+                val cal = Calendar.getInstance(Locale.getDefault())
+                cal.timeInMillis = (postSearch!!.created_at * 1000).toLong()
+                createdAt.text = DateFormat.format("yyyy-MM-dd HH:mm", cal)
+                creatorId.text = postSearch!!.creator_id.toString()
+                val hw = "${postSearch!!.height} x ${postSearch!!.width}"
+                heightWidth.text = hw
+                if (postSearch!!.source != null) {
+                    source.text = postSearch!!.source
+                } else {
+                    source.text = ""
+                }
+                rating.text = postSearch!!.rating
+                score.text = postSearch!!.score.toString()
+                if (postSearch!!.parent_id != null) {
+                    parentIdLayout.visibility = View.VISIBLE
+                } else {
+                    parentIdLayout.visibility = View.GONE
+                }
+                sampleSize.text = Formatter.formatFileSize(detailActivity, postSearch!!.sample_file_size.toLong())
+
+                largerSize.text = Formatter.formatFileSize(detailActivity, postSearch!!.jpeg_file_size.toLong())
+
+                originSize.text = Formatter.formatFileSize(detailActivity, postSearch!!.file_size.toLong())
+            }
+        }
     }
 
     private fun initView(view: View) {

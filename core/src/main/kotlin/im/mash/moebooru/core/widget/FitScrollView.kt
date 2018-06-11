@@ -38,13 +38,10 @@ class FitScrollView : ScrollView {
         when (ev?.action) {
             MotionEvent.ACTION_DOWN -> lastY = ev.y
             MotionEvent.ACTION_MOVE -> {
-                if ((ev.y - lastY) < 0 && isScrolledToBottom) {
-                    return false
-                }
-                if ((ev.y - lastY) > 0 && isScrolledToTop) {
-                    return false
-                }
-                if (!canScroll()) {
+                if (((ev.y - lastY) < 0 && isScrolledToBottom) ||
+                        ((ev.y - lastY) > 0 && isScrolledToTop) || !canScroll()) {
+
+                    requestDisallowInterceptTouchEvent(false)
                     return false
                 }
             }

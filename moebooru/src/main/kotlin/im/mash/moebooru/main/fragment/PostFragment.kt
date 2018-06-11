@@ -190,6 +190,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     override fun onItemClick(itemView: View?, position: Int) {
                         val intent = Intent(mainActivity, DetailActivity::class.java)
                         intent.putExtra("tags", "")
+                        intent.putExtra("position", position)
                         startActivity(intent)
                     }
 

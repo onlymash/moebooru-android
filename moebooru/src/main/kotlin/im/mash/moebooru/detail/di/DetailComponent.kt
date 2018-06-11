@@ -10,6 +10,7 @@ import im.mash.moebooru.detail.model.DetailDataContract
 import im.mash.moebooru.detail.model.DetailLocalData
 import im.mash.moebooru.detail.model.DetailRepository
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
+import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.main.di.MainComponent
 import io.reactivex.disposables.CompositeDisposable
 
@@ -40,4 +41,8 @@ class DetailModule {
     @Provides
     @DetailScope
     fun compositeDisposable(): CompositeDisposable = CompositeDisposable()
+
+    @Provides
+    @DetailScope
+    fun positionViewModelFactory(): PositionViewModelFactory = PositionViewModelFactory()
 }
