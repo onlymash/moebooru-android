@@ -4,7 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
-import  im.mash.moebooru.core.network.Outcome
+import  im.mash.moebooru.core.scheduler.Outcome
 
 /**
  * Created by karn on 18/1/18.

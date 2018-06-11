@@ -6,8 +6,8 @@ import im.mash.moebooru.core.extensions.failed
 import im.mash.moebooru.core.extensions.loading
 import im.mash.moebooru.core.extensions.performOnBackOutOnMain
 import im.mash.moebooru.core.extensions.success
-import im.mash.moebooru.core.network.Outcome
-import im.mash.moebooru.core.network.Scheduler
+import im.mash.moebooru.core.scheduler.Outcome
+import im.mash.moebooru.core.scheduler.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 

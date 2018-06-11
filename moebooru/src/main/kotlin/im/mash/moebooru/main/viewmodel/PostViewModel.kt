@@ -5,7 +5,7 @@ import android.arch.lifecycle.ViewModel
 import android.util.Log
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.extensions.toLiveData
-import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.main.model.PostDataContract
 import io.reactivex.disposables.CompositeDisposable
 import okhttp3.HttpUrl

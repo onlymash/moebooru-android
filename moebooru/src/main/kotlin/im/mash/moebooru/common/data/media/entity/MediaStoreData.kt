@@ -1,4 +1,4 @@
-package im.mash.moebooru.common.model
+package im.mash.moebooru.common.data.media.entity
 
 import android.net.Uri
 import android.os.Parcel

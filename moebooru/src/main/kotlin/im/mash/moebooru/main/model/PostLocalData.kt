@@ -4,7 +4,7 @@ package im.mash.moebooru.main.model
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.extensions.performOnBack
-import im.mash.moebooru.core.network.Scheduler
+import im.mash.moebooru.core.scheduler.Scheduler
 import io.reactivex.Completable
 import io.reactivex.Flowable
 

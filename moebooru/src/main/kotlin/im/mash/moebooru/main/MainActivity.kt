@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.support.customtabs.CustomTabsIntent
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -32,14 +33,17 @@ import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Booru
+import im.mash.moebooru.common.data.media.entity.MediaStoreData
 import im.mash.moebooru.core.application.BaseActivity
-import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.widget.TextDrawable
 import im.mash.moebooru.main.fragment.PostFragment
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.fragment.AboutFragment
 import im.mash.moebooru.main.fragment.SettingsFragment
 import im.mash.moebooru.main.viewmodel.*
+import im.mash.moebooru.util.mayRequestStoragePermission
+import java.io.File
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -84,9 +88,11 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     @Inject
     lateinit var postViewModelFactory: PostViewModelFactory
-
     @Inject
     lateinit var tagViewModelFactory: TagViewModelFactory
+    @Inject
+    lateinit var mediaViewModelFactory: MediaViewModelFactory
+    internal val mediaViewModel: MediaViewModel by lazy { this.getViewModel<MediaViewModel>(mediaViewModelFactory) }
 
     internal var boorus: MutableList<Booru> = mutableListOf()
 
@@ -225,6 +231,27 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         if (savedInstanceState != null && app.settings.isChangedNightMode) {
             drawer.setSelection(DRAWER_ITEM_SETTINGS)
             app.settings.isChangedNightMode = false
+        }
+
+        mediaViewModel.mediaOutcome.observe(this, Observer<Outcome<MutableList<MediaStoreData>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {
+                    Log.i(TAG, "Media Outcome.Progress")
+                }
+                is Outcome.Success -> {
+                    Log.i(TAG, "Media Outcome.Success. Data size: ${outcome.data.size}")
+                }
+                is Outcome.Failure -> {
+                    if (outcome.e is IOException) {
+                        outcome.e.printStackTrace()
+                    }
+                    Log.i(TAG, "Media Outcome.Failure")
+                }
+            }
+        })
+        val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Moebooru")
+        if (mayRequestStoragePermission(this, 0)) {
+            mediaViewModel.loadMedia(dir.absolutePath)
         }
     }
 

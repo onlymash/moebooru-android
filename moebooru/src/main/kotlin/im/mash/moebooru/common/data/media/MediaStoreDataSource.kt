@@ -1,17 +1,12 @@
-package im.mash.moebooru.loader
+package im.mash.moebooru.common.data.media
 
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.v4.content.AsyncTaskLoader
-import im.mash.moebooru.common.model.MediaStoreData
-import kotlin.Comparator
+import im.mash.moebooru.common.data.media.entity.MediaStoreData
+import io.reactivex.Flowable
 
-
-/**
- * Loads metadata from the media store for images and videos.
- */
-class MediaStoreDataLoader internal constructor(context: Context, private val path: String) : AsyncTaskLoader<MutableList<MediaStoreData>>(context) {
+class MediaStoreDataSource(private val context: Context) {
 
     companion object {
         private val IMAGE_PROJECTION = arrayOf(
@@ -29,46 +24,9 @@ class MediaStoreDataLoader internal constructor(context: Context, private val pa
                 "0 AS " + MediaStore.Images.ImageColumns.ORIENTATION)
     }
 
-    private var cached: MutableList<MediaStoreData>? = null
-    private var observerRegistered = false
-    private val forceLoadContentObserver = ForceLoadContentObserver()
-
-    override fun deliverResult(data: MutableList<MediaStoreData>?) {
-        if (!isReset && isStarted) {
-            super.deliverResult(data)
-        }
-    }
-
-    override fun onStartLoading() {
-        if (cached != null) {
-            deliverResult(cached)
-        }
-        if (takeContentChanged() || cached == null) {
-            forceLoad()
-        }
-        registerContentObserver()
-    }
-
-    override fun onStopLoading() {
-        cancelLoad()
-    }
-
-    override fun onReset() {
-        super.onReset()
-
-        onStopLoading()
-        cached = null
-        unregisterContentObserver()
-    }
-
-    override fun onAbandon() {
-        super.onAbandon()
-        unregisterContentObserver()
-    }
-
-    override fun loadInBackground(): MutableList<MediaStoreData>? {
-        val data = queryImages()
-        data.addAll(queryVideos())
+    fun loadMediaData(path: String): Flowable<MutableList<MediaStoreData>> {
+        val data = queryImages(path)
+        data.addAll(queryVideos(path))
         data.sortWith(Comparator<MediaStoreData> { mediaStoreData, mediaStoreData2 ->
             when {
                 mediaStoreData.dateTaken < mediaStoreData2.dateTaken -> 1
@@ -76,10 +34,10 @@ class MediaStoreDataLoader internal constructor(context: Context, private val pa
                 else -> 0
             }
         })
-        return data
+        return Flowable.just(data)
     }
 
-    private fun queryImages(): MutableList<MediaStoreData> {
+    private fun queryImages(path: String): MutableList<MediaStoreData> {
         val selection = MediaStore.Images.Media.DATA + " like ?"
         val selectionArgs = arrayOf("$path%")
         return query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, IMAGE_PROJECTION,
@@ -89,7 +47,7 @@ class MediaStoreDataLoader internal constructor(context: Context, private val pa
                 MediaStoreData.Type.IMAGE, selection, selectionArgs)
     }
 
-    private fun queryVideos(): MutableList<MediaStoreData> {
+    private fun queryVideos(path: String): MutableList<MediaStoreData> {
         val selection = MediaStore.Video.Media.DATA + " like ?"
         val selectionArgs = arrayOf("$path%")
         return query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, VIDEO_PROJECTION,
@@ -127,25 +85,4 @@ class MediaStoreDataLoader internal constructor(context: Context, private val pa
 
         return data
     }
-
-    private fun registerContentObserver() {
-        if (!observerRegistered) {
-            val cr = context.contentResolver
-            cr.registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false,
-                    forceLoadContentObserver)
-            cr.registerContentObserver(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, false,
-                    forceLoadContentObserver)
-
-            observerRegistered = true
-        }
-    }
-
-    private fun unregisterContentObserver() {
-        if (observerRegistered) {
-            observerRegistered = false
-
-            context.contentResolver.unregisterContentObserver(forceLoadContentObserver)
-        }
-    }
 }
-

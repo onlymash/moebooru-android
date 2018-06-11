@@ -4,7 +4,7 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import im.mash.moebooru.common.data.local.entity.Tag
 import im.mash.moebooru.core.extensions.toLiveData
-import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.main.model.TagDataContract
 import io.reactivex.disposables.CompositeDisposable
 

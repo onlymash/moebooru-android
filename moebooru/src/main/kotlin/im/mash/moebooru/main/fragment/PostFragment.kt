@@ -25,7 +25,7 @@ import im.mash.moebooru.common.base.LastItemListener
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Post
-import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity

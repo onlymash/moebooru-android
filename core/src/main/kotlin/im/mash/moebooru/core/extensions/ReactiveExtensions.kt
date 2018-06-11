@@ -1,6 +1,6 @@
 package im.mash.moebooru.core.extensions
 
-import im.mash.moebooru.core.network.Scheduler
+import im.mash.moebooru.core.scheduler.Scheduler
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable

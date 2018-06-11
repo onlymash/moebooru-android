@@ -2,7 +2,7 @@ package im.mash.moebooru.detail.model
 
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostSearch
-import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.core.scheduler.Outcome
 import io.reactivex.Flowable
 import io.reactivex.subjects.PublishSubject
 

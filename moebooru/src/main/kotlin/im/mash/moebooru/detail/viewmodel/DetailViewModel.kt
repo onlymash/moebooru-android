@@ -6,7 +6,7 @@ import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.core.extensions.toLiveData
-import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.model.DetailDataContract
 import io.reactivex.disposables.CompositeDisposable
 

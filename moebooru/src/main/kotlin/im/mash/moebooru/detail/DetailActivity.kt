@@ -6,14 +6,13 @@ import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
-import android.util.Log
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.core.application.SlidingActivity
-import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.widget.VerticalViewPager
 import im.mash.moebooru.detail.adapter.DetailAdapter
 import im.mash.moebooru.detail.fragment.InfoFragment

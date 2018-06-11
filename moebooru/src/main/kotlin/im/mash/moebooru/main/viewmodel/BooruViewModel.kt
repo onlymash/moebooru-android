@@ -6,7 +6,7 @@ import android.util.Log
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Booru
 import im.mash.moebooru.core.extensions.toLiveData
-import im.mash.moebooru.core.network.Outcome
+import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.main.model.BooruDataContract
 import io.reactivex.disposables.CompositeDisposable
 

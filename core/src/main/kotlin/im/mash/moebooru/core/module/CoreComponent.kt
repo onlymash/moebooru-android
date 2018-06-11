@@ -4,7 +4,7 @@ package im.mash.moebooru.core.module
 import android.content.Context
 import android.content.SharedPreferences
 import dagger.Component
-import im.mash.moebooru.core.network.Scheduler
+import im.mash.moebooru.core.scheduler.Scheduler
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import javax.inject.Singleton

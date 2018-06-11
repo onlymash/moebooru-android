@@ -6,13 +6,15 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
+import im.mash.moebooru.common.data.media.MediaStoreDataSource
 import im.mash.moebooru.common.data.remote.PostService
 import im.mash.moebooru.core.constants.Constants
 import im.mash.moebooru.core.module.CoreComponent
-import im.mash.moebooru.core.network.Scheduler
+import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.model.*
 import im.mash.moebooru.main.viewmodel.BooruViewModelFactory
+import im.mash.moebooru.main.viewmodel.MediaViewModelFactory
 import im.mash.moebooru.main.viewmodel.PostViewModelFactory
 import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
@@ -26,6 +28,7 @@ interface MainComponent {
     fun database(): MoeDatabase
     fun postService(): PostService
     fun scheduler(): Scheduler
+    fun mediaStoreDataSource(): MediaStoreDataSource
     fun inject(mainActivity: MainActivity)
 }
 
@@ -99,4 +102,22 @@ class MainModule {
     @Provides
     @MainScope
     fun localTagData(database: MoeDatabase, scheduler: Scheduler): TagDataContract.Local = TagLocalData(database, scheduler)
+
+
+    @Provides
+    @MainScope
+    fun mediaStoreDataSource(context: Context): MediaStoreDataSource = MediaStoreDataSource(context)
+
+    /*MediaViewModel*/
+    @Provides
+    @MainScope
+    fun mediaViewModelFactory(repository: MediaDataContract.Repository,
+                             compositeDisposable: CompositeDisposable): MediaViewModelFactory
+            = MediaViewModelFactory(repository,compositeDisposable)
+
+    /*MediaRepository*/
+    @Provides
+    @MainScope
+    fun mediaRepo(source: MediaStoreDataSource, scheduler: Scheduler, compositeDisposable: CompositeDisposable): MediaDataContract.Repository
+            = MediaRepository(source, scheduler, compositeDisposable)
 }

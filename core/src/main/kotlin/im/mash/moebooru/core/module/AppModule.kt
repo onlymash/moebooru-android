@@ -3,8 +3,8 @@ package im.mash.moebooru.core.module
 import android.content.Context
 import dagger.Module
 import dagger.Provides
-import im.mash.moebooru.core.network.AppScheduler
-import im.mash.moebooru.core.network.Scheduler
+import im.mash.moebooru.core.scheduler.AppScheduler
+import im.mash.moebooru.core.scheduler.Scheduler
 import javax.inject.Singleton
 
 @Module

@@ -1,4 +1,4 @@
-package im.mash.moebooru.core.network
+package im.mash.moebooru.core.scheduler
 
 /**
  * Created by karn on 18/1/18.

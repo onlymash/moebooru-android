@@ -4,7 +4,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
-import im.mash.moebooru.core.network.Scheduler
+import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.detail.model.DetailDataContract
 import im.mash.moebooru.detail.model.DetailLocalData

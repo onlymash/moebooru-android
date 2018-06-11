@@ -3,8 +3,8 @@ package im.mash.moebooru.main.model
 import android.util.Log
 import im.mash.moebooru.common.data.local.entity.Tag
 import im.mash.moebooru.core.extensions.*
-import im.mash.moebooru.core.network.Outcome
-import im.mash.moebooru.core.network.Scheduler
+import im.mash.moebooru.core.scheduler.Outcome
+import im.mash.moebooru.core.scheduler.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
