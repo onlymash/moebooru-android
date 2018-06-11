@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import im.mash.moebooru.R
 import im.mash.moebooru.detail.DetailActivity
@@ -46,6 +47,8 @@ class InfoFragment : Fragment() {
     private lateinit var originSize: TextView
     private lateinit var originLayout: LinearLayout
 
+    private lateinit var scrollView: ScrollView
+
     private val detailActivity by lazy { activity as DetailActivity }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -55,11 +58,12 @@ class InfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView(view)
-        val padding = detailActivity.resources.getDimension(R.dimen.list_padding).toInt()
-        view.setPadding(padding, detailActivity.toolbarHeight + detailActivity.paddingTop + padding, padding, detailActivity.paddingBottom )
     }
 
     private fun initView(view: View) {
+        val padding = detailActivity.resources.getDimension(R.dimen.list_padding).toInt()
+        view.setPadding(padding, detailActivity.toolbarHeight + detailActivity.paddingTop + padding, padding, detailActivity.paddingBottom )
+
         id = view.findViewById(R.id.tv_id)
         author = view.findViewById(R.id.tv_author)
         createdAt = view.findViewById(R.id.tv_created_at)
@@ -85,5 +89,7 @@ class InfoFragment : Fragment() {
         originOpen = view.findViewById(R.id.btn_browser_origin)
         originSize = view.findViewById(R.id.tv_origin_size)
         originLayout = view.findViewById(R.id.origin_layout)
+
+        scrollView = view.findViewById(R.id.scroll_view)
     }
 }
