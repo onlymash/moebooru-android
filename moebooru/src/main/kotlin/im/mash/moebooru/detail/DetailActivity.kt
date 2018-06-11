@@ -18,6 +18,7 @@ import im.mash.moebooru.core.widget.VerticalViewPager
 import im.mash.moebooru.detail.adapter.DetailAdapter
 import im.mash.moebooru.detail.fragment.InfoFragment
 import im.mash.moebooru.detail.fragment.PagerFragment
+import im.mash.moebooru.detail.fragment.TagFragment
 import im.mash.moebooru.detail.viewmodel.DetailViewModel
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModel
@@ -86,7 +87,8 @@ class DetailActivity : SlidingActivity() {
     private fun initDetailPager() {
         detailAdapter = DetailAdapter(supportFragmentManager, mutableListOf(
                 InfoFragment(),
-                PagerFragment()
+                PagerFragment(),
+                TagFragment()
         ))
         detailPager.adapter = detailAdapter
         detailPager.currentItem = 1
