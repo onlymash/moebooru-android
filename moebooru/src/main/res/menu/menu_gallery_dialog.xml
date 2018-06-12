@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <item
+        android:id="@+id/action_share"
+        android:title="@string/share"
+        android:icon="@drawable/ic_action_share_24dp"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+    <item
+        android:id="@+id/action_delete"
+        android:title="Delete"
+        android:icon="@drawable/ic_action_delete_24dp"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_set_as"
+        android:title="Set as"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_info"
+        android:title="Info"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_edit"
+        android:title="Edit"
+        app:showAsAction="never" />
+
+</menu>

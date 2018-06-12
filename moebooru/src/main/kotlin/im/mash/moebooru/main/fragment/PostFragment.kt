@@ -275,10 +275,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             paddingBottom = insets.systemWindowInsetBottom
             val toolbarHeight = this.requireContext().toolbarHeight
             drawerViewLayout.setPadding(0, 0, 0, paddingBottom)
-            drawerToolbar.setPadding(0, paddingTop, 0, 0)
             drawerAppBarLayout.minimumHeight = paddingTop + toolbarHeight
-            drawerAppBarLayout.removeView(drawerToolbar)
-            drawerAppBarLayout.addView(drawerToolbar)
+            drawerToolbar.setPadding(0, paddingTop, 0, 0)
             insets
         }
 

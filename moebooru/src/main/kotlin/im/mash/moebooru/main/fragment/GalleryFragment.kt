@@ -2,6 +2,7 @@ package im.mash.moebooru.main.fragment
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
+import android.content.Context
 import android.os.Bundle
 import android.os.Environment
 import android.support.design.widget.AppBarLayout
@@ -14,14 +15,15 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.animation.AnimationUtils
+import android.widget.ImageButton
 import im.mash.moebooru.R
+import im.mash.moebooru.common.base.RecyclerViewClickListener
+import im.mash.moebooru.common.base.ToolbarDialog
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.media.entity.MediaStoreData
+import im.mash.moebooru.core.application.SlidingDialog
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.GlideRequests
@@ -127,6 +129,16 @@ class GalleryFragment : ToolbarFragment() {
         val glideRequests: GlideRequests = GlideApp.with(this)
         galleryAdapter = GalleryAdapter(glideRequests)
         galleryView.adapter = galleryAdapter
+        galleryView.addOnItemTouchListener(RecyclerViewClickListener(this.requireContext(),
+                object : RecyclerViewClickListener.OnItemClickListener {
+                    override fun onItemClick(itemView: View?, position: Int) {
+                        GalleryDialog(mainActivity, media, position).show()
+                    }
+
+                    override fun onItemLongClick(itemView: View?, position: Int) {
+
+                    }
+                }))
     }
 
     private fun initDrawerListener() {
@@ -165,5 +177,21 @@ class GalleryFragment : ToolbarFragment() {
     override fun onDestroy() {
         super.onDestroy()
         mainActivity.drawer.drawerLayout.addDrawerListener(drawerListener)
+    }
+
+    private class GalleryDialog(context: Context,
+                                private val media: MutableList<MediaStoreData>,
+                                private val position: Int) :
+            ToolbarDialog(context, R.layout.layout_local_gallery_pager) {
+
+        companion object {
+            private const val TAG = "GalleryDialog"
+        }
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            toolbar.title = "Gallery"
+            toolbar.inflateMenu(R.menu.menu_gallery_dialog)
+        }
     }
 }

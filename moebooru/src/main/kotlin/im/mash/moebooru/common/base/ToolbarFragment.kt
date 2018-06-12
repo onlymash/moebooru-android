@@ -38,8 +38,6 @@ abstract class ToolbarFragment: Fragment() {
                     insetTopPadding = insets.systemWindowInsetTop
                     appBarLayout.minimumHeight = insetTopPadding + toolbar.minimumHeight
                     toolbar.setPadding(0, insetTopPadding, 0, 0)
-                    appBarLayout.removeView(toolbar)
-                    appBarLayout.addView(toolbar)
                     insets
                 }
             }
