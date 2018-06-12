@@ -9,6 +9,7 @@ import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
+import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
@@ -17,19 +18,18 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
-import android.widget.ImageButton
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarDialog
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.media.entity.MediaStoreData
-import im.mash.moebooru.core.application.SlidingDialog
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.GlideRequests
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.GalleryAdapter
+import im.mash.moebooru.main.adapter.GalleryPagerAdapter
 import im.mash.moebooru.main.viewmodel.MediaViewModel
 import im.mash.moebooru.util.mayRequestStoragePermission
 import im.mash.moebooru.util.screenWidth
@@ -188,10 +188,20 @@ class GalleryFragment : ToolbarFragment() {
             private const val TAG = "GalleryDialog"
         }
 
+        private lateinit var galleryPager: ViewPager
+        private lateinit var galleryPagerAdapter: GalleryPagerAdapter
+
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            toolbar.title = "Gallery"
+            toolbar.title = getFileName(media[position])
             toolbar.inflateMenu(R.menu.menu_gallery_dialog)
+        }
+
+        private fun getFileName(m: MediaStoreData): String {
+            val path = m.uri.path
+//            return path.substring(path.lastIndexOf("/")+1)
+            Log.i(TAG, path)
+            return path
         }
     }
 }
