@@ -198,10 +198,8 @@ class GalleryFragment : ToolbarFragment() {
         }
 
         private fun getFileName(m: MediaStoreData): String {
-            val path = m.uri.path
-//            return path.substring(path.lastIndexOf("/")+1)
-            Log.i(TAG, path)
-            return path
+            val path = m.mediaData
+            return path.substring(path.lastIndexOf("/")+1)
         }
     }
 }

@@ -3,25 +3,30 @@ package im.mash.moebooru.common.data.media
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import im.mash.moebooru.common.data.media.entity.MediaStoreData
 import io.reactivex.Flowable
 
 class MediaStoreDataSource(private val context: Context) {
 
     companion object {
+        private const val TAG = "MediaStoreDataSource"
+
         private val IMAGE_PROJECTION = arrayOf(
                 MediaStore.Images.ImageColumns._ID,
                 MediaStore.Images.ImageColumns.DATE_TAKEN,
                 MediaStore.Images.ImageColumns.DATE_MODIFIED,
                 MediaStore.Images.ImageColumns.MIME_TYPE,
-                MediaStore.Images.ImageColumns.ORIENTATION)
+                MediaStore.Images.ImageColumns.ORIENTATION,
+                MediaStore.Images.Media.DATA)
 
         private val VIDEO_PROJECTION = arrayOf(
                 MediaStore.Video.VideoColumns._ID,
                 MediaStore.Video.VideoColumns.DATE_TAKEN,
                 MediaStore.Video.VideoColumns.DATE_MODIFIED,
                 MediaStore.Video.VideoColumns.MIME_TYPE,
-                "0 AS " + MediaStore.Images.ImageColumns.ORIENTATION)
+                "0 AS " + MediaStore.Images.ImageColumns.ORIENTATION,
+                MediaStore.Video.Media.DATA)
     }
 
     fun loadMediaData(path: String): Flowable<MutableList<MediaStoreData>> {
@@ -44,7 +49,7 @@ class MediaStoreDataSource(private val context: Context) {
                 MediaStore.Images.ImageColumns.DATE_TAKEN, MediaStore.Images.ImageColumns._ID,
                 MediaStore.Images.ImageColumns.DATE_TAKEN, MediaStore.Images.ImageColumns.DATE_MODIFIED,
                 MediaStore.Images.ImageColumns.MIME_TYPE, MediaStore.Images.ImageColumns.ORIENTATION,
-                MediaStoreData.Type.IMAGE, selection, selectionArgs)
+                MediaStore.Images.Media.DATA, MediaStoreData.Type.IMAGE, selection, selectionArgs)
     }
 
     private fun queryVideos(path: String): MutableList<MediaStoreData> {
@@ -54,12 +59,12 @@ class MediaStoreDataSource(private val context: Context) {
                 MediaStore.Video.VideoColumns.DATE_TAKEN, MediaStore.Video.VideoColumns._ID,
                 MediaStore.Video.VideoColumns.DATE_TAKEN, MediaStore.Video.VideoColumns.DATE_MODIFIED,
                 MediaStore.Video.VideoColumns.MIME_TYPE, MediaStore.Images.ImageColumns.ORIENTATION,
-                MediaStoreData.Type.VIDEO, selection, selectionArgs)
+                MediaStore.Video.Media.DATA, MediaStoreData.Type.VIDEO, selection, selectionArgs)
     }
 
-    private fun query(contentUri: Uri, projection: Array<String>, sortByCol: String,
-                      idCol: String, dateTakenCol: String, dateModifiedCol: String, mimeTypeCol: String,
-                      orientationCol: String, type: MediaStoreData.Type, selection: String, selectionArgs: Array<String>): MutableList<MediaStoreData> {
+    private fun query(contentUri: Uri, projection: Array<String>, sortByCol: String, idCol: String, dateTakenCol: String,
+                      dateModifiedCol: String, mimeTypeCol: String, orientationCol: String, mediaDataCol: String,
+                      type: MediaStoreData.Type, selection: String, selectionArgs: Array<String>): MutableList<MediaStoreData> {
         val data: MutableList<MediaStoreData> = mutableListOf()
         val cursor = context.contentResolver
                 .query(contentUri, projection, selection, selectionArgs, "$sortByCol DESC") ?: return data
@@ -70,6 +75,7 @@ class MediaStoreDataSource(private val context: Context) {
             val dateModifiedColNum = c.getColumnIndexOrThrow(dateModifiedCol)
             val mimeTypeColNum = c.getColumnIndex(mimeTypeCol)
             val orientationColNum = c.getColumnIndexOrThrow(orientationCol)
+            val mediaDataNum = c.getColumnIndexOrThrow(mediaDataCol)
 
             while (c.moveToNext()) {
                 val id = c.getLong(idColNum)
@@ -77,9 +83,10 @@ class MediaStoreDataSource(private val context: Context) {
                 val mimeType = c.getString(mimeTypeColNum)
                 val dateModified = c.getLong(dateModifiedColNum)
                 val orientation = c.getInt(orientationColNum)
+                val mediaData = c.getString(mediaDataNum)
 
                 data.add(MediaStoreData(id, Uri.withAppendedPath(contentUri, id.toString()),
-                        mimeType, dateTaken, dateModified, orientation, type))
+                        mimeType, dateTaken, dateModified, orientation, type, mediaData))
             }
         }
 

@@ -9,7 +9,8 @@ data class MediaStoreData(
         var dateTaken: Long,
         var dateModified: Long,
         var orientation: Int,
-        var type: Type) {
+        var type: Type,
+        var mediaData: String) {
 
     enum class Type {
         VIDEO,
@@ -25,6 +26,7 @@ data class MediaStoreData(
                 + ", orientation=" + orientation
                 + ", type=" + type
                 + ", dateTaken=" + dateTaken
+                + ", mediaData=" + mediaData
                 + '}'.toString())
     }
 }
