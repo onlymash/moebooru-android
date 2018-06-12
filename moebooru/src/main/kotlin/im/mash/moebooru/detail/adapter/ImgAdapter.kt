@@ -53,6 +53,9 @@ class ImgAdapter(private val context: Context) : PagerAdapter() {
         val photoView = view.findViewById<PhotoView>(R.id.post_img)
         photoView.enable()
         photoView.enableRotate()
+        photoView.setOnClickListener {
+            listener?.onClickListener(position)
+        }
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
         progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
         val url = when (type) {
@@ -97,5 +100,15 @@ class ImgAdapter(private val context: Context) : PagerAdapter() {
 
     override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
         container.removeView(`object` as View)
+    }
+
+    interface PhotoViewListener {
+        fun onClickListener(position: Int)
+    }
+
+    private var listener: PhotoViewListener? = null
+
+    fun setPhotoViewListener(listener: PhotoViewListener) {
+        this.listener = listener
     }
 }

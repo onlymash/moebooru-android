@@ -6,6 +6,9 @@ import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
+import android.support.v4.view.ViewPager
+import android.support.v7.widget.Toolbar
+import android.view.View
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.common.MoeDH
@@ -25,7 +28,7 @@ import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.helper.getViewModel
 import javax.inject.Inject
 
-class DetailActivity : SlidingActivity() {
+class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener {
 
     companion object {
         private const val TAG = "DetailActivity"
@@ -53,13 +56,17 @@ class DetailActivity : SlidingActivity() {
     internal var type = "post"
     internal var position = 0
 
+    private lateinit var bg: View
+    private lateinit var appBarLayout: AppBarLayout
+    internal lateinit var toolbar: Toolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         component.inject(this)
         initView()
-        val tags = intent.extras["tags"].toString()
-        position = intent.extras["position"].toString().toInt()
+        val tags = intent.getStringExtra("tags")
+        position = intent.getIntExtra("position", 0)
         positionViewModel.setPosition(position)
         initViewModel(tags)
     }
@@ -67,8 +74,9 @@ class DetailActivity : SlidingActivity() {
     @SuppressLint("InflateParams")
     private fun initView() {
         detailPager = findViewById(R.id.detail_pager)
-        val appBarLayout = findViewById<AppBarLayout>(R.id.appbar_layout)
-        val toolbar = layoutInflater.inflate(R.layout.layout_toolbar, null)
+        bg = findViewById(R.id.detail_bg)
+        appBarLayout = findViewById(R.id.appbar_layout)
+        toolbar = layoutInflater.inflate(R.layout.layout_toolbar, null) as Toolbar
         appBarLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.toolbar_post))
         toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent))
         appBarLayout.addView(toolbar)
@@ -83,6 +91,29 @@ class DetailActivity : SlidingActivity() {
         }
     }
 
+    fun setBg() {
+        when (appBarLayout.visibility) {
+            View.VISIBLE -> {
+                bg.visibility = View.VISIBLE
+                appBarLayout.visibility = View.GONE
+                hideBar()
+            }
+            else -> {
+                bg.visibility = View.GONE
+                appBarLayout.visibility = View.VISIBLE
+                showBar()
+            }
+        }
+    }
+
+    private fun resetBg() {
+        if (appBarLayout.visibility == View.GONE) {
+            bg.visibility = View.GONE
+            appBarLayout.visibility = View.VISIBLE
+            showBar()
+        }
+    }
+
     private fun initDetailPager() {
         detailAdapter = DetailAdapter(supportFragmentManager, mutableListOf(
                 InfoFragment(),
@@ -91,6 +122,7 @@ class DetailActivity : SlidingActivity() {
         ))
         detailPager.adapter = detailAdapter
         detailPager.currentItem = 1
+        detailPager.addOnPageChangeListener(this)
     }
 
     private fun initViewModel(tags: String) {
@@ -103,6 +135,7 @@ class DetailActivity : SlidingActivity() {
                     }
                     is Outcome.Success -> {
                         posts = outcome.data
+                        toolbar.title = getString(R.string.post) + " " + posts[position].id
                         initDetailPager()
                     }
                     is Outcome.Failure -> {
@@ -120,6 +153,7 @@ class DetailActivity : SlidingActivity() {
                     }
                     is Outcome.Success -> {
                         postsSearch = outcome.data
+                        toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
                         initDetailPager()
                     }
                     is Outcome.Failure -> {
@@ -131,4 +165,26 @@ class DetailActivity : SlidingActivity() {
         }
     }
 
+    override fun onPageScrollStateChanged(state: Int) {
+        resetBg()
+    }
+
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+    }
+
+    override fun onPageSelected(position: Int) {
+
+    }
+
+    fun setToolbarTitle(position: Int) {
+        when (type) {
+            "post" -> {
+                toolbar.title = getString(R.string.post) + " " + posts[position].id
+            }
+            else -> {
+                toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
+            }
+        }
+    }
 }

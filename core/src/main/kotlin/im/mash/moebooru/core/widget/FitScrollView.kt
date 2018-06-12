@@ -35,13 +35,12 @@ class FitScrollView : ScrollView {
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        when (ev?.action) {
+        when (ev?.actionMasked) {
             MotionEvent.ACTION_DOWN -> lastY = ev.y
             MotionEvent.ACTION_MOVE -> {
                 if (((ev.y - lastY) < 0 && isScrolledToBottom) ||
                         ((ev.y - lastY) > 0 && isScrolledToTop) || !canScroll()) {
 
-                    requestDisallowInterceptTouchEvent(false)
                     return false
                 }
             }

@@ -32,6 +32,11 @@ class PagerFragment : Fragment() {
         postPagerAdapter = ImgAdapter(detailActivity)
         postPager.adapter = postPagerAdapter
         postPager.setPageTransformer(true, AccordionTransformer())
+        postPagerAdapter.setPhotoViewListener(object : ImgAdapter.PhotoViewListener {
+            override fun onClickListener(position: Int) {
+                detailActivity.setBg()
+            }
+        })
         when (detailActivity.type) {
             "post" -> {
                 postPagerAdapter.updateData(detailActivity.posts, app.settings.postSizeBrowse)
@@ -53,6 +58,7 @@ class PagerFragment : Fragment() {
 
             override fun onPageSelected(position: Int) {
                 detailActivity.positionViewModel.setPosition(position)
+                detailActivity.setToolbarTitle(position)
             }
         })
     }

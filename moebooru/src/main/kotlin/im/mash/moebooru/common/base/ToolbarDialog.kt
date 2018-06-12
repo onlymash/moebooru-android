@@ -13,6 +13,7 @@ import im.mash.moebooru.core.application.SlidingDialog
 abstract class ToolbarDialog(context: Context, private val contentViewResId: Int) : SlidingDialog(context) {
 
     internal lateinit var toolbar: Toolbar
+    internal lateinit var appBarLayout: AppBarLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +23,7 @@ abstract class ToolbarDialog(context: Context, private val contentViewResId: Int
 
     @SuppressLint("InflateParams")
     private fun initView() {
-        val appBarLayout = findViewById<AppBarLayout>(R.id.appbar_layout)
+        appBarLayout = findViewById(R.id.appbar_layout)
         appBarLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.toolbar_post))
         toolbar = layoutInflater.inflate(R.layout.layout_toolbar, null) as Toolbar
         toolbar.setBackgroundColor(ContextCompat.getColor(context, R.color.transparent))

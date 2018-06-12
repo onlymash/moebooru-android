@@ -13,23 +13,23 @@
 
     <item
         android:id="@+id/action_delete"
-        android:title="Delete"
+        android:title="@string/delete"
         android:icon="@drawable/ic_action_delete_24dp"
-        app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_set_as"
-        android:title="Set as"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_info"
-        android:title="Info"
+        android:id="@+id/action_set_as"
+        android:title="@string/set_as"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_edit"
-        android:title="Edit"
+        android:title="@string/edit_img"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_info"
+        android:title="@string/img_info"
         app:showAsAction="never" />
 
 </menu>

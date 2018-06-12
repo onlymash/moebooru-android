@@ -109,5 +109,8 @@
     <string name="clear_all">Clear all</string>
 
     <string name="local_gallery">Local gallery</string>
-
+    <string name="delete">Delete</string>
+    <string name="set_as">Set as</string>
+    <string name="edit_img">Edit</string>
+    <string name="img_info">Image info</string>
 </resources>

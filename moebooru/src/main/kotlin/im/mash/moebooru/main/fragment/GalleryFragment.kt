@@ -24,6 +24,7 @@ import im.mash.moebooru.common.base.ToolbarDialog
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.media.entity.MediaStoreData
 import im.mash.moebooru.core.scheduler.Outcome
+import im.mash.moebooru.core.widget.AccordionTransformer
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.GlideRequests
 import im.mash.moebooru.helper.getViewModel
@@ -182,7 +183,7 @@ class GalleryFragment : ToolbarFragment() {
     private class GalleryDialog(context: Context,
                                 private val media: MutableList<MediaStoreData>,
                                 private val position: Int) :
-            ToolbarDialog(context, R.layout.layout_local_gallery_pager) {
+            ToolbarDialog(context, R.layout.layout_local_gallery_pager), ViewPager.OnPageChangeListener {
 
         companion object {
             private const val TAG = "GalleryDialog"
@@ -195,11 +196,58 @@ class GalleryFragment : ToolbarFragment() {
             super.onCreate(savedInstanceState)
             toolbar.title = getFileName(media[position])
             toolbar.inflateMenu(R.menu.menu_gallery_dialog)
+            val bg: View = findViewById(R.id.bg)
+            galleryPager = findViewById(R.id.gallery_pager)
+            galleryPagerAdapter = GalleryPagerAdapter(media)
+            galleryPager.adapter = galleryPagerAdapter
+            galleryPager.currentItem = position
+            galleryPager.addOnPageChangeListener(this)
+            galleryPager.setPageTransformer(true, AccordionTransformer())
+            galleryPagerAdapter.setPhotoViewListener(object : GalleryPagerAdapter.PhotoViewListener {
+                override fun onClickListener(position: Int) {
+                    when (appBarLayout.visibility) {
+                        View.VISIBLE -> {
+                            bg.visibility = View.VISIBLE
+                            appBarLayout.visibility = View.GONE
+                            hideBar()
+                        }
+                        else -> {
+                            bg.visibility = View.GONE
+                            appBarLayout.visibility = View.VISIBLE
+                            showBar()
+                        }
+                    }
+                }
+            })
         }
 
         private fun getFileName(m: MediaStoreData): String {
             val path = m.mediaData
             return path.substring(path.lastIndexOf("/")+1)
+        }
+
+        private fun showBar() {
+            val uiFlags = View.SYSTEM_UI_FLAG_VISIBLE
+            window.decorView.systemUiVisibility = uiFlags
+        }
+
+        private fun hideBar() {
+            val uiFlags = View.SYSTEM_UI_FLAG_IMMERSIVE or
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            window.decorView.systemUiVisibility = uiFlags
+        }
+
+        override fun onPageScrollStateChanged(state: Int) {
+
+        }
+
+        override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+
+        }
+
+        override fun onPageSelected(position: Int) {
+            toolbar.title = getFileName(media[position])
         }
     }
 }
