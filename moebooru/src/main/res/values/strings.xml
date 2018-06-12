@@ -113,4 +113,10 @@
     <string name="set_as">Set as</string>
     <string name="edit_img">Edit</string>
     <string name="img_info">Image info</string>
+
+    <string name="properties">Properties</string>
+    <string name="path">Path</string>
+    <string name="size">Size</string>
+    <string name="name">Name</string>
+    <string name="filename">Filename</string>
 </resources>

@@ -9,11 +9,13 @@ import android.content.res.Resources
 import android.os.Build
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.text.format.DateFormat
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.WindowManager
 import com.bumptech.glide.load.model.Headers
 import com.bumptech.glide.load.model.LazyHeaders
+import java.util.*
 
 val Context.screenWidth: Int
     get() {
@@ -88,3 +90,9 @@ val navBarHeight: Int
         val resId = res.getIdentifier("navigation_bar_height", "dimen", "android")
         return if (resId > 0) res.getDimensionPixelSize(resId) else 0
     }
+
+fun formatDate(time: Long): CharSequence {
+    val cal = Calendar.getInstance(Locale.getDefault())
+    cal.timeInMillis = time
+    return DateFormat.format("yyyy-MM-dd HH:mm", cal)
+}

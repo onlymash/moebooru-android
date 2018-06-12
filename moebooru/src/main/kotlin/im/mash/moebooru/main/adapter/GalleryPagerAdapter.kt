@@ -64,6 +64,15 @@ class GalleryPagerAdapter(private var media: MutableList<MediaStoreData>) : Page
         return view
     }
 
+    fun updateData(media: MutableList<MediaStoreData>) {
+        this.media = media
+        notifyDataSetChanged()
+    }
+
+    override fun getItemPosition(`object`: Any): Int {
+        return POSITION_NONE
+    }
+
     interface PhotoViewListener {
         fun onClickListener(position: Int)
     }

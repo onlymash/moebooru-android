@@ -1,8 +1,12 @@
 package im.mash.moebooru.main.fragment
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.content.Context
+import android.content.Intent
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.support.design.widget.AppBarLayout
@@ -18,6 +22,8 @@ import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
+import android.widget.LinearLayout
+import android.widget.TextView
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarDialog
@@ -32,10 +38,12 @@ import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.GalleryAdapter
 import im.mash.moebooru.main.adapter.GalleryPagerAdapter
 import im.mash.moebooru.main.viewmodel.MediaViewModel
+import im.mash.moebooru.util.formatDate
 import im.mash.moebooru.util.mayRequestStoragePermission
 import im.mash.moebooru.util.screenWidth
 import java.io.File
 import java.io.IOException
+import java.util.*
 
 @SuppressLint("RtlHardcoded")
 class GalleryFragment : ToolbarFragment() {
@@ -133,7 +141,14 @@ class GalleryFragment : ToolbarFragment() {
         galleryView.addOnItemTouchListener(RecyclerViewClickListener(this.requireContext(),
                 object : RecyclerViewClickListener.OnItemClickListener {
                     override fun onItemClick(itemView: View?, position: Int) {
-                        GalleryDialog(mainActivity, media, position).show()
+                        val dialog = GalleryDialog(mainActivity, media, position)
+                        dialog.setItemRemoveListener(object : GalleryDialog.ItemRemoveListener {
+                            override fun onItemRemoved(position: Int) {
+                                media.removeAt(position)
+                                galleryAdapter.updateData(media)
+                            }
+                        })
+                        dialog.show()
                     }
 
                     override fun onItemLongClick(itemView: View?, position: Int) {
@@ -182,8 +197,8 @@ class GalleryFragment : ToolbarFragment() {
 
     private class GalleryDialog(context: Context,
                                 private val media: MutableList<MediaStoreData>,
-                                private val position: Int) :
-            ToolbarDialog(context, R.layout.layout_local_gallery_pager), ViewPager.OnPageChangeListener {
+                                private var position: Int) :
+            ToolbarDialog(context, R.layout.layout_local_gallery_pager), ViewPager.OnPageChangeListener, Toolbar.OnMenuItemClickListener {
 
         companion object {
             private const val TAG = "GalleryDialog"
@@ -196,6 +211,7 @@ class GalleryFragment : ToolbarFragment() {
             super.onCreate(savedInstanceState)
             toolbar.title = getFileName(media[position])
             toolbar.inflateMenu(R.menu.menu_gallery_dialog)
+            toolbar.setOnMenuItemClickListener(this)
             val bg: View = findViewById(R.id.bg)
             galleryPager = findViewById(R.id.gallery_pager)
             galleryPagerAdapter = GalleryPagerAdapter(media)
@@ -247,7 +263,117 @@ class GalleryFragment : ToolbarFragment() {
         }
 
         override fun onPageSelected(position: Int) {
+            this.position = position
             toolbar.title = getFileName(media[position])
+        }
+
+        @SuppressLint("InflateParams")
+        override fun onMenuItemClick(item: MenuItem?): Boolean {
+            when (item?.itemId) {
+                R.id.action_set_as -> {
+                    val intent = Intent(Intent.ACTION_ATTACH_DATA)
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    intent.putExtra("mimeType", "image/*")
+                    intent.data = media[position].uri
+                    try {
+                        context.startActivity(Intent.createChooser(intent, context.getString(R.string.set_as)))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                R.id.action_share -> {
+                    val intent = Intent()
+                    intent.action = Intent.ACTION_SEND
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    intent.type = "image/*"
+                    intent.putExtra(Intent.EXTRA_STREAM, media[position].uri)
+                    try {
+                        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_to)))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                R.id.action_delete -> {
+                    AlertDialog.Builder(context)
+                            .setTitle("Delete image")
+                            .setMessage("Do you confirm the deletion of ${media[position].mediaData} ?")
+                            .setPositiveButton(context.getString(R.string.ok), { _, _ ->
+                                try {
+                                    val file = File(media[position].mediaData)
+                                    file.delete()
+                                    val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file))
+                                    try {
+                                        context.sendBroadcast(mediaScanIntent)
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                    media.removeAt(position)
+                                    listener?.onItemRemoved(position)
+                                    galleryPagerAdapter.updateData(media)
+                                    toolbar.title = getFileName(media[position])
+                                } catch (e: IOException) {
+                                    e.printStackTrace()
+                                }
+                            })
+                            .setNegativeButton(context.getString(R.string.cancel), null)
+                            .show()
+
+                }
+                R.id.action_edit -> {
+                    val intent = Intent(Intent.ACTION_EDIT)
+                    intent.setDataAndType(media[position].uri, "image/*")
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    try {
+                        context.startActivity(Intent.createChooser(intent, context.getString(R.string.edit_img)))
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                R.id.action_info -> {
+                    val view = layoutInflater.inflate(R.layout.layout_dialog_properties, null)
+                    val linearLayout = view.findViewById<LinearLayout>(R.id.properties_holder)
+                    setProperty("Mime type", media[position].mimeType, linearLayout)
+                    setProperty("Date modified", formatDate(media[position].dateModified * 1000).toString(), linearLayout)
+                    try {
+                        val options: BitmapFactory.Options = BitmapFactory.Options()
+                        options.inJustDecodeBounds = true
+                        BitmapFactory.decodeFile(media[position].mediaData, options)
+                        setProperty("Resolution", "${options.outWidth} x ${options.outHeight}", linearLayout)
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                    setProperty("Path", media[position].mediaData, linearLayout)
+                    val dialog = AlertDialog.Builder(context)
+                            .setPositiveButton(R.string.ok, null)
+                            .create()
+                    dialog.apply {
+                        setView(view)
+                        requestWindowFeature(Window.FEATURE_NO_TITLE)
+                        setCanceledOnTouchOutside(true)
+                        show()
+                    }
+                }
+            }
+            return true
+        }
+
+        private fun setProperty(label: String, value: String, linearLayout: LinearLayout) {
+            val v = layoutInflater.inflate(R.layout.layout_dialog_property_item, linearLayout, false)
+                    .apply {
+                        findViewById<TextView>(R.id.property_label).text = label
+                        findViewById<TextView>(R.id.property_value).text = value
+                    }
+            linearLayout.addView(v)
+        }
+
+        private var listener: ItemRemoveListener? = null
+
+        fun setItemRemoveListener(listener: ItemRemoveListener) {
+            this.listener = listener
+        }
+
+        interface ItemRemoveListener {
+            fun onItemRemoved(position: Int)
         }
     }
 }
