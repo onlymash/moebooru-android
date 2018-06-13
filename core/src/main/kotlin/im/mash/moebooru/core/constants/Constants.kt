@@ -5,3 +5,7 @@ object Constants {
      const val DB_NAME = "room_database.db"
      const val USER_AGENT_KEY = "User-Agent"
 }
+
+object Cookies {
+     var values = HashSet<String>()
+}

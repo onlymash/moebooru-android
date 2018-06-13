@@ -1,5 +1,6 @@
 package im.mash.moebooru
 
+import im.mash.moebooru.util.HashUtil
 import org.junit.Test
 import kotlin.test.assertEquals
 
