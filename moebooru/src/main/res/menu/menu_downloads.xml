@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/action_start_all"
-        android:title="@string/downloads_stop_all"
+        android:title="@string/downloads_start_all"
         android:icon="@drawable/ic_action_play_arrow_white_24dp"
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
