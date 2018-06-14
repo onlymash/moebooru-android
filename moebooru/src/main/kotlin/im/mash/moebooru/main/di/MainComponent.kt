@@ -13,10 +13,7 @@ import im.mash.moebooru.core.module.CoreComponent
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.model.*
-import im.mash.moebooru.main.viewmodel.BooruViewModelFactory
-import im.mash.moebooru.main.viewmodel.MediaViewModelFactory
-import im.mash.moebooru.main.viewmodel.PostViewModelFactory
-import im.mash.moebooru.main.viewmodel.TagViewModelFactory
+import im.mash.moebooru.main.viewmodel.*
 import io.reactivex.disposables.CompositeDisposable
 import retrofit2.Retrofit
 
@@ -29,6 +26,8 @@ interface MainComponent {
     fun postService(): PostService
     fun scheduler(): Scheduler
     fun mediaStoreDataSource(): MediaStoreDataSource
+    fun downloadViewModelFactory(): DownloadViewModelFactory
+    fun downloadRepo(): DownloadDataContract.Repository
     fun inject(mainActivity: MainActivity)
 }
 
@@ -120,4 +119,16 @@ class MainModule {
     @MainScope
     fun mediaRepo(source: MediaStoreDataSource, scheduler: Scheduler, compositeDisposable: CompositeDisposable): MediaDataContract.Repository
             = MediaRepository(source, scheduler, compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun downloadViewModelFactory(repository: DownloadDataContract.Repository,
+                                 compositeDisposable: CompositeDisposable): DownloadViewModelFactory
+            = DownloadViewModelFactory(repository,compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun downloadRepo(database: MoeDatabase, scheduler: Scheduler,
+                     compositeDisposable: CompositeDisposable): DownloadDataContract.Repository
+            = DownloadRepository(database, scheduler, compositeDisposable)
 }

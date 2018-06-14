@@ -38,24 +38,26 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <!--<activity android:name=".ui.SearchActivity">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="${applicationId}.action.SEARCH" />-->
+        <!-- <activity android:name=".ui.SearchActivity"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="${applicationId}.action.SEARCH" /> -->
 
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-            <!--</intent-filter>-->
-        <!--</activity>-->
-        <!--<activity android:name=".ui.GalleryActivity"/>-->
 
-        <!--<provider-->
-            <!--android:name=".content.PostsProvider"-->
-            <!--android:authorities="${applicationId}.onlymash"-->
-            <!--android:exported="false"-->
-            <!--android:grantUriPermissions="true">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.FILE_PROVIDER_PATHS"-->
-                <!--android:resource="@xml/file_paths" />-->
-        <!--</provider>-->
+        <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
+        <!-- <activity android:name=".ui.GalleryActivity"/> -->
+
+
+         <provider
+         android:name="im.mash.moebooru.content.MoeProvider"
+         android:authorities="${applicationId}.onlymash"
+         android:exported="false"
+         android:grantUriPermissions="true">
+         <meta-data
+         android:name="android.support.FILE_PROVIDER_PATHS"
+         android:resource="@xml/file_paths" />
+         </provider>
 
         <meta-data
             android:name="com.google.android.backup.api_key"
@@ -64,8 +66,9 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
 
-        <!--<service-->
-            <!--android:name=".download.MoeDownloadService" />-->
+        <service
+            android:name=".download.DownloadService"
+            android:exported="false"/>
 
     </application>
 

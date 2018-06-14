@@ -8,7 +8,6 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
@@ -24,6 +23,7 @@ import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import android.widget.TextView
+import im.mash.moebooru.App.Companion.moePath
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarDialog
@@ -43,7 +43,6 @@ import im.mash.moebooru.util.mayRequestStoragePermission
 import im.mash.moebooru.util.screenWidth
 import java.io.File
 import java.io.IOException
-import java.util.*
 
 @SuppressLint("RtlHardcoded")
 class GalleryFragment : ToolbarFragment() {
@@ -116,9 +115,9 @@ class GalleryFragment : ToolbarFragment() {
                 }
             }
         })
-        val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Moebooru")
+
         if (mayRequestStoragePermission(mainActivity, 0)) {
-            mediaViewModel.loadMedia(dir.absolutePath)
+            mediaViewModel.loadMedia(moePath)
         }
     }
     private fun initGalleryView(view: View) {

@@ -35,11 +35,8 @@ import im.mash.moebooru.common.data.local.entity.Booru
 import im.mash.moebooru.core.application.BaseActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.widget.TextDrawable
-import im.mash.moebooru.main.fragment.PostFragment
 import im.mash.moebooru.helper.getViewModel
-import im.mash.moebooru.main.fragment.AboutFragment
-import im.mash.moebooru.main.fragment.GalleryFragment
-import im.mash.moebooru.main.fragment.SettingsFragment
+import im.mash.moebooru.main.fragment.*
 import im.mash.moebooru.main.viewmodel.*
 import java.io.IOException
 import java.util.*
@@ -89,6 +86,10 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     lateinit var tagViewModelFactory: TagViewModelFactory
     @Inject
     lateinit var mediaViewModelFactory: MediaViewModelFactory
+
+    @Inject
+    lateinit var downloadViewModelFactory: DownloadViewModelFactory
+    internal val downloadViewModel: DownloadViewModel by lazy { this.getViewModel<DownloadViewModel>(downloadViewModelFactory) }
 
     internal var boorus: MutableList<Booru> = mutableListOf()
 
@@ -250,6 +251,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             previousSelectedDrawer = id
             when (id) {
                 DRAWER_ITEM_POSTS -> displayFragment(PostFragment())
+                DRAWER_ITEM_DOWNLOADS -> displayFragment(DownloadFragment())
                 DRAWER_ITEM_LOCAL_GALLERY -> displayFragment(GalleryFragment())
                 DRAWER_ITEM_SETTINGS -> displayFragment(SettingsFragment())
                 DRAWER_ITEM_ABOUT -> displayFragment(AboutFragment())
@@ -287,16 +289,4 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             }
         }
     }
-
-    private val customTabsIntent by lazy {
-        CustomTabsIntent.Builder()
-                .setToolbarColor(ContextCompat.getColor(this, R.color.primary))
-                .build()
-    }
-
-    fun launchUrl(uri: Uri) = try {
-        customTabsIntent.launchUrl(this, uri)
-    } catch (_: ActivityNotFoundException) { }  // ignore
-
-    fun launchUrl(uri: String) = launchUrl(Uri.parse(uri))
 }

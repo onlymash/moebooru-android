@@ -12,6 +12,7 @@ import im.mash.moebooru.BuildConfig
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.main.MainActivity
+import im.mash.moebooru.util.launchUrl
 
 class AboutFragment : ToolbarFragment() {
 

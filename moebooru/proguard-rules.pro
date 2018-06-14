@@ -25,6 +25,9 @@
 -dontwarn okio.**
 -dontwarn org.conscrypt.**
 
+-dontnote retrofit2.Platform
+-dontwarn retrofit2.Platform$Java8
+
 # This is for Kotlin
 -dontwarn kotlin.**
 
@@ -68,19 +71,7 @@
 # Application classes
 -keep class im.mash.moebooru.common.data.** { *; }
 
--dontwarn com.liulishuo.okdownload.**
-
 # A resource is loaded with a relative path so the package of this class must be preserved.
 -keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
 # ------- end okhttp proguard rules ----
 
-# ------- because of we using com.liulishuo.okdownload:okhttp on sample ----
--keepnames class com.liulishuo.okdownload.core.connection.DownloadOkHttp3Connection
-# ------- end com.liulishuo.okdownload:okhttp proguard rules ----
-
-# ------- because of we using com.liulishuo.okdownload:sqlite on sample ----
--keep class com.liulishuo.okdownload.core.breakpoint.BreakpointStoreOnSQLite {
-        public com.liulishuo.okdownload.core.breakpoint.DownloadStore createRemitSelf();
-        public com.liulishuo.okdownload.core.breakpoint.BreakpointStoreOnSQLite(android.content.Context);
-}
-# ------- end com.liulishuo.okdownload:sqlite proguard rules ----

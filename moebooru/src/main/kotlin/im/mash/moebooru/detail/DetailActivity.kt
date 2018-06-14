@@ -2,17 +2,22 @@ package im.mash.moebooru.detail
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
+import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Post
+import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
@@ -26,9 +31,12 @@ import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModel
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.helper.getViewModel
+import im.mash.moebooru.main.viewmodel.DownloadViewModel
+import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.util.launchUrl
 import javax.inject.Inject
 
-class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener {
+class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolbar.OnMenuItemClickListener {
 
     companion object {
         private const val TAG = "DetailActivity"
@@ -49,6 +57,10 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener {
     @Inject
     lateinit var positionViewModelFactory: PositionViewModelFactory
     internal val positionViewModel: PositionViewModel by lazy { this.getViewModel<PositionViewModel>(positionViewModelFactory) }
+
+    @Inject
+    lateinit var downloadViewModelFactory: DownloadViewModelFactory
+    internal val downloadViewModel: DownloadViewModel by lazy { this.getViewModel<DownloadViewModel>(downloadViewModelFactory) }
 
     internal var posts: MutableList<Post> = mutableListOf()
     internal var postsSearch: MutableList<PostSearch> = mutableListOf()
@@ -88,6 +100,66 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener {
             appBarLayout.removeView(toolbar)
             appBarLayout.addView(toolbar)
             insets
+        }
+        toolbar.inflateMenu(R.menu.menu_details)
+        toolbar.setOnMenuItemClickListener(this)
+
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.action_share_url -> {
+                val shareUrl = getPostUrl()
+                val intent = Intent()
+                intent.action = Intent.ACTION_SEND
+                intent.type = "text/*"
+                intent.putExtra(Intent.EXTRA_TEXT, shareUrl)
+                try {
+                    startActivity(Intent.createChooser(intent, getString(R.string.share_to)))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            R.id.action_download -> {
+                downloadViewModel.addTask(getDownloadPost())
+            }
+            R.id.action_browser -> {
+                this.launchUrl(getPostUrl())
+            }
+        }
+        return true
+    }
+
+    private fun getDownloadPost(): PostDownload {
+        return when (type) {
+            "post" -> {
+                val url = when (app.settings.postSizeDownload) {
+                    Settings.POST_SIZE_SAMPLE -> posts[position].sample_url
+                    Settings.POST_SIZE_LARGER -> posts[position].jpeg_url
+                    else -> posts[position].file_url
+                }
+                PostDownload(null, app.settings.activeProfileHost, posts[position].id, posts[position].preview_url, url,"")
+            }
+            else -> {
+                val url = when (app.settings.postSizeDownload) {
+                    Settings.POST_SIZE_SAMPLE -> postsSearch[position].sample_url
+                    Settings.POST_SIZE_LARGER -> postsSearch[position].jpeg_url
+                    else -> postsSearch[position].file_url
+                }
+                PostDownload(null, app.settings.activeProfileHost, postsSearch[position].id,
+                        postsSearch[position].preview_url, url,"")
+            }
+        }
+    }
+
+    private fun getPostUrl(): String {
+        return when (type) {
+            "post" -> {
+                app.settings.activeProfileScheme + "://"+ app.settings.activeProfileHost + "/post/show/" + posts[position].id
+            }
+            else -> {
+                app.settings.activeProfileScheme + "://"+ app.settings.activeProfileHost + "/post/show/" + postsSearch[position].id
+            }
         }
     }
 
@@ -178,6 +250,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener {
     }
 
     fun setToolbarTitle(position: Int) {
+        this.position = position
         when (type) {
             "post" -> {
                 toolbar.title = getString(R.string.post) + " " + posts[position].id

@@ -3,18 +3,23 @@ package im.mash.moebooru.util
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Build
+import android.support.customtabs.CustomTabsIntent
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import android.support.v4.content.ContextCompat
 import android.text.format.DateFormat
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.WindowManager
 import com.bumptech.glide.load.model.Headers
 import com.bumptech.glide.load.model.LazyHeaders
+import im.mash.moebooru.R
 import java.util.*
 
 val Context.screenWidth: Int
@@ -96,3 +101,15 @@ fun formatDate(time: Long): CharSequence {
     cal.timeInMillis = time
     return DateFormat.format("yyyy-MM-dd HH:mm", cal)
 }
+
+private fun getCustomTabsIntent(context: Context): CustomTabsIntent {
+    return CustomTabsIntent.Builder()
+            .setToolbarColor(ContextCompat.getColor(context, R.color.primary))
+            .build()
+}
+
+fun Context.launchUrl(uri: Uri) = try {
+    getCustomTabsIntent(this).launchUrl(this, uri)
+} catch (_: ActivityNotFoundException) { }  // ignore
+
+fun Context.launchUrl(url: String) = this.launchUrl(Uri.parse(url))
