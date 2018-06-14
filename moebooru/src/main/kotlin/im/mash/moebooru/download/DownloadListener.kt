@@ -1,7 +1,9 @@
 package im.mash.moebooru.download
 
+import android.app.NotificationManager
 import android.content.Intent
 import android.net.Uri
+import android.support.v4.app.NotificationCompat
 import android.util.SparseArray
 import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.StatusUtil
@@ -13,7 +15,8 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import java.lang.Exception
 
-class DownloadListener : DownloadListener1() {
+class DownloadListener(private val notificationManager: NotificationManager,
+                       private val notificationBuilder: NotificationCompat.Builder) : DownloadListener1() {
 
     companion object {
         private const val TAG = "DownloadListener"
@@ -100,6 +103,7 @@ class DownloadListener : DownloadListener1() {
             val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(task.file))
             app.sendBroadcast(mediaScanIntent)
         }
+        notificationManager.cancel(task.id)
         val status = cause.toString()
         TagUtil.saveStatus(task, status)
         val listener = listeners.get(task.id) ?: return
@@ -114,6 +118,9 @@ class DownloadListener : DownloadListener1() {
         val status = "progress"
         TagUtil.saveStatus(task, status)
         TagUtil.saveOffset(task, currentOffset)
+        notificationBuilder.setProgress(totalLength.toInt(), currentOffset.toInt(), false)
+        notificationBuilder.setContentText(task.filename)
+        notificationManager.notify(task.id, notificationBuilder.build())
         val listener = listeners.get(task.id) ?: return
         listener.onStatusChanged(status)
         listener.onProgressChange(currentOffset)

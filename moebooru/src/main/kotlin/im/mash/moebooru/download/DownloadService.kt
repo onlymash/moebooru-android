@@ -1,10 +1,18 @@
 package im.mash.moebooru.download
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.arch.lifecycle.LifecycleService
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.content.Context
+import android.os.Build
+import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import im.mash.moebooru.App.Companion.app
+import im.mash.moebooru.R
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.core.scheduler.Outcome
@@ -17,6 +25,8 @@ class DownloadService : LifecycleService() {
 
     companion object {
         private const val TAG = "DownloadService"
+
+        private var NOTIFICATION_CHANNEL_ID = "im.mash.moebooru.download"
 
         private const val ACTION_INIT = "init"
         private const val ACTION_START = "start"
@@ -64,12 +74,17 @@ class DownloadService : LifecycleService() {
 
     private var startFirst = false
 
-    private var downloadListener: DownloadListener = DownloadListener()
+    private lateinit var downloadListener: DownloadListener
+
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var notificationBuilder: NotificationCompat.Builder
 
     override fun onCreate() {
         super.onCreate()
         component.inject(this)
         initViewModel()
+        initNotification()
+        downloadListener = DownloadListener(notificationManager, notificationBuilder)
         app.downloadManager.setDownloadListener(downloadListener)
     }
 
@@ -99,6 +114,33 @@ class DownloadService : LifecycleService() {
         downloadViewModel.loadAll()
     }
 
+    private fun initNotification() {
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NOTIFICATION_CHANNEL_ID = "$packageName.download"
+            val notificationChannel = NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    getString(R.string.downloads_notification),
+                    NotificationManager.IMPORTANCE_LOW)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+
+        val stopAllIntent = Intent(this, DownloadService::class.java).apply {
+            action = ACTION_STOP_ALL
+        }
+        val pendingIntentStopAll = PendingIntent.getService(this, 0, stopAllIntent, 0)
+        notificationBuilder = NotificationCompat.Builder(app, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
+                .setOngoing(true)
+                .setAutoCancel(false)
+                .setCategory(NotificationCompat.CATEGORY_PROGRESS)
+                .setColor(ContextCompat.getColor(this, R.color.primary_1))
+                .addAction(R.drawable.ic_action_pause_primary_24dp, getString(R.string.downloads_stop_all), pendingIntentStopAll)
+                .setShowWhen(false)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         handleIntent(intent)
         return super.onStartCommand(intent, flags, startId)
@@ -114,10 +156,10 @@ class DownloadService : LifecycleService() {
                 handleActionStop(param)
             }
             ACTION_START_ALL -> {
-
+                app.downloadManager.startAll(true)
             }
             ACTION_STOP_ALL -> {
-
+                app.downloadManager.stopAll()
             }
         }
     }
