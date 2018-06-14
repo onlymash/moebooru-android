@@ -2,7 +2,6 @@ package im.mash.moebooru.main.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import im.mash.moebooru.main.model.BooruDataContract
 import im.mash.moebooru.main.model.DownloadDataContract
 import io.reactivex.disposables.CompositeDisposable
 

@@ -20,23 +20,14 @@ import java.util.*
 class DownloadManager : DownloadContextListener {
 
     companion object {
-        private const val TAG = "DownloadController"
-        private var instance: DownloadManager? = null
-        @Synchronized
-        fun getInstance() : DownloadManager {
-            if (instance == null) {
-                instance = DownloadManager()
-            }
-            return instance!!
-        }
+        private const val TAG = "DownloadManager"
     }
 
-    private lateinit var posts: MutableList<PostDownload>
-    private lateinit var downloadListener: DownloadListener
-
+    private var posts: MutableList<PostDownload> = mutableListOf()
     private var tasks: MutableList<DownloadTask> = mutableListOf()
     private var size = 0
 
+    private lateinit var downloadListener: DownloadListener
     private lateinit var downloadContext: DownloadContext
     private lateinit var builder: DownloadContext.Builder
 

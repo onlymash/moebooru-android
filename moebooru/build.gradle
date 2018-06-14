@@ -91,10 +91,14 @@ dependencies {
     implementation "com.github.bumptech.glide:recyclerview-integration:$glide_version"
     implementation "com.liulishuo.okdownload:okdownload:$okdownload_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
-    kapt "android.arch.persistence.room:compiler:$room_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     implementation "com.squareup.okhttp3:okhttp:$okhttp3_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp3_version"
+    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
+    implementation "android.arch.lifecycle:runtime:$lifecycle_version"
+    implementation "android.arch.lifecycle:livedata:$lifecycle_version"
+    kapt "android.arch.lifecycle:compiler:$lifecycle_version"
+    kapt "android.arch.persistence.room:compiler:$room_version"
     testImplementation 'junit:junit:4.12'
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

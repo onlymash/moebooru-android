@@ -25,9 +25,6 @@ interface MainComponent {
     fun database(): MoeDatabase
     fun postService(): PostService
     fun scheduler(): Scheduler
-    fun mediaStoreDataSource(): MediaStoreDataSource
-    fun downloadViewModelFactory(): DownloadViewModelFactory
-    fun downloadRepo(): DownloadDataContract.Repository
     fun inject(mainActivity: MainActivity)
 }
 
@@ -131,4 +128,5 @@ class MainModule {
     fun downloadRepo(database: MoeDatabase, scheduler: Scheduler,
                      compositeDisposable: CompositeDisposable): DownloadDataContract.Repository
             = DownloadRepository(database, scheduler, compositeDisposable)
+
 }

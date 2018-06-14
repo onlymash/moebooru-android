@@ -48,16 +48,15 @@
         <!-- </activity> -->
         <!-- <activity android:name=".ui.GalleryActivity"/> -->
 
-
-         <provider
-         android:name="im.mash.moebooru.content.MoeProvider"
-         android:authorities="${applicationId}.onlymash"
-         android:exported="false"
-         android:grantUriPermissions="true">
-         <meta-data
-         android:name="android.support.FILE_PROVIDER_PATHS"
-         android:resource="@xml/file_paths" />
-         </provider>
+        <provider
+            android:name=".content.MoeProvider"
+            android:authorities="${applicationId}.onlymash"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <meta-data
             android:name="com.google.android.backup.api_key"
@@ -67,8 +66,7 @@
             android:value="false" />
 
         <service
-            android:name=".download.DownloadService"
-            android:exported="false"/>
+            android:name=".download.DownloadService" />
 
     </application>
 

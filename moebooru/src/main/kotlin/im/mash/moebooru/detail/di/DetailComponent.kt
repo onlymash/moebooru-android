@@ -12,6 +12,9 @@ import im.mash.moebooru.detail.model.DetailRepository
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.main.di.MainComponent
+import im.mash.moebooru.main.model.DownloadDataContract
+import im.mash.moebooru.main.model.DownloadRepository
+import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
 
 @DetailScope
@@ -22,6 +25,10 @@ interface DetailComponent {
 
 @Module
 class DetailModule {
+
+    @Provides
+    @DetailScope
+    fun compositeDisposable(): CompositeDisposable = CompositeDisposable()
 
     @Provides
     @DetailScope
@@ -40,9 +47,17 @@ class DetailModule {
 
     @Provides
     @DetailScope
-    fun compositeDisposable(): CompositeDisposable = CompositeDisposable()
+    fun positionViewModelFactory(): PositionViewModelFactory = PositionViewModelFactory()
 
     @Provides
     @DetailScope
-    fun positionViewModelFactory(): PositionViewModelFactory = PositionViewModelFactory()
+    fun downloadViewModelFactory(repo: DownloadDataContract.Repository,
+                                 compositeDisposable: CompositeDisposable): DownloadViewModelFactory
+            = DownloadViewModelFactory(repo, compositeDisposable)
+
+    @Provides
+    @DetailScope
+    fun downloadRepo(database: MoeDatabase, scheduler: Scheduler,
+                     compositeDisposable: CompositeDisposable): DownloadDataContract.Repository
+            = DownloadRepository(database, scheduler, compositeDisposable)
 }

@@ -16,6 +16,7 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
+import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.common.data.local.entity.PostSearch
@@ -30,6 +31,7 @@ import im.mash.moebooru.detail.viewmodel.DetailViewModel
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModel
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
+import im.mash.moebooru.download.DownloadService
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
@@ -59,8 +61,11 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     internal val positionViewModel: PositionViewModel by lazy { this.getViewModel<PositionViewModel>(positionViewModelFactory) }
 
     @Inject
+    lateinit var database: MoeDatabase
+
+    @Inject
     lateinit var downloadViewModelFactory: DownloadViewModelFactory
-    internal val downloadViewModel: DownloadViewModel by lazy { this.getViewModel<DownloadViewModel>(downloadViewModelFactory) }
+    private val downloadViewModel: DownloadViewModel by lazy { this.getViewModel<DownloadViewModel>(downloadViewModelFactory) }
 
     internal var posts: MutableList<Post> = mutableListOf()
     internal var postsSearch: MutableList<PostSearch> = mutableListOf()
@@ -103,7 +108,6 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         }
         toolbar.inflateMenu(R.menu.menu_details)
         toolbar.setOnMenuItemClickListener(this)
-
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
@@ -122,6 +126,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
             }
             R.id.action_download -> {
                 downloadViewModel.addTask(getDownloadPost())
+                DownloadService.startTask(this)
             }
             R.id.action_browser -> {
                 this.launchUrl(getPostUrl())
