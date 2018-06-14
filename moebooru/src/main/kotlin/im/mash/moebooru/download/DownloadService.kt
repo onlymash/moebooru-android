@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.content.Context
 import android.util.Log
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.core.scheduler.Outcome
@@ -12,20 +13,28 @@ import im.mash.moebooru.main.viewmodel.DownloadViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
 import javax.inject.Inject
 
-class DownloadService : LifecycleService(){
+class DownloadService : LifecycleService() {
 
     companion object {
         private const val TAG = "DownloadService"
 
+        private const val ACTION_INIT = "init"
         private const val ACTION_START = "start"
         private const val ACTION_STOP = "stop"
         private const val EXTRA_PARAM_START = "start"
         private const val EXTRA_PARAM_STOP = "stop"
-
         private const val ACTION_START_ALL = "start_all"
         private const val ACTION_STOP_ALL = "stop_all"
         private const val EXTRA_PARAM_START_ALL = "start_all"
         private const val EXTRA_PARAM_STOP_ALL = "stop_all"
+
+        @JvmStatic
+        fun init(context: Context) {
+            val intent = Intent(context, DownloadService::class.java).apply {
+                action = ACTION_INIT
+            }
+            context.startService(intent)
+        }
 
         @JvmStatic
         fun startTask(context: Context) {
@@ -46,8 +55,6 @@ class DownloadService : LifecycleService(){
     }
 
     @Inject
-    lateinit var downloadManager: DownloadManager
-    @Inject
     lateinit var downloadViewModelFactory: DownloadViewModelFactory
     private val downloadViewModel: DownloadViewModel by lazy { downloadViewModelFactory.create(DownloadViewModel::class.java) }
 
@@ -57,10 +64,13 @@ class DownloadService : LifecycleService(){
 
     private var status: String = ""
 
+    private var downloadListener: DownloadListener = DownloadListener()
+
     override fun onCreate() {
         super.onCreate()
         component.inject(this)
         initViewModel()
+        app.downloadManager.setDownloadListener(downloadListener)
     }
 
     private fun initViewModel() {
@@ -73,6 +83,7 @@ class DownloadService : LifecycleService(){
 
                         is Outcome.Success -> {
                             posts = outcome.data
+                            app.downloadManager.updateData(posts)
                             Log.i(TAG, "Outcome.Success. posts.size: ${posts.size}")
                         }
 
@@ -115,4 +126,8 @@ class DownloadService : LifecycleService(){
         status = ACTION_STOP
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        app.downloadManager.setDownloadListener(null)
+    }
 }

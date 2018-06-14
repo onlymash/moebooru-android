@@ -11,6 +11,7 @@ import com.google.firebase.FirebaseApp
 import im.mash.moebooru.core.module.AppModule
 import im.mash.moebooru.core.module.CoreComponent
 import im.mash.moebooru.core.module.DaggerCoreComponent
+import im.mash.moebooru.download.DownloadManager
 import im.mash.moebooru.util.DeviceContext
 import io.fabric.sdk.android.Fabric
 import java.io.File
@@ -26,6 +27,7 @@ class App : Application() {
 
     internal val settings: Settings by lazy { Settings(coreComponent.sharedPreferences()) }
     private val deviceContext: Context by lazy { if (Build.VERSION.SDK_INT < 24) this else DeviceContext(this) }
+    internal val downloadManager: DownloadManager by lazy { DownloadManager.getInstance() }
 
     override fun onCreate() {
         super.onCreate()

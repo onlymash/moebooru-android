@@ -86,10 +86,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     lateinit var tagViewModelFactory: TagViewModelFactory
     @Inject
     lateinit var mediaViewModelFactory: MediaViewModelFactory
-
     @Inject
     lateinit var downloadViewModelFactory: DownloadViewModelFactory
-    internal val downloadViewModel: DownloadViewModel by lazy { this.getViewModel<DownloadViewModel>(downloadViewModelFactory) }
 
     internal var boorus: MutableList<Booru> = mutableListOf()
 

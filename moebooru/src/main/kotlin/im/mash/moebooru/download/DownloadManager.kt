@@ -21,19 +21,36 @@ class DownloadManager : DownloadContextListener {
 
     companion object {
         private const val TAG = "DownloadManager"
+        private var instance: DownloadManager? = null
+        @Synchronized
+        fun getInstance(): DownloadManager {
+            if (instance == null) {
+                instance = DownloadManager()
+            }
+            return instance!!
+        }
     }
 
     private var posts: MutableList<PostDownload> = mutableListOf()
     private var tasks: MutableList<DownloadTask> = mutableListOf()
     private var size = 0
 
-    private lateinit var downloadListener: DownloadListener
+    private var downloadListener: DownloadListener? = null
+
     private lateinit var downloadContext: DownloadContext
     private lateinit var builder: DownloadContext.Builder
+
+    private val set: DownloadContext.QueueSet = DownloadContext.QueueSet()
+
+    init {
+        set.minIntervalMillisCallbackProcess = 100
+        set.headerMapFields = app.okDownloadHeaders
+    }
 
     private fun initTask() {
         size = posts.size
         if (size == 0) {
+            tasks.clear()
             return
         }
         tasks.clear()
@@ -52,9 +69,7 @@ class DownloadManager : DownloadContextListener {
             TagUtil.saveTaskName(boundTask, posts[size - index - 1].id.toString()
                     + " - " + posts[size - index - 1].domain)
         }
-        val set: DownloadContext.QueueSet = DownloadContext.QueueSet()
-        set.minIntervalMillisCallbackProcess = 100
-        set.headerMapFields = app.okDownloadHeaders
+
         builder = DownloadContext.Builder(set, tasks as ArrayList<DownloadTask>?)
         builder.setListener(this)
         downloadContext = builder.build()
@@ -129,8 +144,8 @@ class DownloadManager : DownloadContextListener {
 
     fun bind(listener: DownloadStatusListener, position: Int) {
         val task = tasks[position]
-        downloadListener.bind(task, listener)
-        downloadListener.resetInfo(task, listener)
+        downloadListener?.bind(task, listener)
+        downloadListener?.resetInfo(task, listener)
         // priority
         val priority = TagUtil.getPriority(task)
 
@@ -139,7 +154,7 @@ class DownloadManager : DownloadContextListener {
 
     fun getCount(): Int = tasks.size
 
-    fun setDownloadListener(downloadListener: DownloadListener) {
+    fun setDownloadListener(downloadListener: DownloadListener?) {
         this.downloadListener = downloadListener
     }
 

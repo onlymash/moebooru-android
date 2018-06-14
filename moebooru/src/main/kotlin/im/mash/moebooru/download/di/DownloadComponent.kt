@@ -37,8 +37,4 @@ class DownloadModule {
     fun downloadRepo(database: MoeDatabase, scheduler: Scheduler,
                      compositeDisposable: CompositeDisposable): DownloadDataContract.Repository
             = DownloadRepository(database, scheduler, compositeDisposable)
-
-    @Provides
-    @DownloadScope
-    fun downloadManager(): DownloadManager = DownloadManager()
 }
