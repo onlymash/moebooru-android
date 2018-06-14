@@ -10,6 +10,8 @@ interface DownloadDataContract {
         fun loadPosts()
         fun addPost(post: PostDownload)
         fun deletePost(post: PostDownload)
+        fun deletePosts(posts: MutableList<PostDownload>)
+        fun deleteAll()
         fun handleError(error: Throwable)
     }
 }

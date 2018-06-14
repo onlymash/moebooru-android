@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="6dp"
         android:paddingRight="6dp"
-        android:visibility="gone"
+        android:visibility="invisible"
         android:src="@drawable/ic_action_pause_24dp"
         android:contentDescription="@null"
         android:clickable="true"

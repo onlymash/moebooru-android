@@ -2,19 +2,14 @@ package im.mash.moebooru.main
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
-import android.content.ActivityNotFoundException
 import android.content.SharedPreferences
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Bundle
-import android.support.customtabs.CustomTabsIntent
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatDelegate
 import android.support.v7.content.res.AppCompatResources
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import com.mikepenz.materialdrawer.AccountHeader
@@ -38,6 +33,7 @@ import im.mash.moebooru.core.widget.TextDrawable
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.fragment.*
 import im.mash.moebooru.main.viewmodel.*
+import im.mash.moebooru.util.logi
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -179,13 +175,13 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome: Outcome<MutableList<Booru>>? ->
             when (outcome) {
                 is Outcome.Progress -> {
-                    Log.i(TAG, "Booru Outcome.Progress")
+                    logi(TAG, "Booru Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    Log.i(TAG, "Booru Outcome.Success")
+                    logi(TAG, "Booru Outcome.Success")
                     boorus = outcome.data
                     if (boorus.size <= 0) {
-                        booruViewModel.addBoorus(mutableListOf<Booru>(
+                        booruViewModel.addBoorus(mutableListOf(
                                 Booru(0, 0, "Konachan", "https", "konachan.com", "https://konachan.com"),
                                 Booru(1, 1, "Yande.re", "https", "yande.re", "https://yande.re")
                         ))
@@ -213,10 +209,10 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                     if (outcome.e is IOException) {
                         outcome.e.printStackTrace()
                     }
-                    Log.i(TAG, "Booru Outcome.Failure")
+                    logi(TAG, "Booru Outcome.Failure")
                 }
                 null -> {
-                    Log.i(TAG, "Booru outcome == null")
+                    logi(TAG, "Booru outcome == null")
                 }
             }
         })

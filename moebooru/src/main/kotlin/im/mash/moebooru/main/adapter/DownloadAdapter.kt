@@ -38,6 +38,12 @@ class DownloadAdapter(private val context: Context,
 
     override fun onBindViewHolder(holder: DownloadViewHolder, position: Int) {
         downloadManager.bind(holder.listener, position)
+        holder.start.setOnClickListener {
+            downloadManager.start(position)
+        }
+        holder.stop.setOnClickListener {
+            downloadManager.stop(position)
+        }
     }
 
     class DownloadViewHolder(itemView: View, private val context: Context) : RecyclerView.ViewHolder(itemView), DownloadStatusListener {
@@ -87,6 +93,16 @@ class DownloadAdapter(private val context: Context,
                     .load(url)
                     .centerCrop()
                     .into(this.preview)
+        }
+
+        override fun onStart() {
+            start.visibility = View.INVISIBLE
+            stop.visibility = View.VISIBLE
+        }
+
+        override fun onEnd() {
+            stop.visibility = View.INVISIBLE
+            start.visibility = View.VISIBLE
         }
     }
 }

@@ -9,4 +9,6 @@ interface DownloadStatusListener {
     fun onProgressChange(currentOffset: Long)
     fun onProgressCompleted()
     fun onLoadPreview(url: String)
+    fun onStart()
+    fun onEnd()
 }

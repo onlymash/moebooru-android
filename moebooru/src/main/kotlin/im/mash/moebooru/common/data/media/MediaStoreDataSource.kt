@@ -3,7 +3,6 @@ package im.mash.moebooru.common.data.media
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import im.mash.moebooru.common.data.media.entity.MediaStoreData
 import io.reactivex.Flowable
 
@@ -32,7 +31,7 @@ class MediaStoreDataSource(private val context: Context) {
     fun loadMediaData(path: String): Flowable<MutableList<MediaStoreData>> {
         val data = queryImages(path)
         data.addAll(queryVideos(path))
-        data.sortWith(Comparator<MediaStoreData> { mediaStoreData, mediaStoreData2 ->
+        data.sortWith(Comparator { mediaStoreData, mediaStoreData2 ->
             when {
                 mediaStoreData.dateTaken < mediaStoreData2.dateTaken -> 1
                 mediaStoreData.dateTaken > mediaStoreData2.dateTaken -> -1

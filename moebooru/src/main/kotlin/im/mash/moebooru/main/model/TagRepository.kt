@@ -1,10 +1,10 @@
 package im.mash.moebooru.main.model
 
-import android.util.Log
 import im.mash.moebooru.common.data.local.entity.Tag
 import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
+import im.mash.moebooru.util.logi
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
@@ -24,7 +24,7 @@ class TagRepository(private val local: TagDataContract.Local,
         local.getTags(site)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ tags ->
-                    Log.i(TAG, "getTags success")
+                    logi(TAG, "getTags success")
                     tagFetchOutcome.success(tags)
                 }, {  error -> handleError(error)})
                 .addTo(compositeDisposable)

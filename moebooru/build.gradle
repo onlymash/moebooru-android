@@ -78,7 +78,7 @@ dependencies {
     implementation project(':core')
     implementation "com.android.support:cardview-v7:$support_library_version"
     implementation "com.android.support:customtabs:$support_library_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.mikepenz:materialdrawer:6.0.7'
     implementation "moe.shizuku.preference:preference:$rikka_preference_version"
     implementation "moe.shizuku.preference:preference-simplemenu:$rikka_preference_version"
@@ -90,6 +90,8 @@ dependencies {
     implementation "com.github.bumptech.glide:okhttp3-integration:$glide_version"
     implementation "com.github.bumptech.glide:recyclerview-integration:$glide_version"
     implementation "com.liulishuo.okdownload:okdownload:$okdownload_version"
+    implementation "com.liulishuo.okdownload:sqlite:$okdownload_version"
+    implementation "com.liulishuo.okdownload:okhttp:$okdownload_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     implementation "com.squareup.okhttp3:okhttp:$okhttp3_version"

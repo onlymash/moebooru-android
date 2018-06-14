@@ -91,6 +91,7 @@ class DownloadListener : DownloadListener1() {
         val status = "taskStart"
         TagUtil.saveStatus(task, status)
         val listener = listeners.get(task.id) ?: return
+        listener.onStart()
         listener.onStatusChanged(status)
     }
 
@@ -102,6 +103,7 @@ class DownloadListener : DownloadListener1() {
         val status = cause.toString()
         TagUtil.saveStatus(task, status)
         val listener = listeners.get(task.id) ?: return
+        listener.onEnd()
         listener.onStatusChanged(status)
         if (cause == EndCause.COMPLETED) {
             listener.onProgressCompleted()

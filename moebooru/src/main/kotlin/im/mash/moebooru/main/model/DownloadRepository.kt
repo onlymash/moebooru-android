@@ -43,6 +43,22 @@ class DownloadRepository(private val database: MoeDatabase,
                 .subscribe()
     }
 
+    override fun deletePosts(posts: MutableList<PostDownload>) {
+        Completable.fromAction{
+            database.postDownloadDao().delete(posts)
+        }
+                .performOnBack(scheduler)
+                .subscribe()
+    }
+
+    override fun deleteAll() {
+        Completable.fromAction{
+            database.postDownloadDao().deleteAll()
+        }
+                .performOnBack(scheduler)
+                .subscribe()
+    }
+
     override fun handleError(error: Throwable) {
         downloadPostsOutcome.failed(error)
     }

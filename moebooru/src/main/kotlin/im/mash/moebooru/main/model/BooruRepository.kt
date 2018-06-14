@@ -1,10 +1,10 @@
 package im.mash.moebooru.main.model
 
-import android.util.Log
 import im.mash.moebooru.common.data.local.entity.Booru
 import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
+import im.mash.moebooru.util.logi
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
@@ -24,7 +24,7 @@ class BooruRepository(private val local: BooruDataContract.Local,
         local.getBoorus()
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ boorus ->
-                    Log.i(TAG, "LoadBoorus success")
+                    logi(TAG, "LoadBoorus success")
                     booruFetchOutcome.success(boorus)
                 }, { error ->
                     handleError(error) })

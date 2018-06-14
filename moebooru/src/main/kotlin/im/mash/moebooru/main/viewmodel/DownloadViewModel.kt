@@ -27,6 +27,14 @@ class DownloadViewModel(private val repo: DownloadDataContract.Repository,
         repo.deletePost(post)
     }
 
+    fun delete(posts: MutableList<PostDownload>) {
+        repo.deletePosts(posts)
+    }
+
+    fun deleteAll() {
+        repo.deleteAll()
+    }
+
     fun addTask(post: PostDownload) {
         repo.addPost(post)
     }

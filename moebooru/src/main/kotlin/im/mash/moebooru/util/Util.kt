@@ -25,7 +25,7 @@ import java.util.*
 val Context.screenWidth: Int
     get() {
         val wm = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val metric: DisplayMetrics = DisplayMetrics()
+        val metric = DisplayMetrics()
         wm.defaultDisplay.getMetrics(metric)
         return metric.widthPixels
     }
@@ -33,7 +33,7 @@ val Context.screenWidth: Int
 val Context.screenHeight: Int
     get() {
         val wm = this.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val metric: DisplayMetrics = DisplayMetrics()
+        val metric = DisplayMetrics()
         wm.defaultDisplay.getMetrics(metric)
         return metric.heightPixels
     }

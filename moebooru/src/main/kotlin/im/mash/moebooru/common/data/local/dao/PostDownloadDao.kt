@@ -15,4 +15,10 @@ interface PostDownloadDao {
 
     @Delete
     fun delete(post: PostDownload)
+
+    @Delete
+    fun delete(posts: MutableList<PostDownload>)
+
+    @Query("DELETE FROM posts_download")
+    fun deleteAll()
 }

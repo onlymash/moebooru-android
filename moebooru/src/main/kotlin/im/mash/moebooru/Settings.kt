@@ -52,7 +52,7 @@ class Settings(private val sp: SharedPreferences) {
 
     private val editor: SharedPreferences.Editor = sp.edit()
 
-    var nightModeString: String
+    private var nightModeString: String
         get() = sp.getString(NIGHT_MODE, NIGHT_MODE_SYSTEM)
         set(value) = editor.putString(NIGHT_MODE, value).apply()
 

@@ -1,10 +1,10 @@
 package im.mash.moebooru.main.model
 
-import android.util.Log
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
+import im.mash.moebooru.util.logi
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import okhttp3.HttpUrl
@@ -38,14 +38,14 @@ class PostRepository(private val local: PostDataContract.Local,
                         refreshPosts(httpUrl)
                         remoteFetch = false
                     }
-                    Log.i(TAG, "fetchPosts. post size: ${posts.size}")
+                    logi(TAG, "fetchPosts. post size: ${posts.size}")
                 }, {
                     error -> handleError(error) })
                 .addTo(compositeDisposable)
     }
 
     override fun refreshPosts(httpUrl: HttpUrl) {
-        Log.i(TAG, "refreshPosts")
+        logi(TAG, "refreshPosts")
         notMore = false
         remote.getPosts(httpUrl)
                 .performOnBackOutOnMain(scheduler)

@@ -1,7 +1,6 @@
 package im.mash.moebooru.download
 
 import android.net.Uri
-import android.util.Log
 import com.liulishuo.okdownload.DownloadContext
 import com.liulishuo.okdownload.DownloadContextListener
 import com.liulishuo.okdownload.DownloadTask
@@ -11,6 +10,7 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.App.Companion.moePath
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.content.UriRetriever.getUriFromFilePath
+import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.okDownloadHeaders
 import java.io.File
 import java.lang.Exception
@@ -37,7 +37,7 @@ class DownloadManager : DownloadContextListener {
 
     private var downloadListener: DownloadListener? = null
 
-    private lateinit var downloadContext: DownloadContext
+    private var downloadContext: DownloadContext? = null
     private lateinit var builder: DownloadContext.Builder
 
     private val set: DownloadContext.QueueSet = DownloadContext.QueueSet()
@@ -51,6 +51,10 @@ class DownloadManager : DownloadContextListener {
         size = posts.size
         if (size == 0) {
             tasks.clear()
+            if (downloadContext != null) {
+                downloadContext!!.stop()
+                downloadContext = null
+            }
             return
         }
         tasks.clear()
@@ -61,13 +65,15 @@ class DownloadManager : DownloadContextListener {
             val booruDir = File(booruPath)
             if (!booruDir.exists()) {
                 if (!booruDir.mkdirs()) {
-                    Log.i(TAG, "Directory not created")
+                    logi(TAG, "Directory not created")
                 }
             }
-            val boundTask: DownloadTask = DownloadTask.Builder(url, booruDir).setFilename(fileName).build()
+            val boundTask: DownloadTask = DownloadTask.Builder(url, booruPath, fileName)
+                    .setPriority(size - index)
+                    .setPassIfAlreadyCompleted(true)
+                    .build()
             tasks.add(boundTask)
-            TagUtil.saveTaskName(boundTask, posts[size - index - 1].id.toString()
-                    + " - " + posts[size - index - 1].domain)
+            TagUtil.saveTaskName(boundTask, posts[size - index - 1].id.toString() + " - " + posts[size - index - 1].domain)
         }
 
         builder = DownloadContext.Builder(set, tasks as ArrayList<DownloadTask>?)
@@ -81,7 +87,7 @@ class DownloadManager : DownloadContextListener {
         val booruDir = File(booruPath)
         if (!booruDir.exists()) {
             if (!booruDir.mkdirs()) {
-                Log.i(TAG, "Directory not created")
+                logi(TAG, "Directory not created")
             }
         }
         return getUriFromFilePath(app, "$booruPath/$fileName")
@@ -98,12 +104,12 @@ class DownloadManager : DownloadContextListener {
     }
 
     fun startAll(isSerial: Boolean) {
-        downloadContext.start(downloadListener, isSerial)
+        downloadContext?.start(downloadListener, isSerial)
     }
 
     fun stopAll() {
-        if (downloadContext.isStarted) {
-            downloadContext.stop()
+        if (downloadContext?.isStarted!!) {
+            downloadContext?.stop()
         }
     }
 
@@ -115,14 +121,16 @@ class DownloadManager : DownloadContextListener {
         tasks[position].cancel()
     }
 
-    fun clearCompleted() {
+    fun getCompleted(): MutableList<PostDownload> {
+        val completedPosts: MutableList<PostDownload> = mutableListOf()
         val size = posts.size
         for (index in 0 until size) {
             if (TagUtil.getStatus(tasks[index]) == EndCause.COMPLETED.toString()
                     || StatusUtil.getStatus(tasks[index]) ==  StatusUtil.Status.COMPLETED) {
-//                app.downloadManager.deletePost(posts[size - index - 1].url)
+                completedPosts.add(posts[size - index - 1])
             }
         }
+        return completedPosts
     }
 
     fun deleteFiles() {
@@ -134,22 +142,22 @@ class DownloadManager : DownloadContextListener {
 
     fun setPriority(task: DownloadTask, priority: Int) {
         val newTask = task.toBuilder().setPriority(priority).build()
-        downloadContext = downloadContext.toBuilder()
+        downloadContext = downloadContext!!.toBuilder()
                 .bindSetTask(newTask)
                 .build()
         newTask.setTags(task)
         TagUtil.savePriority(newTask, priority)
-        tasks = downloadContext.tasks.toMutableList()
+        tasks = downloadContext!!.tasks.toMutableList()
     }
 
     fun bind(listener: DownloadStatusListener, position: Int) {
-        val task = tasks[position]
-        downloadListener?.bind(task, listener)
-        downloadListener?.resetInfo(task, listener)
-        // priority
-        val priority = TagUtil.getPriority(task)
-
         listener.onLoadPreview(posts[size - position - 1].preview_url)
+        if (downloadListener == null) {
+            return
+        }
+        val task = tasks[position]
+        downloadListener!!.bind(task, listener)
+        downloadListener!!.resetInfo(task, listener)
     }
 
     fun getCount(): Int = tasks.size

@@ -4,13 +4,13 @@ import android.arch.lifecycle.LifecycleService
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.content.Context
-import android.util.Log
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.main.viewmodel.DownloadViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.util.logi
 import javax.inject.Inject
 
 class DownloadService : LifecycleService() {
@@ -62,7 +62,7 @@ class DownloadService : LifecycleService() {
 
     private var posts: MutableList<PostDownload> = mutableListOf()
 
-    private var status: String = ""
+    private var startFirst = false
 
     private var downloadListener: DownloadListener = DownloadListener()
 
@@ -78,17 +78,21 @@ class DownloadService : LifecycleService() {
                 Observer<Outcome<MutableList<PostDownload>>> { outcome ->
                     when (outcome) {
                         is Outcome.Progress -> {
-                            Log.i(TAG, "Outcome.Progress")
+                            logi(TAG, "Outcome.Progress")
                         }
 
                         is Outcome.Success -> {
                             posts = outcome.data
                             app.downloadManager.updateData(posts)
-                            Log.i(TAG, "Outcome.Success. posts.size: ${posts.size}")
+                            if (startFirst) {
+                                startFirst = false
+                                app.downloadManager.start(0)
+                            }
+                            logi(TAG, "Outcome.Success. posts.size: ${posts.size}")
                         }
 
                         is Outcome.Failure -> {
-                            Log.i(TAG, "Outcome.Failure")
+                            logi(TAG, "Outcome.Failure")
                         }
                     }
                 })
@@ -119,11 +123,11 @@ class DownloadService : LifecycleService() {
     }
 
     private fun handleActionStart() {
-        status = ACTION_START
+        startFirst = true
     }
 
     private fun handleActionStop(param: String) {
-        status = ACTION_STOP
+
     }
 
     override fun onDestroy() {

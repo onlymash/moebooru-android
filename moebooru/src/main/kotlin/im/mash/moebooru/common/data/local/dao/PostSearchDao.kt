@@ -1,7 +1,6 @@
 package im.mash.moebooru.common.data.local.dao
 
 import android.arch.persistence.room.*
-import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import io.reactivex.Flowable
 

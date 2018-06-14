@@ -7,7 +7,6 @@ import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -23,6 +22,7 @@ import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.DownloadAdapter
 import im.mash.moebooru.main.viewmodel.DownloadViewModel
+import im.mash.moebooru.util.logi
 
 class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
@@ -67,7 +67,7 @@ class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 Observer<Outcome<MutableList<PostDownload>>> { outcome ->
                     when (outcome) {
                         is Outcome.Progress -> {
-                            Log.i(TAG, "Outcome.Progress")
+                            logi(TAG, "Outcome.Progress")
                         }
 
                         is Outcome.Success -> {
@@ -76,11 +76,11 @@ class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                                 app.downloadManager.updateData(posts)
                             }
                             downloadAdapter.updateData(posts)
-                            Log.i(TAG, "Outcome.Success. posts.size: ${posts.size}")
+                            logi(TAG, "Outcome.Success. posts.size: ${posts.size}")
                         }
 
                         is Outcome.Failure -> {
-                            Log.i(TAG, "Outcome.Failure")
+                            logi(TAG, "Outcome.Failure")
                         }
                     }
                 })
@@ -92,11 +92,11 @@ class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
             R.id.action_start_all -> app.downloadManager.startAll(true)
             R.id.action_stop_all -> app.downloadManager.stopAll()
             R.id.action_clear_completed -> {
-                app.downloadManager.clearCompleted()
+                downloadViewModel.delete(app.downloadManager.getCompleted())
             }
             R.id.action_clear_all -> {
                 app.downloadManager.stopAll()
-//                downloadViewModel.delete()
+                downloadViewModel.deleteAll()
             }
         }
         return true

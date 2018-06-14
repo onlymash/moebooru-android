@@ -18,7 +18,6 @@ import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
@@ -39,6 +38,7 @@ import im.mash.moebooru.main.adapter.GalleryAdapter
 import im.mash.moebooru.main.adapter.GalleryPagerAdapter
 import im.mash.moebooru.main.viewmodel.MediaViewModel
 import im.mash.moebooru.util.formatDate
+import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.mayRequestStoragePermission
 import im.mash.moebooru.util.screenWidth
 import java.io.File
@@ -100,10 +100,10 @@ class GalleryFragment : ToolbarFragment() {
         mediaViewModel.mediaOutcome.observe(this, Observer<Outcome<MutableList<MediaStoreData>>> { outcome ->
             when (outcome) {
                 is Outcome.Progress -> {
-                    Log.i(TAG, "Media Outcome.Progress")
+                    logi(TAG, "Media Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    Log.i(TAG, "Media Outcome.Success")
+                    logi(TAG, "Media Outcome.Success")
                     media = outcome.data
                     galleryAdapter.updateData(media)
                 }
@@ -111,7 +111,7 @@ class GalleryFragment : ToolbarFragment() {
                     if (outcome.e is IOException) {
                         outcome.e.printStackTrace()
                     }
-                    Log.i(TAG, "Media Outcome.Failure")
+                    logi(TAG, "Media Outcome.Failure")
                 }
             }
         })

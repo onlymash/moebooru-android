@@ -13,7 +13,6 @@ import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.*
-import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
@@ -32,6 +31,7 @@ import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.PostAdapter
 import im.mash.moebooru.main.adapter.TagsDrawerAdapter
 import im.mash.moebooru.main.viewmodel.PostViewModel
+import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.screenWidth
 import im.mash.moebooru.util.toolbarHeight
 import okhttp3.HttpUrl
@@ -97,12 +97,12 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
             when (outcome) {
                 is Outcome.Progress -> {
-                    Log.i(TAG, "postViewModel Outcome.Progress")
+                    logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
                     refreshLayout.isRefreshing = false
                     val data = outcome.data
-                    Log.i(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
+                    logi(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
                     if (loadingMore) {
                         posts = data
                         postAdapter.addData(posts)
@@ -119,7 +119,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     if (outcome.e is IOException) {
                         outcome.e.printStackTrace()
                     }
-                    Log.i(TAG, "postViewModel Outcome.Failure")
+                    logi(TAG, "postViewModel Outcome.Failure")
                 }
             }
         })
@@ -195,7 +195,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     }
 
                     override fun onItemLongClick(itemView: View?, position: Int) {
-                        Log.i(TAG, "Long click item: $position")
+                        logi(TAG, "Long click item: $position")
                     }
                 }))
     }
@@ -339,7 +339,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private fun loadMoreData() {
         val isNotMore = postViewModel.isNotMore()
         if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
-            Log.i(TAG, "loadMoreData()")
+            logi(TAG, "loadMoreData()")
             refreshLayout.isRefreshing = true
             loadingMore = true
             page = posts.size/(limit-1) + 1
