@@ -8,8 +8,6 @@ import dagger.Provides
 import im.mash.moebooru.core.BuildConfig
 import im.mash.moebooru.core.constants.Constants.BASE_URL
 import im.mash.moebooru.core.constants.Constants.USER_AGENT_KEY
-import im.mash.moebooru.core.interceptor.AddCookiesInterceptor
-import im.mash.moebooru.core.interceptor.ReceivedCookiesInterceptor
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -54,8 +52,6 @@ class NetworkModule {
             chain.proceed(request)
         }
         builder.addInterceptor(interceptor)
-                .addInterceptor(AddCookiesInterceptor())
-                .addInterceptor(ReceivedCookiesInterceptor())
         if (BuildConfig.DEBUG) {
             val loggingInterceptor = HttpLoggingInterceptor()
             loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
