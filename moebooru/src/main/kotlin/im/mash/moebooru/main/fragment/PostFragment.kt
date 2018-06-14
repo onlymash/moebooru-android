@@ -2,8 +2,7 @@ package im.mash.moebooru.main.fragment
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
@@ -12,9 +11,12 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
 import android.view.*
 import android.view.animation.AnimationUtils
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.App.Companion.coreComponent
@@ -24,13 +26,15 @@ import im.mash.moebooru.common.base.LastItemListener
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Post
+import im.mash.moebooru.common.data.local.entity.Tag
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.PostAdapter
-import im.mash.moebooru.main.adapter.TagsDrawerAdapter
+import im.mash.moebooru.main.adapter.TagDrawerAdapter
 import im.mash.moebooru.main.viewmodel.PostViewModel
+import im.mash.moebooru.main.viewmodel.TagViewModel
 import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.screenWidth
 import im.mash.moebooru.util.toolbarHeight
@@ -52,6 +56,9 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private lateinit var postView: RecyclerView
     private lateinit var postAdapter: PostAdapter
 
+    private lateinit var tagView: RecyclerView
+    private lateinit var tagAdapter: TagDrawerAdapter
+
     private lateinit var refreshLayout: SwipeRefreshLayout
 
     private var spanCount = 3
@@ -68,6 +75,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private val mainActivity by lazy { activity as MainActivity }
     
     private val postViewModel: PostViewModel by lazy { this.getViewModel<PostViewModel>(mainActivity.postViewModelFactory) }
+    private val tagViewModel: TagViewModel by lazy { this.getViewModel<TagViewModel>(mainActivity.tagViewModelFactory) }
+    private var tags: MutableList<Tag> = mutableListOf()
 
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -257,16 +266,56 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         drawerToolbar.inflateMenu(R.menu.menu_search)
         drawerToolbar.setOnMenuItemClickListener { item: MenuItem? ->
             when (item?.itemId) {
-                R.id.action_add -> {}
-                R.id.action_search -> {}
+                R.id.action_add -> {
+                    val editText = EditText(this.requireContext())
+                    editText.setSingleLine()
+                    val container = FrameLayout(this.requireContext())
+                    val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    val margin = resources.getDimensionPixelSize(R.dimen.dialog_margin)
+                    params.leftMargin = margin
+                    params.rightMargin = margin
+                    params.topMargin = margin
+                    params.bottomMargin = margin
+                    editText.layoutParams = params
+                    container.addView(editText)
+                    AlertDialog.Builder(this.requireContext())
+                            .setTitle(getString(R.string.add_a_tag))
+                            .setView(container)
+                            .setPositiveButton(getString(R.string.ok), { _, _->
+                                val input = editText.text.toString()
+                                if (input.isEmpty() || input == "") {
+                                    val snackbar = Snackbar.make(view, getString(R.string.tag_can_not_be_empty), Snackbar.LENGTH_SHORT)
+                                    snackbar.view.setPadding(0, 0, 0, paddingBottom)
+                                    snackbar.show()
+                                } else {
+                                    var isExist = false
+                                    tags.forEach { tag ->
+                                        if (input == tag.tag) {
+                                            isExist = true
+                                            return@forEach
+                                        }
+                                    }
+                                    if (!isExist) {
+                                        val tag = Tag(null, app.settings.activeProfileHost, input, false)
+                                        tagViewModel.saveTag(tag)
+                                    }
+                                }
+                            })
+                            .setNegativeButton(getString(R.string.cancel), null)
+                            .show()
+                }
+                R.id.action_search -> {
+
+                }
             }
             return@setOnMenuItemClickListener true
         }
-        val drawerRecyclerView = view.findViewById<RecyclerView>(R.id.drawer_rv_list)
-        drawerRecyclerView.layoutManager = LinearLayoutManager(this.requireContext(),
+        val tagView = view.findViewById<RecyclerView>(R.id.drawer_rv_list)
+        tagView.layoutManager = LinearLayoutManager(this.requireContext(),
                 LinearLayoutManager.VERTICAL, false)
-        val drawerAdapter = TagsDrawerAdapter(this.requireContext())
-        drawerRecyclerView.adapter = drawerAdapter
+        tagAdapter = TagDrawerAdapter(this.requireContext())
+        tagView.adapter = tagAdapter
+
         val drawerViewLayout: LinearLayout = view.findViewById(R.id.drawer_list_layout)
         val drawerAppBarLayout: AppBarLayout = view.findViewById(R.id.appbar_layout_drawer)
         drawerAppBarLayout.addView(drawerToolbar)
@@ -280,6 +329,41 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             insets
         }
 
+        tagViewModel.tagOutcome.observe(this,
+                Observer<Outcome<MutableList<Tag>>> { outcome ->
+                    when (outcome) {
+                        is Outcome.Progress -> {
+                            logi(TAG, "tagViewModel Outcome.Progress")
+                        }
+                        is Outcome.Success -> {
+                            tags = outcome.data
+                            tagAdapter.updateData(tags)
+                            logi(TAG, "tagViewModel Outcome.Success.")
+                        }
+                        is Outcome.Failure -> {
+                            logi(TAG, "tagViewModel Outcome.Failure")
+                        }
+                    }
+        })
+        tagViewModel.loadTags(app.settings.activeProfileHost)
+
+        tagAdapter.setTagItemClickListener(object : TagDrawerAdapter.TagItemClickListener {
+            override fun onClickItemView(position: Int) {
+                tags[position].is_selected = !tags[position].is_selected
+                tagViewModel.saveTag(tags[position])
+            }
+
+            override fun onCopyTag(position: Int) {
+                val cm = this@PostFragment.requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as  ClipboardManager
+                val cd = ClipData.newPlainText("Tag: $position", tags[position].tag)
+                cm.primaryClip = cd
+            }
+
+            override fun onRemoveTag(position: Int) {
+                tagViewModel.deleteTag(tags[position])
+            }
+
+        })
     }
 
     private fun closeRightDrawer() {

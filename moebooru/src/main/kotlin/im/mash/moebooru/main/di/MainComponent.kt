@@ -92,12 +92,8 @@ class MainModule {
 
     @Provides
     @MainScope
-    fun tagRepo(local: TagDataContract.Local, scheduler: Scheduler, compositeDisposable: CompositeDisposable) : TagDataContract.Repository
-            = TagRepository(local, scheduler, compositeDisposable)
-
-    @Provides
-    @MainScope
-    fun localTagData(database: MoeDatabase, scheduler: Scheduler): TagDataContract.Local = TagLocalData(database, scheduler)
+    fun tagRepo(database: MoeDatabase, scheduler: Scheduler, compositeDisposable: CompositeDisposable) : TagDataContract.Repository
+            = TagRepository(database, scheduler, compositeDisposable)
 
 
     @Provides

@@ -16,17 +16,15 @@ class TagViewModel(private val repo: TagDataContract.Repository,
     }
 
     fun loadTags(site: String) {
-        if (tagOutcome.value == null) {
-            repo.getTags(site)
-        }
-    }
-
-    fun reLoadTags(site: String) {
         repo.getTags(site)
     }
 
-    fun clear() {
-        compositeDisposable.clear()
+    fun deleteTag(tag: Tag) {
+        repo.deleteTag(tag)
+    }
+
+    fun saveTag(tag: Tag) {
+        repo.saveTag(tag)
     }
 
     override fun onCleared() {

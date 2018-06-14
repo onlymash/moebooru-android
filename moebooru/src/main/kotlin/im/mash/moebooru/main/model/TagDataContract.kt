@@ -13,9 +13,4 @@ interface TagDataContract {
         fun deleteTag(tag: Tag)
         fun handleError(error: Throwable)
     }
-    interface Local {
-        fun getTags(site: String): Flowable<MutableList<Tag>>
-        fun saveTag(tag: Tag)
-        fun deleteTag(tag: Tag)
-    }
 }
