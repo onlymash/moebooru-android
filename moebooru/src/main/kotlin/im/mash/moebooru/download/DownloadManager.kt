@@ -93,7 +93,7 @@ class DownloadManager : DownloadContextListener {
         return getUriFromFilePath(app, "$booruPath/$fileName")
     }
 
-    fun getPostsUriFromPosition(position: Int): Uri {
+    fun getPostUriFromPosition(position: Int): Uri {
         val url = posts[size - position - 1].url
         return getPostUri(url, posts[size - position - 1].domain)
     }

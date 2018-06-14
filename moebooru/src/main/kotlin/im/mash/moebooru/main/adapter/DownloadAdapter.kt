@@ -1,6 +1,7 @@
 package im.mash.moebooru.main.adapter
 
 import android.content.Context
+import android.content.Intent
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -43,6 +44,17 @@ class DownloadAdapter(private val context: Context,
         }
         holder.stop.setOnClickListener {
             downloadManager.stop(position)
+        }
+        holder.itemView.setOnClickListener {
+            val uri = downloadManager.getPostUriFromPosition(position)
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setDataAndType(uri, "image/*")
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            try {
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
