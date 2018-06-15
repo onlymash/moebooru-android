@@ -10,6 +10,7 @@ import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
@@ -263,5 +264,15 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                 toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
             }
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        var result = true
+        try {
+            result = super.dispatchTouchEvent(ev)
+        } catch (e: RuntimeException) {
+            e.printStackTrace()
+        }
+        return result
     }
 }
