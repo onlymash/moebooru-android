@@ -1,9 +1,7 @@
 package im.mash.moebooru.download
 
-import android.app.NotificationManager
 import android.content.Intent
 import android.net.Uri
-import android.support.v4.app.NotificationCompat
 import android.util.SparseArray
 import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.StatusUtil
@@ -13,10 +11,10 @@ import com.liulishuo.okdownload.core.listener.DownloadListener1
 import com.liulishuo.okdownload.core.listener.assist.Listener1Assist
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import java.io.File
 import java.lang.Exception
 
-class DownloadListener(private val notificationManager: NotificationManager,
-                       private val notificationBuilder: NotificationCompat.Builder) : DownloadListener1() {
+class DownloadListener : DownloadListener1() {
 
     companion object {
         private const val TAG = "DownloadListener"
@@ -90,6 +88,19 @@ class DownloadListener(private val notificationManager: NotificationManager,
         }
     }
 
+
+    private var taskListener: TaskListener? = null
+
+    fun setTaskListener(taskListener: TaskListener) {
+        this.taskListener = taskListener
+    }
+
+    interface TaskListener {
+        fun onSuccess(taskId: Int, fileName: String, file: File)
+        fun onError(taskId: Int, fileName: String, status: String)
+        fun onProgress(taskId: Int, fileName: String, currentOffset: Long, totalLength: Long)
+    }
+
     override fun taskStart(task: DownloadTask, model: Listener1Assist.Listener1Model) {
         val status = "taskStart"
         TagUtil.saveStatus(task, status)
@@ -99,13 +110,15 @@ class DownloadListener(private val notificationManager: NotificationManager,
     }
 
     override fun taskEnd(task: DownloadTask, cause: EndCause, realCause: Exception?, model: Listener1Assist.Listener1Model) {
+        val status = cause.toString()
+        TagUtil.saveStatus(task, status)
         if (cause == EndCause.COMPLETED) {
             val mediaScanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(task.file))
             app.sendBroadcast(mediaScanIntent)
+            taskListener?.onSuccess(task.id, task.filename.toString(), task.file!!)
+        } else {
+            taskListener?.onError(task.id, task.filename.toString(), status)
         }
-        notificationManager.cancel(task.id)
-        val status = cause.toString()
-        TagUtil.saveStatus(task, status)
         val listener = listeners.get(task.id) ?: return
         listener.onEnd()
         listener.onStatusChanged(status)
@@ -118,9 +131,7 @@ class DownloadListener(private val notificationManager: NotificationManager,
         val status = "progress"
         TagUtil.saveStatus(task, status)
         TagUtil.saveOffset(task, currentOffset)
-        notificationBuilder.setProgress(totalLength.toInt(), currentOffset.toInt(), false)
-        notificationBuilder.setContentText(task.filename)
-        notificationManager.notify(task.id, notificationBuilder.build())
+        taskListener?.onProgress(task.id, task.filename.toString(), currentOffset, totalLength)
         val listener = listeners.get(task.id) ?: return
         listener.onStatusChanged(status)
         listener.onProgressChange(currentOffset)

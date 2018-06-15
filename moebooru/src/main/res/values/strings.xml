@@ -120,4 +120,7 @@
     <string name="name">Name</string>
     <string name="filename">Filename</string>
     <string name="open_on_website">Open on website</string>
+
+    <string name="stat_downloading_title">Downloading</string>
+    <string name="stat_download_done_title">Download finished</string>
 </resources>

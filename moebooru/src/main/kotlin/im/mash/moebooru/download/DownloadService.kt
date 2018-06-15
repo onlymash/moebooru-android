@@ -1,6 +1,5 @@
 package im.mash.moebooru.download
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -8,6 +7,7 @@ import android.arch.lifecycle.LifecycleService
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
@@ -15,10 +15,12 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.PostDownload
+import im.mash.moebooru.content.UriRetriever
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.main.viewmodel.DownloadViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.util.logi
+import java.io.File
 import javax.inject.Inject
 
 class DownloadService : LifecycleService() {
@@ -77,15 +79,16 @@ class DownloadService : LifecycleService() {
     private lateinit var downloadListener: DownloadListener
 
     private lateinit var notificationManager: NotificationManager
-    private lateinit var notificationBuilder: NotificationCompat.Builder
+    private lateinit var downloadingNotificationBuilder: NotificationCompat.Builder
+    private lateinit var downloadedNotificationBuilder: NotificationCompat.Builder
+    private lateinit var downloadErrorNotificationBuilder: NotificationCompat.Builder
 
     override fun onCreate() {
         super.onCreate()
         component.inject(this)
         initViewModel()
         initNotification()
-        downloadListener = DownloadListener(notificationManager, notificationBuilder)
-        app.downloadManager.setDownloadListener(downloadListener)
+        initTaskListener()
     }
 
     private fun initViewModel() {
@@ -114,6 +117,36 @@ class DownloadService : LifecycleService() {
         downloadViewModel.loadAll()
     }
 
+    private fun initTaskListener() {
+        downloadListener = DownloadListener()
+        downloadListener.setTaskListener(object : DownloadListener.TaskListener {
+
+            override fun onProgress(taskId: Int, fileName: String, currentOffset: Long, totalLength: Long) {
+                downloadingNotificationBuilder.setContentText(fileName)
+                downloadingNotificationBuilder.setProgress(totalLength.toInt(), currentOffset.toInt(), false)
+                notificationManager.notify(taskId, downloadingNotificationBuilder.build())
+            }
+
+            override fun onSuccess(taskId: Int, fileName: String, file: File) {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.setDataAndType(UriRetriever.getUriFromFile(this@DownloadService, file), "image/*")
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                val pendingIntent = PendingIntent.getActivity(this@DownloadService, 0, intent, 0)
+                downloadedNotificationBuilder.setContentIntent(pendingIntent)
+                downloadedNotificationBuilder.setContentText(fileName)
+                notificationManager.notify(taskId, downloadedNotificationBuilder.build())
+            }
+
+            override fun onError(taskId: Int, fileName: String, status: String) {
+                downloadErrorNotificationBuilder.setContentTitle(status)
+                downloadErrorNotificationBuilder.setContentText(fileName)
+                notificationManager.notify(taskId, downloadErrorNotificationBuilder.build())
+            }
+
+        })
+        app.downloadManager.setDownloadListener(downloadListener)
+    }
+
     private fun initNotification() {
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -129,7 +162,7 @@ class DownloadService : LifecycleService() {
             action = ACTION_STOP_ALL
         }
         val pendingIntentStopAll = PendingIntent.getService(this, 0, stopAllIntent, 0)
-        notificationBuilder = NotificationCompat.Builder(app, NOTIFICATION_CHANNEL_ID)
+        downloadingNotificationBuilder = NotificationCompat.Builder(app, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setOngoing(true)
                 .setAutoCancel(false)
@@ -137,6 +170,22 @@ class DownloadService : LifecycleService() {
                 .setColor(ContextCompat.getColor(this, R.color.primary_1))
                 .addAction(R.drawable.ic_action_pause_primary_24dp, getString(R.string.downloads_stop_all), pendingIntentStopAll)
                 .setShowWhen(false)
+                .setContentTitle(getString(R.string.stat_downloading_title))
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+
+        downloadedNotificationBuilder = NotificationCompat.Builder(app, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.stat_sys_download_done)
+                .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+                .setContentTitle(getString(R.string.stat_download_done_title))
+                .setOngoing(false)
+                .setAutoCancel(true)
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+
+        downloadErrorNotificationBuilder = NotificationCompat.Builder(app, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.stat_sys_warning)
+                .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
+                .setOngoing(false)
+                .setAutoCancel(true)
                 .setChannelId(NOTIFICATION_CHANNEL_ID)
 
     }

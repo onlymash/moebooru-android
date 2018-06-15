@@ -19,4 +19,15 @@ object UriRetriever {
             Uri.fromFile(file)
         }
     }
+
+    fun getUriFromFile(context: Context, file: File): Uri {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            FileProvider.getUriForFile(
+                    context,
+                    context.applicationContext.packageName + ".onlymash",
+                    file)
+        } else {
+            Uri.fromFile(file)
+        }
+    }
 }
