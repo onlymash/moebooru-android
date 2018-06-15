@@ -7,7 +7,7 @@ buildscript {
         min_sdk_version = 21
         sdk_version = 27
         build_tools_version = '27.0.3'
-        kotlin_version = '1.2.41'
+        kotlin_version = '1.2.50'
         support_library_version = '27.1.1'
         rikka_preference_version = '2.2.3'
         glide_version = '4.7.1'
