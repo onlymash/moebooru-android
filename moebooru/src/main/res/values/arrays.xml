@@ -113,4 +113,14 @@
         <item>origin</item>
     </string-array>
 
+    <string-array name="image_loader">
+        <item>@string/image_loader_glide</item>
+        <item>@string/image_loader_sketch</item>
+    </string-array>
+
+    <string-array name="image_loader_values">
+        <item>glide</item>
+        <item>sketch</item>
+    </string-array>
+
 </resources>

@@ -16,6 +16,11 @@
     <string name="grid">Grid</string>
     <string name="staggered_grid">Staggered Grid</string>
 
+    <string name="advanced_options">Advanced options</string>
+    <string name="image_loader">Image loader</string>
+    <string name="image_loader_glide">Glide</string>
+    <string name="image_loader_sketch">Sketch</string>
+
     <string name="cache">Cache</string>
     <string name="cache_memory">Memory cache</string>
     <string name="cache_disk">Disk cache</string>
