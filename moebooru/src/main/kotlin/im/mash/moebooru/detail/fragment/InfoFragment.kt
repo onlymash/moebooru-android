@@ -1,6 +1,7 @@
 package im.mash.moebooru.detail.fragment
 
 import android.arch.lifecycle.Observer
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.format.DateFormat
@@ -88,9 +89,15 @@ class InfoFragment : Fragment() {
                 }
                 id.text = post!!.id.toString()
                 author.text = post!!.author
-                val cal = Calendar.getInstance(Locale.getDefault())
-                cal.timeInMillis = (post!!.created_at * 1000).toLong()
-                createdAt.text = DateFormat.format("yyyy-MM-dd HH:mm", cal)
+                val date = Date()
+                date.time = post!!.created_at * 1000L
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    val df = android.icu.text.DateFormat.getDateInstance()
+                    createdAt.text = df.format(date)
+                } else {
+                    val df = DateFormat.getDateFormat(this.requireContext())
+                    createdAt.text = df.format(date)
+                }
                 creatorId.text = post!!.creator_id.toString()
                 val hw = "${post!!.height} x ${post!!.width}"
                 heightWidth.text = hw
@@ -120,9 +127,15 @@ class InfoFragment : Fragment() {
                 logi(TAG, "postSearch.site: ${postSearch!!.site}")
                 id.text = postSearch!!.id.toString()
                 author.text = postSearch!!.author
-                val cal = Calendar.getInstance(Locale.getDefault())
-                cal.timeInMillis = (postSearch!!.created_at * 1000).toLong()
-                createdAt.text = DateFormat.format("yyyy-MM-dd HH:mm", cal)
+                val date = Date()
+                date.time = postSearch!!.created_at * 1000L
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    val df = android.icu.text.DateFormat.getDateInstance()
+                    createdAt.text = df.format(date)
+                } else {
+                    val df = DateFormat.getDateFormat(this.requireContext())
+                    createdAt.text = df.format(date)
+                }
                 creatorId.text = postSearch!!.creator_id.toString()
                 val hw = "${postSearch!!.height} x ${postSearch!!.width}"
                 heightWidth.text = hw
