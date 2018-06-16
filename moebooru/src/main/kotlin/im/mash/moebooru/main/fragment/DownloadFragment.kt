@@ -95,8 +95,10 @@ class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                 downloadViewModel.delete(app.downloadManager.getCompleted())
             }
             R.id.action_clear_all -> {
-                app.downloadManager.stopAll()
-                downloadViewModel.deleteAll()
+                if (posts.size > 0) {
+                    app.downloadManager.stopAll()
+                    downloadViewModel.deleteAll()
+                }
             }
         }
         return true
