@@ -248,6 +248,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             previousSelectedDrawer = id
             when (id) {
                 DRAWER_ITEM_POSTS -> displayFragment(PostFragment())
+                DRAWER_ITEM_ACCOUNT -> displayFragment(AccountFragment())
                 DRAWER_ITEM_DOWNLOADS -> displayFragment(DownloadFragment())
                 DRAWER_ITEM_LOCAL_GALLERY -> displayFragment(GalleryFragment())
                 DRAWER_ITEM_SETTINGS -> displayFragment(SettingsFragment())
