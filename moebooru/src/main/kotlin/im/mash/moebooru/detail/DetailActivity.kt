@@ -35,6 +35,7 @@ import im.mash.moebooru.download.DownloadService
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import im.mash.moebooru.util.launchUrl
 import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.mayRequestStoragePermission
@@ -68,6 +69,9 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     @Inject
     lateinit var downloadViewModelFactory: DownloadViewModelFactory
     private val downloadViewModel: DownloadViewModel by lazy { this.getViewModel<DownloadViewModel>(downloadViewModelFactory) }
+
+    @Inject
+    lateinit var tagViewModelFactory: TagViewModelFactory
 
     internal var posts: MutableList<Post> = mutableListOf()
     internal var postsSearch: MutableList<PostSearch> = mutableListOf()

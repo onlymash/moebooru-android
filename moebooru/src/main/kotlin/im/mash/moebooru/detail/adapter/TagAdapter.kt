@@ -29,6 +29,32 @@ class TagAdapter : RecyclerView.Adapter<TagAdapter.TagViewHolder>(){
 
     override fun onBindViewHolder(holder: TagViewHolder, position: Int) {
         holder.tagName.text = tags[position]
+        holder.itemView.setOnClickListener {
+            listener?.onClickItem(tags[position])
+        }
+        holder.itemView.setOnLongClickListener {
+            listener?.onLongClickItem(tags[position])
+            return@setOnLongClickListener true
+        }
+        holder.tagAdd.setOnClickListener {
+            listener?.onClickAdd(tags[position])
+        }
+        holder.tagAddNegated.setOnClickListener {
+            listener?.onClickAddNegated(tags[position])
+        }
+    }
+
+    private var listener: TagItemClickListener? = null
+
+    interface TagItemClickListener {
+        fun onClickItem(tag: String)
+        fun onClickAdd(tag: String)
+        fun onClickAddNegated(tag: String)
+        fun onLongClickItem(tag: String)
+    }
+
+    fun setTagItemClickListener(listener: TagItemClickListener) {
+        this.listener = listener
     }
 
     inner class TagViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

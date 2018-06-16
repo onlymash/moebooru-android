@@ -4,7 +4,7 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.Index
 import android.arch.persistence.room.PrimaryKey
 
-@Entity(tableName = "tags", indices = [(Index(value = ["uid", "tag", "site"], unique = true))])
+@Entity(tableName = "tags", indices = [(Index(value = ["tag", "site"], unique = true))])
 data class Tag(
         @PrimaryKey(autoGenerate = true)
         val uid: Int?,

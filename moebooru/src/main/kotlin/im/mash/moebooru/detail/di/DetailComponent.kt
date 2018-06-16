@@ -14,7 +14,10 @@ import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.main.di.MainComponent
 import im.mash.moebooru.main.model.DownloadDataContract
 import im.mash.moebooru.main.model.DownloadRepository
+import im.mash.moebooru.main.model.TagDataContract
+import im.mash.moebooru.main.model.TagRepository
 import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
 
 @DetailScope
@@ -60,4 +63,15 @@ class DetailModule {
     fun downloadRepo(database: MoeDatabase, scheduler: Scheduler,
                      compositeDisposable: CompositeDisposable): DownloadDataContract.Repository
             = DownloadRepository(database, scheduler, compositeDisposable)
+
+    @Provides
+    @DetailScope
+    fun tagViewModelFactory(repository: TagDataContract.Repository,
+                            compositeDisposable: CompositeDisposable): TagViewModelFactory
+            = TagViewModelFactory(repository,compositeDisposable)
+
+    @Provides
+    @DetailScope
+    fun tagRepo(database: MoeDatabase, scheduler: Scheduler, compositeDisposable: CompositeDisposable) : TagDataContract.Repository
+            = TagRepository(database, scheduler, compositeDisposable)
 }
