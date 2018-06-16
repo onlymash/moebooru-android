@@ -13,10 +13,10 @@ interface PostSearchDao {
     @Query("SELECT * FROM posts_search WHERE site=:site AND keyword = :tags AND id = :id")
     fun getPost(site: String, tags: String, id: Int): Flowable<PostSearch>
 
-    @Query("SELECT * FROM posts_search WHERE site=:site")
+    @Query("SELECT * FROM posts_search WHERE site=:site ORDER BY id DESC")
     fun getPosts(site: String): Flowable<MutableList<PostSearch>>
 
-    @Query("SELECT * FROM posts_search WHERE site=:site AND keyword = :tags")
+    @Query("SELECT * FROM posts_search WHERE site=:site AND keyword = :tags ORDER BY id DESC")
     fun getPosts(site: String, tags: String): Flowable<MutableList<PostSearch>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
