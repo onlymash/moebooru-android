@@ -11,10 +11,15 @@ import android.view.ViewGroup
 import im.mash.moebooru.R
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.detail.adapter.TagAdapter
+import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.screenWidth
 import im.mash.moebooru.util.toolbarHeight
 
 class TagFragment : Fragment() {
+
+    companion object {
+        private const val TAG = "TagFragment"
+    }
 
     private var tags: MutableList<String> = mutableListOf()
 
@@ -46,7 +51,7 @@ class TagFragment : Fragment() {
         position = detailActivity.position
         type = detailActivity.type
         setData()
-        detailActivity.positionViewModel.getPosition().observe(this, Observer {  pos ->
+        detailActivity.positionViewModel.getPosition().observe(this, Observer { pos ->
             if (pos != null) {
                 position = pos
                 setData()
@@ -67,6 +72,7 @@ class TagFragment : Fragment() {
                 val tagsList = detailActivity.postsSearch[position].tags?.split(" ")?.toMutableList()
                 if (tagsList != null) {
                     tags = tagsList
+                    logi(TAG, "tags size: ${tags.size}")
                     tagAdapter.updateData(tags)
                 }
             }

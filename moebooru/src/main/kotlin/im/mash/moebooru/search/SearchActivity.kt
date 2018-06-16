@@ -3,6 +3,7 @@ package im.mash.moebooru.search
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.Snackbar
@@ -10,6 +11,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.*
+import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
 import im.mash.moebooru.App.Companion.app
@@ -19,7 +21,6 @@ import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.base.LastItemListener
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.data.local.entity.PostSearch
-import im.mash.moebooru.common.data.remote.PostSearchService
 import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
@@ -29,12 +30,11 @@ import im.mash.moebooru.search.viewmodel.PostSearchViewModel
 import im.mash.moebooru.search.viewmodel.PostSearchViewModelFactory
 import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.screenWidth
-import io.reactivex.disposables.CompositeDisposable
 import okhttp3.HttpUrl
 import java.io.IOException
 import javax.inject.Inject
 
-class SearchActivity : SlidingActivity() {
+class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
     companion object {
         private const val TAG = "SearchActivity"
     }
@@ -60,6 +60,9 @@ class SearchActivity : SlidingActivity() {
     private val component by lazy { MoeDH.searchComponent() }
 
     @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
+    @Inject
     lateinit var searchViewModelFactory: PostSearchViewModelFactory
 
     private val postSearchViewModel: PostSearchViewModel by lazy {
@@ -77,6 +80,7 @@ class SearchActivity : SlidingActivity() {
         initView()
         initRefresh()
         observePosts()
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     private fun observePosts() {
@@ -121,6 +125,27 @@ class SearchActivity : SlidingActivity() {
         appBarLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.toolbar_post))
         toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent))
         toolbar.inflateMenu(R.menu.menu_search)
+        when (app.settings.gridModeString) {
+            Settings.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).isChecked = true
+            Settings.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
+        }
+        toolbar.setOnMenuItemClickListener {item: MenuItem? ->
+            when (item?.itemId) {
+                R.id.action_grid -> {
+                    if (!toolbar.menu.findItem(R.id.action_grid).isChecked) {
+                        toolbar.menu.findItem(R.id.action_grid).isChecked = true
+                        app.settings.gridModeString = Settings.GRID_MODE_GRID
+                    }
+                }
+                R.id.action_staggered_grid -> {
+                    if (!toolbar.menu.findItem(R.id.action_staggered_grid).isChecked) {
+                        toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
+                        app.settings.gridModeString = Settings.GRID_MODE_STAGGERED_GRID
+                    }
+                }
+            }
+            return@setOnMenuItemClickListener true
+        }
         toolbar.setTitle(R.string.posts)
         toolbar.subtitle = keyword
         appBarLayout.addView(toolbar)
@@ -220,5 +245,33 @@ class SearchActivity : SlidingActivity() {
             snackbar.view.setPadding(0, 0, 0, paddingBottom)
             snackbar.show()
         }
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        when (key) {
+            Settings.GRID_MODE -> {
+                when (app.settings.gridModeString) {
+                    Settings.GRID_MODE_GRID -> {
+                        postSearchView.layoutManager = GridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
+                        postSearchView.setHasFixedSize(true)
+                        postSearchAdapter.setGridMode(Settings.GRID_MODE_GRID)
+                        postSearchAdapter.updateData(mutableListOf())
+                        postSearchAdapter.updateData(posts)
+                    }
+                    Settings.GRID_MODE_STAGGERED_GRID -> {
+                        postSearchView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                        postSearchView.setHasFixedSize(false)
+                        postSearchAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
+                        postSearchAdapter.updateData(mutableListOf())
+                        postSearchAdapter.updateData(posts)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 }

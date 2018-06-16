@@ -19,7 +19,6 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import im.mash.moebooru.App.Companion.app
-import im.mash.moebooru.App.Companion.coreComponent
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.base.LastItemListener
@@ -87,7 +86,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        coreComponent.sharedPreferences().registerOnSharedPreferenceChangeListener(this)
         initToolbar()
         initRightDrawer(view)
         initDrawerListener()
@@ -100,6 +98,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             refreshLayout.isRefreshing = true
             postViewModel.loadPosts(getHttpUrl())
         }
+        mainActivity.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     private fun observePosts() {
@@ -331,7 +330,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             }
             return@setOnMenuItemClickListener true
         }
-        val tagView = view.findViewById<RecyclerView>(R.id.drawer_rv_list)
+        tagView = view.findViewById<RecyclerView>(R.id.drawer_rv_list)
         tagView.layoutManager = LinearLayoutManager(this.requireContext(),
                 LinearLayoutManager.VERTICAL, false)
         tagAdapter = TagDrawerAdapter(this.requireContext())
@@ -461,6 +460,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     override fun onDestroy() {
         super.onDestroy()
         mainActivity.drawer.drawerLayout.removeDrawerListener(drawerListener)
-        coreComponent.sharedPreferences().unregisterOnSharedPreferenceChangeListener(this)
+        mainActivity.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 }

@@ -69,11 +69,10 @@ class InfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView(view)
-        initInfo(detailActivity.position)
         type = detailActivity.type
+        initInfo(detailActivity.position)
         detailActivity.positionViewModel.getPosition().observe(this, Observer { position ->
-            if (position != null && (position < detailActivity.postsSearch.size ||
-                            position < detailActivity.posts.size)) {
+            if (position != null && (position < detailActivity.postsSearch.size || position < detailActivity.posts.size)) {
                 logi(TAG, "$position")
                 initInfo(position)
             }
@@ -118,6 +117,7 @@ class InfoFragment : Fragment() {
                 if (postSearch == null) {
                     return
                 }
+                logi(TAG, "postSearch.site: ${postSearch!!.site}")
                 id.text = postSearch!!.id.toString()
                 author.text = postSearch!!.author
                 val cal = Calendar.getInstance(Locale.getDefault())

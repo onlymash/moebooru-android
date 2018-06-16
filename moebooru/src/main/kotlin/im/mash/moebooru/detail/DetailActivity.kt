@@ -197,9 +197,9 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
 
     private fun initDetailPager() {
         detailAdapter = DetailAdapter(supportFragmentManager, mutableListOf(
-//                InfoFragment(),
-                PagerFragment()
-//                TagFragment()
+                InfoFragment(),
+                PagerFragment(),
+                TagFragment()
         ))
         detailPager.adapter = detailAdapter
         detailPager.currentItem = 1

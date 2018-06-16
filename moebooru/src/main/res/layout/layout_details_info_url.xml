@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp">
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearance"
                     android:textColor="@color/stats_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -58,13 +58,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp">
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearance"
                     android:textColor="@color/stats_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/post_stats_sample_size" />
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearance"
                     android:textColor="@color/white"
                     android:ellipsize="marquee"
                     android:gravity="right"
@@ -88,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp">
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearance"
                     android:textColor="@color/stats_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -117,12 +117,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp">
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearance"
                     android:textColor="@color/stats_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/post_stats_larger_size" />
-                <TextView android:textAppearance="?android:textAppearanceMedium"
+                <TextView android:textAppearance="?android:textAppearance"
                     android:textColor="@color/white"
                     android:ellipsize="marquee"
                     android:gravity="right"
@@ -146,7 +146,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp">
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearance"
                     android:textColor="@color/stats_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -175,13 +175,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp">
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearance"
                     android:textColor="@color/stats_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/post_stats_origin_size" />
                 <TextView
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAppearance="?android:textAppearance"
                     android:textColor="@color/white"
                     android:ellipsize="marquee"
                     android:gravity="right"

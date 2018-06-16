@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatDelegate
 import android.support.v7.content.res.AppCompatResources
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -21,7 +22,6 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem
 import com.mikepenz.materialdrawer.model.ProfileSettingDrawerItem
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem
 import im.mash.moebooru.App.Companion.app
-import im.mash.moebooru.App.Companion.coreComponent
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
@@ -71,6 +71,9 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     private var previousSelectedDrawer: Long = 0L    // it's actually lateinit
 
     private val component by lazy { MoeDH.mainComponent() }
+
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
 
     @Inject
     lateinit var booruViewModelFactory: BooruViewModelFactory
@@ -170,7 +173,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             insets
         }
 
-        coreComponent.sharedPreferences().registerOnSharedPreferenceChangeListener(this)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
         booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome: Outcome<MutableList<Booru>>? ->
             when (outcome) {
@@ -266,7 +269,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     override fun onDestroy() {
         super.onDestroy()
-        coreComponent.sharedPreferences().unregisterOnSharedPreferenceChangeListener(this)
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     override fun onBackPressed() {
@@ -282,5 +285,15 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 }
             }
         }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        var result = true
+        try {
+            result = super.dispatchTouchEvent(ev)
+        } catch (e: RuntimeException) {
+            e.printStackTrace()
+        }
+        return result
     }
 }

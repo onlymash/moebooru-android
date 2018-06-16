@@ -2,6 +2,7 @@ package im.mash.moebooru.main.di
 
 import android.arch.persistence.room.Room
 import android.content.Context
+import android.content.SharedPreferences
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -25,6 +26,7 @@ interface MainComponent {
     fun database(): MoeDatabase
     fun scheduler(): Scheduler
     fun retrofit(): Retrofit
+    fun sharedPreferences(): SharedPreferences
     fun inject(mainActivity: MainActivity)
 }
 
