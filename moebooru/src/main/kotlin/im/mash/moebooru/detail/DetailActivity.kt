@@ -37,6 +37,7 @@ import im.mash.moebooru.main.viewmodel.DownloadViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.util.launchUrl
 import im.mash.moebooru.util.logi
+import im.mash.moebooru.util.mayRequestStoragePermission
 import javax.inject.Inject
 
 class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolbar.OnMenuItemClickListener {
@@ -126,8 +127,10 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                 }
             }
             R.id.action_download -> {
-                downloadViewModel.addTask(getDownloadPost())
-                DownloadService.startTask(this)
+                if (mayRequestStoragePermission(this, 0)) {
+                    downloadViewModel.addTask(getDownloadPost())
+                    DownloadService.startTask(this)
+                }
             }
             R.id.action_browser -> {
                 this.launchUrl(getPostUrl())

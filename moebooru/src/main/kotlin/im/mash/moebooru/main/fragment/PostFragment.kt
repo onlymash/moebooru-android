@@ -106,6 +106,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
             when (outcome) {
                 is Outcome.Progress -> {
+                    if (!refreshLayout.isRefreshing) refreshLayout.isRefreshing = true
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
@@ -308,8 +309,24 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                             .show()
                 }
                 R.id.action_search -> {
-                    val intent = Intent(this.requireContext(), SearchActivity::class.java)
-                    startActivity(intent)
+                    var keyword = ""
+                    tags.forEach { tag ->
+                        if (tag.is_selected) {
+                            keyword = when (keyword) {
+                                "" -> tag.tag
+                                else -> "$keyword ${tag.tag}"
+                            }
+                        }
+                    }
+                    if (keyword == "") {
+                        val snackbar: Snackbar = Snackbar.make(this.view!!, "Tag cant be null", Snackbar.LENGTH_SHORT)
+                        snackbar.view.setPadding(0, 0, 0, paddingBottom)
+                        snackbar.show()
+                    } else {
+                        val intent = Intent(this.requireContext(), SearchActivity::class.java)
+                        intent.putExtra("keyword", keyword)
+                        startActivity(intent)
+                    }
                 }
             }
             return@setOnMenuItemClickListener true

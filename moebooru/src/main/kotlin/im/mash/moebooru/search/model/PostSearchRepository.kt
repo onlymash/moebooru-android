@@ -32,6 +32,7 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
         postFetchOutcome.loading(true)
         var tags = httpUrl.queryParameter("tags")
         if (tags == null) tags = ""
+        logi(TAG, "remoteFetch: $remoteFetch")
         //Observe changes to the db
         local.getPosts(httpUrl.host(), tags)
                 .performOnBackOutOnMain(scheduler)
@@ -71,15 +72,19 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
         if (notMore) {
             return
         }
+        var tags = httpUrl.queryParameter("tags")
+        if (tags == null) tags = ""
         remote.getPosts(httpUrl)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe(
                         { posts ->
                             val limit = httpUrl.queryParameter("limit")!!.toInt()
                             val size = posts.size
+                            logi(TAG, "loadMorePosts. size: $size")
                             if (size > 0) {
                                 posts.forEach { post ->
                                     post.site = httpUrl.host()
+                                    post.keyword = tags
                                 }
                                 addPosts(posts)
                             }

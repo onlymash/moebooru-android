@@ -72,9 +72,10 @@ class SearchActivity : SlidingActivity() {
         component.inject(this)
         spanCount = this.screenWidth/resources.getDimension(R.dimen.item_width).toInt()
         limit = app.settings.postLimitInt
+        keyword = intent.getStringExtra("keyword")
+        logi(TAG, keyword)
         initView()
         initRefresh()
-        keyword = "yuri"
         observePosts()
     }
 
@@ -83,6 +84,7 @@ class SearchActivity : SlidingActivity() {
                 Observer<Outcome<MutableList<PostSearch>>> { outcome ->
             when (outcome) {
                 is Outcome.Progress -> {
+                    if (!refreshLayout.isRefreshing) refreshLayout.isRefreshing = true
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
@@ -119,6 +121,8 @@ class SearchActivity : SlidingActivity() {
         appBarLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.toolbar_post))
         toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent))
         toolbar.inflateMenu(R.menu.menu_search)
+        toolbar.setTitle(R.string.posts)
+        toolbar.subtitle = keyword
         appBarLayout.addView(toolbar)
         ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
             paddingTop = insets.systemWindowInsetTop
@@ -204,10 +208,10 @@ class SearchActivity : SlidingActivity() {
     private fun loadMoreData() {
         val isNotMore = postSearchViewModel.isNotMore()
         if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
-            logi(TAG, "loadMoreData()")
             refreshLayout.isRefreshing = true
             loadingMore = true
             page = posts.size/(limit-1) + 1
+            logi(TAG, "loadMoreData. page: $page")
             postSearchViewModel.loadMorePosts(getHttpUrl())
         }
         if (isNotMore && notiNotMore) {

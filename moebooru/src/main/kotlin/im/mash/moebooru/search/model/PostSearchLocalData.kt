@@ -13,7 +13,7 @@ class PostSearchLocalData(private val database: MoeDatabase,
     : PostSearchDataContract.Local {
 
     override fun getPosts(site: String, tags: String): Flowable<MutableList<PostSearch>> {
-        return database.postSearchDao().getPosts(site)
+        return database.postSearchDao().getPosts(site, tags)
     }
 
     override fun addPosts(posts: MutableList<PostSearch>) {
