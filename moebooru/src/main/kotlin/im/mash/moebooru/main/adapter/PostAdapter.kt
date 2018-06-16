@@ -10,6 +10,7 @@ import im.mash.moebooru.Settings
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.widget.FixedImageView
 import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.glide.MoeGlideUrl
 import im.mash.moebooru.util.*
 
 class PostAdapter(private val context: Context, private var gridMode: String) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
@@ -67,7 +68,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
             Settings.GRID_MODE_GRID -> {
                 holder.fixedImageView.setWidthAndHeightWeight(1, 1)
                 GlideApp.with(context)
-                        .load(posts[position].preview_url)
+                        .load(MoeGlideUrl(posts[position].preview_url))
                         .centerCrop()
                         .placeholder(placeHolderId)
                         .into(holder.fixedImageView)
@@ -75,7 +76,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
             else -> {
                 holder.fixedImageView.setWidthAndHeightWeight(posts[position].width, posts[position].height)
                 GlideApp.with(context)
-                        .load(posts[position].preview_url)
+                        .load(MoeGlideUrl(posts[position].preview_url))
                         .fitCenter()
                         .placeholder(placeHolderId)
                         .into(holder.fixedImageView)

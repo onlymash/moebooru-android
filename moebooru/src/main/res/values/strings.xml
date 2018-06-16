@@ -47,8 +47,8 @@
     <string name="more_options">More options</string>
 
     <string name="post_limit_default">50 (Default)</string>
-    <string name="cache_memory_default">256 MiB (Default)</string>
-    <string name="disk_memory_default">256 MiB (Default)</string>
+    <string name="cache_memory_default">512 MiB (Default)</string>
+    <string name="disk_memory_default">512 MiB (Default)</string>
 
     <string name="crash_report">Crash Report</string>
     <string name="enable_crash_report">Enable crash report</string>

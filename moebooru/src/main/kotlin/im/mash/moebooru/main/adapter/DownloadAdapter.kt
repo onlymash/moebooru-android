@@ -16,6 +16,7 @@ import im.mash.moebooru.download.DownloadManager
 import im.mash.moebooru.download.DownloadStatusListener
 import im.mash.moebooru.download.ProgressUtil
 import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.glide.MoeGlideUrl
 
 class DownloadAdapter(private val context: Context,
                       private val downloadManager: DownloadManager) : RecyclerView.Adapter<DownloadAdapter.DownloadViewHolder>()  {
@@ -102,7 +103,7 @@ class DownloadAdapter(private val context: Context,
 
         override fun onLoadPreview(url: String) {
             GlideApp.with(context)
-                    .load(url)
+                    .load(MoeGlideUrl(url))
                     .centerCrop()
                     .into(this.preview)
         }

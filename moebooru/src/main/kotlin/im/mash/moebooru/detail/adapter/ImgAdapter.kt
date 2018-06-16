@@ -20,6 +20,7 @@ import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.core.widget.photoview.PhotoView
 import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.glide.MoeGlideUrl
 
 class ImgAdapter(private val context: Context) : PagerAdapter() {
 
@@ -79,7 +80,7 @@ class ImgAdapter(private val context: Context) : PagerAdapter() {
             }
         }
         GlideApp.with(context)
-                .load(url)
+                .load(MoeGlideUrl(url))
                 .fitCenter()
                 .listener(object : RequestListener<Drawable> {
                     override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?,

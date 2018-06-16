@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Environment
 import android.support.v7.app.AppCompatDelegate
+import com.bumptech.glide.load.model.Headers
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
 import im.mash.moebooru.core.module.AppModule
@@ -12,6 +13,7 @@ import im.mash.moebooru.core.module.CoreComponent
 import im.mash.moebooru.core.module.DaggerCoreComponent
 import im.mash.moebooru.download.DownloadManager
 import im.mash.moebooru.util.DeviceContext
+import im.mash.moebooru.util.glideHeader
 import im.mash.moebooru.util.logi
 import io.fabric.sdk.android.Fabric
 import java.io.File
@@ -23,6 +25,7 @@ class App : Application() {
         lateinit var app: App
         lateinit var coreComponent: CoreComponent
         lateinit var moePath: String
+        lateinit var glideHeaders: Headers
     }
 
     internal val settings: Settings by lazy { Settings(coreComponent.sharedPreferences()) }
@@ -39,6 +42,7 @@ class App : Application() {
         }
         AppCompatDelegate.setDefaultNightMode(settings.nightMode)
         initPath()
+        glideHeaders = this.glideHeader
     }
 
     private fun initPath() {
