@@ -99,21 +99,6 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:title="@string/advanced_options">
-
-        <SimpleMenuPreference
-            android:key="image_loader"
-            android:title="@string/image_loader"
-            android:entries="@array/image_loader"
-            android:entryValues="@array/image_loader_values"
-            android:defaultValue="glide"
-            android:summary="%s"
-            android:icon="@drawable/ic_settings_layers_24dp"
-            app:iconSpaceReserved="true"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
         android:title="@string/crash_report">
 
         <SwitchPreference

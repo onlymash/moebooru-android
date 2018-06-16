@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import com.bumptech.glide.ListPreloader
 import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.signature.MediaStoreSignature
 import im.mash.moebooru.R
 import im.mash.moebooru.common.data.media.entity.MediaStoreData
@@ -21,7 +22,11 @@ class GalleryAdapter(glideRequests: GlideRequests) :
         ListPreloader.PreloadSizeProvider<MediaStoreData> {
 
     private var media: MutableList<MediaStoreData> = mutableListOf()
-    private val requestBuilder: GlideRequest<Drawable> = glideRequests.asDrawable().fitCenter()
+    private val requestBuilder: GlideRequest<Drawable> = glideRequests
+            .asDrawable()
+            .centerCrop()
+            .format(DecodeFormat.PREFER_ARGB_8888)
+
     private var actualDimensions: IntArray? = null
 
     init {

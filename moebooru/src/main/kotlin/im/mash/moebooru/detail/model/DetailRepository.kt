@@ -8,6 +8,7 @@ import im.mash.moebooru.core.extensions.performOnBackOutOnMain
 import im.mash.moebooru.core.extensions.success
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
+import im.mash.moebooru.util.logi
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
@@ -15,6 +16,9 @@ class DetailRepository(private val local: DetailDataContract.Local,
                        private val scheduler: Scheduler,
                        private val compositeDisposable: CompositeDisposable) : DetailDataContract.Repository {
 
+    companion object {
+        private const val TAG = "DetailRepository"
+    }
 
     override val postFetchOutcome: PublishSubject<Outcome<MutableList<Post>>>
         = PublishSubject.create<Outcome<MutableList<Post>>>()
@@ -36,6 +40,7 @@ class DetailRepository(private val local: DetailDataContract.Local,
         local.getPosts(site, tags)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ posts ->
+                    logi(TAG, posts.size.toString())
                     postSearchFetchOutcome.success(posts)
                 }, { error -> handleSearchError(error) })
     }

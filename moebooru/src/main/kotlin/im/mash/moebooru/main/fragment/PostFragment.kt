@@ -35,6 +35,7 @@ import im.mash.moebooru.main.adapter.PostAdapter
 import im.mash.moebooru.main.adapter.TagDrawerAdapter
 import im.mash.moebooru.main.viewmodel.PostViewModel
 import im.mash.moebooru.main.viewmodel.TagViewModel
+import im.mash.moebooru.search.SearchActivity
 import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.screenWidth
 import im.mash.moebooru.util.toolbarHeight
@@ -87,7 +88,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         coreComponent.sharedPreferences().registerOnSharedPreferenceChangeListener(this)
-        view.setBackgroundColor(ContextCompat.getColor(mainActivity, R.color.window_background))
         initToolbar()
         initRightDrawer(view)
         initDrawerListener()
@@ -263,7 +263,10 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         drawerLayout = view.findViewById(R.id.drawer_layout_posts)
         drawer = view.findViewById(R.id.right_drawer_view)
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_white_24dp)
-        drawerToolbar.inflateMenu(R.menu.menu_search)
+        drawerToolbar.setNavigationOnClickListener {
+            closeRightDrawer()
+        }
+        drawerToolbar.inflateMenu(R.menu.menu_main_search)
         drawerToolbar.setOnMenuItemClickListener { item: MenuItem? ->
             when (item?.itemId) {
                 R.id.action_add -> {
@@ -281,7 +284,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     AlertDialog.Builder(this.requireContext())
                             .setTitle(getString(R.string.add_a_tag))
                             .setView(container)
-                            .setPositiveButton(getString(R.string.ok), { _, _->
+                            .setPositiveButton(getString(R.string.ok)) { _, _->
                                 val input = editText.text.toString()
                                 if (input.isEmpty() || input == "") {
                                     val snackbar = Snackbar.make(view, getString(R.string.tag_can_not_be_empty), Snackbar.LENGTH_SHORT)
@@ -300,12 +303,13 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                                         tagViewModel.saveTag(tag)
                                     }
                                 }
-                            })
+                            }
                             .setNegativeButton(getString(R.string.cancel), null)
                             .show()
                 }
                 R.id.action_search -> {
-
+                    val intent = Intent(this.requireContext(), SearchActivity::class.java)
+                    startActivity(intent)
                 }
             }
             return@setOnMenuItemClickListener true

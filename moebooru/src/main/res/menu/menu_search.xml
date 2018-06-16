@@ -12,20 +12,22 @@
 
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item
-        android:id="@+id/action_add"
-        android:title="@string/add"
-        android:icon="@drawable/ic_action_add_white_24dp"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction" />
-    <item
-        android:id="@+id/action_search"
-        android:title="@string/search"
-        android:icon="@drawable/ic_action_search_white_24dp"
-        app:showAsAction="always"
-        tools:ignore="AlwaysShowAction" />
+    <group
+        android:id="@+id/menu_group"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/action_grid"
+            android:title="@string/grid"
+            app:showAsAction="never"/>
+
+        <item
+            android:id="@+id/action_staggered_grid"
+            android:title="@string/staggered_grid"
+            app:showAsAction="never"/>
+
+    </group>
 
 </menu>

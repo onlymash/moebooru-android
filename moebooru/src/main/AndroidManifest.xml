@@ -38,16 +38,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <!-- <activity android:name=".ui.SearchActivity"> -->
-        <!-- <intent-filter> -->
-        <!-- <action android:name="${applicationId}.action.SEARCH" /> -->
+         <activity android:name=".search.SearchActivity">
+             <intent-filter>
+                 <action android:name="${applicationId}.action.SEARCH" />
 
-
-        <!-- <category android:name="android.intent.category.DEFAULT" /> -->
-        <!-- </intent-filter> -->
-        <!-- </activity> -->
-        <!-- <activity android:name=".ui.GalleryActivity"/> -->
-
+                 <category android:name="android.intent.category.DEFAULT" />
+             </intent-filter>
+         </activity>
         <provider
             android:name=".content.MoeProvider"
             android:authorities="${applicationId}.onlymash"

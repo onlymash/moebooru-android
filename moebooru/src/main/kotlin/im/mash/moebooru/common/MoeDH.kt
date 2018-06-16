@@ -7,6 +7,8 @@ import im.mash.moebooru.download.di.DaggerDownloadComponent
 import im.mash.moebooru.download.di.DownloadComponent
 import im.mash.moebooru.main.di.DaggerMainComponent
 import im.mash.moebooru.main.di.MainComponent
+import im.mash.moebooru.search.di.DaggerSearchComponent
+import im.mash.moebooru.search.di.SearchComponent
 import javax.inject.Singleton
 
 @Singleton
@@ -49,5 +51,18 @@ object MoeDH {
 
     fun destroyDownloadComponent() {
         downloadComponent = null
+    }
+
+    private var searchComponent: SearchComponent? = null
+
+    fun searchComponent(): SearchComponent {
+        if (searchComponent == null) {
+            searchComponent = DaggerSearchComponent.builder().mainComponent(mainComponent()).build()
+        }
+        return searchComponent as SearchComponent
+    }
+
+    fun destroySearchComponent() {
+        searchComponent = null
     }
 }

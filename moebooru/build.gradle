@@ -89,8 +89,7 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$glide_version"
     implementation "com.github.bumptech.glide:okhttp3-integration:$glide_version"
     implementation "com.github.bumptech.glide:recyclerview-integration:$glide_version"
-    implementation 'me.panpf:sketch:2.6.1'
-    implementation 'me.panpf:sketch-gif:2.6.1'
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.10.0'
     implementation "com.liulishuo.okdownload:okdownload:$okdownload_version"
     implementation "com.liulishuo.okdownload:sqlite:$okdownload_version"
     implementation "com.liulishuo.okdownload:okhttp:$okdownload_version"
@@ -103,6 +102,7 @@ dependencies {
     implementation "android.arch.lifecycle:livedata:$lifecycle_version"
     kapt "android.arch.lifecycle:compiler:$lifecycle_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'junit:junit:4.12'
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'

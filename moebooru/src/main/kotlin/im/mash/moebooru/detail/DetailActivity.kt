@@ -36,6 +36,7 @@ import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModel
 import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.util.launchUrl
+import im.mash.moebooru.util.logi
 import javax.inject.Inject
 
 class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolbar.OnMenuItemClickListener {
@@ -193,9 +194,9 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
 
     private fun initDetailPager() {
         detailAdapter = DetailAdapter(supportFragmentManager, mutableListOf(
-                InfoFragment(),
-                PagerFragment(),
-                TagFragment()
+//                InfoFragment(),
+                PagerFragment()
+//                TagFragment()
         ))
         detailPager.adapter = detailAdapter
         detailPager.currentItem = 1
@@ -205,15 +206,19 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     private fun initViewModel(tags: String) {
         if (tags == "") {
             type = "post"
-            detailViewModel.postOutcome.observe(this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
+            logi(TAG, "type = post")
+            detailViewModel.postOutcome.observe(this,
+                    Observer<Outcome<MutableList<Post>>> { outcome ->
                 when (outcome) {
                     is Outcome.Progress -> {
 
                     }
                     is Outcome.Success -> {
                         posts = outcome.data
-                        toolbar.title = getString(R.string.post) + " " + posts[position].id
-                        initDetailPager()
+                        if (posts.size > 0) {
+                            toolbar.title = getString(R.string.post) + " " + posts[position].id
+                            initDetailPager()
+                        }
                     }
                     is Outcome.Failure -> {
 
@@ -223,18 +228,24 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
             detailViewModel.loadPosts(app.settings.activeProfileHost)
         } else {
             type = "search"
-            detailViewModel.postSearchOutcome.observe(this, Observer<Outcome<MutableList<PostSearch>>> { outcome: Outcome<MutableList<PostSearch>>? ->
+            logi(TAG, "type = search")
+            detailViewModel.postSearchOutcome.observe(this,
+                    Observer<Outcome<MutableList<PostSearch>>> { outcome ->
                 when (outcome) {
                     is Outcome.Progress -> {
-
+                        logi(TAG, "Outcome.Progress")
                     }
                     is Outcome.Success -> {
+                        logi(TAG, "Outcome.Success")
                         postsSearch = outcome.data
-                        toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
-                        initDetailPager()
+                        if (postsSearch.size > 0) {
+                            toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
+                            initDetailPager()
+                        }
                     }
                     is Outcome.Failure -> {
-
+                        logi(TAG, "Outcome.Failure")
+                        outcome.e.printStackTrace()
                     }
                 }
             })

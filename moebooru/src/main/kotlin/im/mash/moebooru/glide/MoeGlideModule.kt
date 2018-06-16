@@ -17,6 +17,7 @@ import com.bumptech.glide.GlideBuilder
 import com.bumptech.glide.Registry
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
+import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory
 import com.bumptech.glide.load.engine.cache.LruResourceCache
@@ -34,7 +35,10 @@ class MoeGlideModule : AppGlideModule() {
         val diskCacheSizeBytes: Int = 1024 * 1024 * app.settings.cacheDiskInt
         builder.setMemoryCache(LruResourceCache(memoryCacheSizeBytes.toLong()))
         builder.setDiskCache(InternalCacheDiskCacheFactory(context, diskCacheSizeBytes.toLong()))
-        builder.setDefaultRequestOptions(RequestOptions().diskCacheStrategy(DiskCacheStrategy.ALL))
+        val requestOptions = RequestOptions
+                .formatOf(DecodeFormat.PREFER_ARGB_8888)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+        builder.setDefaultRequestOptions(requestOptions)
     }
 
     override fun registerComponents(context: Context, glide: Glide, registry: Registry) {

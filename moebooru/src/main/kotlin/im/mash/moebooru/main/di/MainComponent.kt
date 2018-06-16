@@ -23,8 +23,8 @@ interface MainComponent {
 
     //Expose to dependent components
     fun database(): MoeDatabase
-    fun postService(): PostService
     fun scheduler(): Scheduler
+    fun retrofit(): Retrofit
     fun inject(mainActivity: MainActivity)
 }
 
@@ -47,7 +47,7 @@ class MainModule {
 
     @Provides
     @MainScope
-    fun remotePostData(postService: PostService): PostDataContract.Remote = RemoteData(postService)
+    fun remotePostData(postService: PostService): PostDataContract.Remote = PostRemoteData(postService)
 
     @Provides
     @MainScope

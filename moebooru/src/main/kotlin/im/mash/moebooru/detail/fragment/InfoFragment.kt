@@ -16,6 +16,7 @@ import im.mash.moebooru.R
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.detail.DetailActivity
+import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.toolbarHeight
 import java.util.*
 
@@ -71,7 +72,9 @@ class InfoFragment : Fragment() {
         initInfo(detailActivity.position)
         type = detailActivity.type
         detailActivity.positionViewModel.getPosition().observe(this, Observer { position ->
-            if (position != null) {
+            if (position != null && (position < detailActivity.postsSearch.size ||
+                            position < detailActivity.posts.size)) {
+                logi(TAG, "$position")
                 initInfo(position)
             }
         })
