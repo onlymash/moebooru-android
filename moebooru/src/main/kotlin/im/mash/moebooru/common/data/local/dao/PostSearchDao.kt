@@ -7,7 +7,7 @@ import io.reactivex.Flowable
 @Dao
 interface PostSearchDao {
 
-    @Query("SELECT * FROM posts_search")
+    @Query("SELECT * FROM posts_search ORDER BY id DESC")
     fun getAll(): Flowable<MutableList<PostSearch>>
 
     @Query("SELECT * FROM posts_search WHERE site=:site AND keyword = :tags AND id = :id")

@@ -1,6 +1,8 @@
 package im.mash.moebooru.detail.fragment
 
 import android.arch.lifecycle.Observer
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,11 +15,16 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.common.data.local.entity.Post
+import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.detail.DetailActivity
+import im.mash.moebooru.download.DownloadService
+import im.mash.moebooru.util.copyText
 import im.mash.moebooru.util.logi
+import im.mash.moebooru.util.mayRequestStoragePermission
 import im.mash.moebooru.util.toolbarHeight
 import java.util.*
 
@@ -62,6 +69,7 @@ class InfoFragment : Fragment() {
     private var type = "post"
     private var post: Post? = null
     private var postSearch: PostSearch? = null
+    private var position = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_details_info, container, false)
@@ -75,9 +83,11 @@ class InfoFragment : Fragment() {
         detailActivity.positionViewModel.getPosition().observe(this, Observer { position ->
             if (position != null && (position < detailActivity.postsSearch.size || position < detailActivity.posts.size)) {
                 logi(TAG, "$position")
+                this.position = position
                 initInfo(position)
             }
         })
+        initClickListener()
     }
 
     private fun initInfo(position: Int) {
@@ -191,5 +201,123 @@ class InfoFragment : Fragment() {
         originLayout = view.findViewById(R.id.origin_layout)
 
         scrollView = view.findViewById(R.id.scroll_view)
+    }
+
+    private fun initClickListener() {
+        sampleLayout.setOnLongClickListener {
+            copyText(detailActivity, "sample", getSampleUrl())
+            return@setOnLongClickListener true
+        }
+        sampleDownload.setOnClickListener {
+            actionDownload("sample")
+        }
+        sampleOpen.setOnClickListener {
+            actionOpen("sample")
+        }
+        largerLayout.setOnLongClickListener {
+            copyText(detailActivity, "larger", getLargerUrl())
+            return@setOnLongClickListener true
+        }
+        largerDownload.setOnClickListener {
+            actionDownload("larger")
+        }
+        largerOpen.setOnClickListener {
+            actionOpen("larger")
+        }
+        originLayout.setOnLongClickListener {
+            copyText(detailActivity, "origin", getOriginUrl())
+            return@setOnLongClickListener true
+        }
+        originDownload.setOnClickListener {
+            actionDownload("origin")
+        }
+        originOpen.setOnClickListener {
+            actionOpen("origin")
+        }
+    }
+
+    private fun actionDownload(type: String) {
+        if (mayRequestStoragePermission(detailActivity, 0)) {
+            val post = when (type) {
+                "sample" -> {
+                    getDownloadPost(getSampleUrl())
+                }
+                "larger" -> {
+                    getDownloadPost(getLargerUrl())
+                }
+                else -> {
+                    getDownloadPost(getOriginUrl())
+                }
+            }
+            detailActivity.downloadViewModel.addTask(post)
+            DownloadService.startTask(detailActivity)
+        }
+    }
+
+    private fun actionOpen(type: String) {
+        val intent = Intent().apply {
+            action = Intent.ACTION_VIEW
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        val url = when (type) {
+            "sample" -> {
+                getSampleUrl()
+            }
+            "larger" -> {
+                getLargerUrl()
+            }
+            else -> {
+                getOriginUrl()
+            }
+        }
+        val uri = Uri.parse(url)
+        intent.data = uri
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            logi(TAG, e.toString())
+        }
+    }
+    private fun getSampleUrl(): String {
+        return when (type) {
+            "post" -> {
+                detailActivity.posts[position].sample_url
+            }
+            else -> {
+                detailActivity.postsSearch[position].sample_url
+            }
+        }
+    }
+    private fun getLargerUrl(): String {
+        return when (type) {
+            "post" -> {
+                detailActivity.posts[position].getJpegUrl()
+            }
+            else -> {
+                detailActivity.postsSearch[position].getJpegUrl()
+            }
+        }
+    }
+    private fun getOriginUrl(): String {
+        return when (type) {
+            "post" -> {
+                detailActivity.posts[position].getFileUrl()
+            }
+            else -> {
+                detailActivity.postsSearch[position].getFileUrl()
+            }
+        }
+    }
+    private fun getDownloadPost(url: String): PostDownload {
+        return when (type) {
+            "post" -> {
+                PostDownload(null, app.settings.activeProfileHost, detailActivity.posts[position].id,
+                        detailActivity.posts[position].preview_url, url,"")
+            }
+            else -> {
+                PostDownload(null, app.settings.activeProfileHost, detailActivity.postsSearch[position].id,
+                        detailActivity.postsSearch[position].preview_url, url,"")
+            }
+        }
     }
 }

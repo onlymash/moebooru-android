@@ -68,7 +68,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
 
     @Inject
     lateinit var downloadViewModelFactory: DownloadViewModelFactory
-    private val downloadViewModel: DownloadViewModel by lazy { this.getViewModel<DownloadViewModel>(downloadViewModelFactory) }
+    internal val downloadViewModel: DownloadViewModel by lazy { this.getViewModel<DownloadViewModel>(downloadViewModelFactory) }
 
     @Inject
     lateinit var tagViewModelFactory: TagViewModelFactory
@@ -148,16 +148,16 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
             "post" -> {
                 val url = when (app.settings.postSizeDownload) {
                     Settings.POST_SIZE_SAMPLE -> posts[position].sample_url
-                    Settings.POST_SIZE_LARGER -> posts[position].jpeg_url
-                    else -> posts[position].file_url
+                    Settings.POST_SIZE_LARGER -> posts[position].getJpegUrl()
+                    else -> posts[position].getFileUrl()
                 }
                 PostDownload(null, app.settings.activeProfileHost, posts[position].id, posts[position].preview_url, url,"")
             }
             else -> {
                 val url = when (app.settings.postSizeDownload) {
                     Settings.POST_SIZE_SAMPLE -> postsSearch[position].sample_url
-                    Settings.POST_SIZE_LARGER -> postsSearch[position].jpeg_url
-                    else -> postsSearch[position].file_url
+                    Settings.POST_SIZE_LARGER -> postsSearch[position].getJpegUrl()
+                    else -> postsSearch[position].getFileUrl()
                 }
                 PostDownload(null, app.settings.activeProfileHost, postsSearch[position].id,
                         postsSearch[position].preview_url, url,"")

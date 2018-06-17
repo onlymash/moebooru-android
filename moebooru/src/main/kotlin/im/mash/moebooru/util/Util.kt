@@ -4,6 +4,8 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
@@ -113,3 +115,9 @@ fun Context.launchUrl(uri: Uri) = try {
 } catch (_: ActivityNotFoundException) { }  // ignore
 
 fun Context.launchUrl(url: String) = this.launchUrl(Uri.parse(url))
+
+fun copyText(context: Context, label: String, text: String) {
+    val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val cd = ClipData.newPlainText(label, text)
+    cm.primaryClip = cd
+}

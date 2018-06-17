@@ -10,7 +10,7 @@ data class Post(
         val uid: Int?,
         var site: String?,
         val id: Int,
-        val tags: String?,
+        val tags: String = "",
         val created_at: Int,
         val creator_id: Int,
         val author: String,
@@ -18,8 +18,8 @@ data class Post(
         val source: String?,
         val score: Int,
         val md5: String,
-        val file_size: Int,
-        val file_url: String,
+        val file_size: Int = 0,
+        val file_url: String = "",
         val is_shown_in_index: Boolean,
         val preview_url: String,
         val preview_width: Int,
@@ -30,10 +30,10 @@ data class Post(
         val sample_width: Int,
         val sample_height: Int,
         val sample_file_size: Int,
-        val jpeg_url: String,
-        val jpeg_width: Int,
-        val jpeg_height: Int,
-        val jpeg_file_size: Int,
+        val jpeg_url: String = "",
+        val jpeg_width: Int = 0,
+        val jpeg_height: Int = 0,
+        val jpeg_file_size: Int = 0,
         val rating: String,
         val has_children: Boolean,
         val parent_id: Int?,
@@ -41,4 +41,17 @@ data class Post(
         val width: Int,
         val height: Int,
         val is_held: Boolean
-)
+) {
+        fun getFileUrl(): String {
+                if (file_url == "") {
+                        return getJpegUrl()
+                }
+                return file_url
+        }
+
+        fun getJpegUrl(): String {
+                if (jpeg_url == "")
+                        return sample_url
+                return jpeg_url
+        }
+}

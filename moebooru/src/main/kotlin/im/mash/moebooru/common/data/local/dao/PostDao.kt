@@ -7,7 +7,7 @@ import io.reactivex.Flowable
 @Dao
 interface PostDao {
 
-    @Query("SELECT * FROM posts")
+    @Query("SELECT * FROM posts ORDER BY id DESC")
     fun getAll(): Flowable<MutableList<Post>>
 
     @Query("SELECT * FROM posts WHERE site = :site AND id = :id")

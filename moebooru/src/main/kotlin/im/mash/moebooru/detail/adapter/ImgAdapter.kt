@@ -67,15 +67,15 @@ class ImgAdapter(private val context: Context) : PagerAdapter() {
             "post" -> {
                 when (size) {
                     Settings.POST_SIZE_SAMPLE -> posts[position].sample_url
-                    Settings.POST_SIZE_LARGER -> posts[position].jpeg_url
-                    else -> posts[position].file_url
+                    Settings.POST_SIZE_LARGER -> posts[position].getJpegUrl()
+                    else -> posts[position].getFileUrl()
                 }
             }
             else -> {
                 when (size) {
                     Settings.POST_SIZE_SAMPLE -> postsSearch[position].sample_url
-                    Settings.POST_SIZE_LARGER -> postsSearch[position].jpeg_url
-                    else -> postsSearch[position].file_url
+                    Settings.POST_SIZE_LARGER -> postsSearch[position].getJpegUrl()
+                    else -> postsSearch[position].getFileUrl()
                 }
             }
         }
