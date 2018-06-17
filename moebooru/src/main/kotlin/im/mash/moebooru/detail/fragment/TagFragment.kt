@@ -95,19 +95,22 @@ class TagFragment : Fragment() {
     private fun setData() {
         when (type) {
             "post" -> {
-                val tagsList = detailActivity.posts[position].tags?.split(" ")?.toMutableList()
-                if (tagsList != null) {
-                    tags = tagsList
-                    tagAdapter.updateData(tags)
+                val tagsString = detailActivity.posts[position].tags
+                if (tagsString == "") {
+                    return
                 }
+                val tagsList = tagsString.split(" ").toMutableList()
+                tags = tagsList
+                tagAdapter.updateData(tags)
             }
             else -> {
-                val tagsList = detailActivity.postsSearch[position].tags?.split(" ")?.toMutableList()
-                if (tagsList != null) {
-                    tags = tagsList
-                    logi(TAG, "tags size: ${tags.size}")
-                    tagAdapter.updateData(tags)
+                val tagsString = detailActivity.postsSearch[position].tags
+                if (tagsString == "") {
+                    return
                 }
+                val tagsList = tagsString.split(" ").toMutableList()
+                tags = tagsList
+                tagAdapter.updateData(tags)
             }
         }
     }

@@ -12,12 +12,14 @@ import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
 import android.support.customtabs.CustomTabsIntent
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.content.ContextCompat
 import android.text.format.DateFormat
 import android.util.DisplayMetrics
 import android.util.TypedValue
+import android.view.View
 import android.view.WindowManager
 import com.bumptech.glide.load.model.Headers
 import com.bumptech.glide.load.model.LazyHeaders
@@ -120,4 +122,10 @@ fun copyText(context: Context, label: String, text: String) {
     val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     val cd = ClipData.newPlainText(label, text)
     cm.primaryClip = cd
+}
+
+fun takeSnackbarShort(view: View, text: String, paddingButton: Int) {
+    val snackbar = Snackbar.make(view, text, Snackbar.LENGTH_SHORT)
+    snackbar.view.setPadding(0, 0, 0, paddingButton)
+    snackbar.show()
 }

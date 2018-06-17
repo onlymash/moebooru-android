@@ -22,10 +22,7 @@ import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.download.DownloadService
-import im.mash.moebooru.util.copyText
-import im.mash.moebooru.util.logi
-import im.mash.moebooru.util.mayRequestStoragePermission
-import im.mash.moebooru.util.toolbarHeight
+import im.mash.moebooru.util.*
 import java.util.*
 
 
@@ -87,7 +84,7 @@ class InfoFragment : Fragment() {
                 initInfo(position)
             }
         })
-        initClickListener()
+        initClickListener(view)
     }
 
     private fun initInfo(position: Int) {
@@ -203,9 +200,10 @@ class InfoFragment : Fragment() {
         scrollView = view.findViewById(R.id.scroll_view)
     }
 
-    private fun initClickListener() {
+    private fun initClickListener(view: View) {
         sampleLayout.setOnLongClickListener {
             copyText(detailActivity, "sample", getSampleUrl())
+            takeSnackbarShort(view, getString(R.string.sample_url_has_been_copied), detailActivity.paddingBottom)
             return@setOnLongClickListener true
         }
         sampleDownload.setOnClickListener {
@@ -216,6 +214,7 @@ class InfoFragment : Fragment() {
         }
         largerLayout.setOnLongClickListener {
             copyText(detailActivity, "larger", getLargerUrl())
+            takeSnackbarShort(view, getString(R.string.larger_url_has_been_copied), detailActivity.paddingBottom)
             return@setOnLongClickListener true
         }
         largerDownload.setOnClickListener {
@@ -226,6 +225,7 @@ class InfoFragment : Fragment() {
         }
         originLayout.setOnLongClickListener {
             copyText(detailActivity, "origin", getOriginUrl())
+            takeSnackbarShort(view, getString(R.string.origin_url_has_been_copied), detailActivity.paddingBottom)
             return@setOnLongClickListener true
         }
         originDownload.setOnClickListener {

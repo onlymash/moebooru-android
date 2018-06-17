@@ -128,4 +128,8 @@
 
     <string name="stat_downloading_title">Downloading</string>
     <string name="stat_download_done_title">Download finished</string>
+
+    <string name="sample_url_has_been_copied">Sample url has been copied</string>
+    <string name="larger_url_has_been_copied">Larger url has been copied</string>
+    <string name="origin_url_has_been_copied">Origin url has been copied</string>
 </resources>

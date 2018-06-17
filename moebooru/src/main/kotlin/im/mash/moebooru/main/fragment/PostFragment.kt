@@ -330,7 +330,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             }
             return@setOnMenuItemClickListener true
         }
-        tagView = view.findViewById<RecyclerView>(R.id.drawer_rv_list)
+        tagView = view.findViewById(R.id.drawer_rv_list)
         tagView.layoutManager = LinearLayoutManager(this.requireContext(),
                 LinearLayoutManager.VERTICAL, false)
         tagAdapter = TagDrawerAdapter(this.requireContext())
