@@ -3,6 +3,7 @@ package im.mash.moebooru.detail.viewmodel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import im.mash.moebooru.common.MoeDH
 
 class PositionViewModel : ViewModel() {
 
@@ -14,5 +15,10 @@ class PositionViewModel : ViewModel() {
 
     fun setPosition(position: Int) {
         this.position.value = position
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        MoeDH.destroyDetailComponent()
     }
 }

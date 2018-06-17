@@ -73,9 +73,14 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_posts_content)
         component.inject(this)
+        val key = intent.getStringExtra("keyword")
+        if ( key == null) {
+            finish()
+        }
+        keyword = key
+        if (keyword == "") finish()
         spanCount = this.screenWidth/resources.getDimension(R.dimen.item_width).toInt()
         limit = app.settings.postLimitInt
-        keyword = intent.getStringExtra("keyword")
         logi(TAG, keyword)
         initView()
         initRefresh()
@@ -273,5 +278,6 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     override fun onDestroy() {
         super.onDestroy()
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        MoeDH.destroySearchComponent()
     }
 }

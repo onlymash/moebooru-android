@@ -87,9 +87,10 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         component.inject(this)
-        initView()
         val tags = intent.getStringExtra("tags")
+        if (tags == null) finish()
         position = intent.getIntExtra("position", 0)
+        initView()
         positionViewModel.setPosition(position)
         initViewModel(tags)
     }
@@ -292,5 +293,10 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
             e.printStackTrace()
         }
         return result
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        MoeDH.destroyDetailComponent()
     }
 }
