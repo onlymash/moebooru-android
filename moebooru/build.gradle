@@ -25,6 +25,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testApplicationId "im.mash.moebooru.test"
     }
+    setProperty("archivesBaseName", "moebooru-" + defaultConfig.versionName)
     buildTypes {
         release {
             shrinkResources false
