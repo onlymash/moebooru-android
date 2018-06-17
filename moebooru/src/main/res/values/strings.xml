@@ -132,4 +132,6 @@
     <string name="sample_url_has_been_copied">Sample url has been copied</string>
     <string name="larger_url_has_been_copied">Larger url has been copied</string>
     <string name="origin_url_has_been_copied">Origin url has been copied</string>
+
+    <string name="all_website">All website</string>
 </resources>

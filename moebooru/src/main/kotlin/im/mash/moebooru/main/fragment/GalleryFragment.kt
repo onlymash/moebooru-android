@@ -14,10 +14,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
+import android.support.v7.widget.*
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
@@ -35,6 +32,7 @@ import im.mash.moebooru.glide.GlideRequests
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.GalleryAdapter
+import im.mash.moebooru.main.adapter.GalleryDrawerAdapter
 import im.mash.moebooru.main.adapter.GalleryPagerAdapter
 import im.mash.moebooru.main.viewmodel.MediaViewModel
 import im.mash.moebooru.util.formatDate
@@ -58,6 +56,9 @@ class GalleryFragment : ToolbarFragment() {
     private lateinit var galleryView: RecyclerView
     private lateinit var galleryAdapter: GalleryAdapter
     private lateinit var drawerListener: DrawerLayout.DrawerListener
+
+    private lateinit var drawerBooruView: RecyclerView
+    private lateinit var drawerBooruAdapter: GalleryDrawerAdapter
 
     private var spanCount = 1
     private var media: MutableList<MediaStoreData> = mutableListOf()
@@ -94,6 +95,26 @@ class GalleryFragment : ToolbarFragment() {
             appBarLayoutRight.addView(drawerToolbar)
             insets
         }
+        drawerBooruView = view.findViewById(R.id.drawer_rv_list)
+        drawerBooruView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
+        drawerBooruAdapter = GalleryDrawerAdapter()
+        drawerBooruView.adapter = drawerBooruAdapter
+        drawerBooruAdapter.updateData(mainActivity.boorus)
+        drawerBooruAdapter.setItemClickListener(object : GalleryDrawerAdapter.ItemClickListener {
+            override fun onItemClick(position: Int) {
+                if (position == 0) {
+                    if (mayRequestStoragePermission(mainActivity, 0)) {
+                        mediaViewModel.loadMedia(moePath)
+                    }
+                } else if (position > 0) {
+                    if (mayRequestStoragePermission(mainActivity, 0)) {
+                        val path = moePath + File.separator + mainActivity.boorus[position - 1].host
+                        mediaViewModel.loadMedia(path)
+                    }
+                }
+                drawerLayout.closeDrawer(Gravity.RIGHT)
+            }
+        })
     }
 
     private fun initViewModel() {
