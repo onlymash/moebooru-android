@@ -1,16 +1,13 @@
 package im.mash.moebooru.main.di
 
-import android.arch.persistence.room.Room
 import android.content.Context
-import android.content.SharedPreferences
 import dagger.Component
 import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.media.MediaStoreDataSource
 import im.mash.moebooru.common.data.remote.PostService
-import im.mash.moebooru.core.constants.Constants
-import im.mash.moebooru.core.module.CoreComponent
+import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.model.*
@@ -21,12 +18,6 @@ import retrofit2.Retrofit
 @MainScope
 @Component(dependencies = [CoreComponent::class], modules = [MainModule::class])
 interface MainComponent {
-
-    //Expose to dependent components
-    fun database(): MoeDatabase
-    fun scheduler(): Scheduler
-    fun retrofit(): Retrofit
-    fun sharedPreferences(): SharedPreferences
     fun inject(mainActivity: MainActivity)
 }
 
@@ -58,12 +49,6 @@ class MainModule {
     @Provides
     @MainScope
     fun compositeDisposable(): CompositeDisposable = CompositeDisposable()
-
-    /*Parent providers to dependents*/
-    @Provides
-    @MainScope
-    fun database(context: Context): MoeDatabase
-            = Room.databaseBuilder(context, MoeDatabase::class.java, Constants.DB_NAME).build()
 
     @Provides
     @MainScope

@@ -8,9 +8,9 @@ import android.support.v7.app.AppCompatDelegate
 import com.bumptech.glide.load.model.Headers
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
+import im.mash.moebooru.common.di.CoreComponent
+import im.mash.moebooru.common.di.DaggerCoreComponent
 import im.mash.moebooru.core.module.AppModule
-import im.mash.moebooru.core.module.CoreComponent
-import im.mash.moebooru.core.module.DaggerCoreComponent
 import im.mash.moebooru.download.DownloadManager
 import im.mash.moebooru.util.DeviceContext
 import im.mash.moebooru.util.glideHeader

@@ -5,8 +5,8 @@ import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.remote.PostSearchService
+import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.core.scheduler.Scheduler
-import im.mash.moebooru.main.di.MainComponent
 import im.mash.moebooru.search.SearchActivity
 import im.mash.moebooru.search.model.PostSearchDataContract
 import im.mash.moebooru.search.model.PostSearchLocalData
@@ -17,7 +17,7 @@ import io.reactivex.disposables.CompositeDisposable
 import retrofit2.Retrofit
 
 @SearchScope
-@Component(dependencies = [MainComponent::class], modules = [SearchModule::class])
+@Component(dependencies = [CoreComponent::class], modules = [SearchModule::class])
 interface SearchComponent {
     fun inject(searchActivity: SearchActivity)
 }

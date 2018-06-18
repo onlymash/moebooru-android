@@ -31,7 +31,7 @@ object MoeDH {
 
     fun detailComponent(): DetailComponent {
         if (detailComponent == null) {
-            detailComponent = DaggerDetailComponent.builder().mainComponent(mainComponent()).build()
+            detailComponent = DaggerDetailComponent.builder().coreComponent(App.coreComponent).build()
         }
         return detailComponent as DetailComponent
     }
@@ -44,7 +44,7 @@ object MoeDH {
 
     fun downloadComponent(): DownloadComponent {
         if (downloadComponent == null) {
-            downloadComponent = DaggerDownloadComponent.builder().mainComponent(mainComponent()).build()
+            downloadComponent = DaggerDownloadComponent.builder().coreComponent(App.coreComponent).build()
         }
         return downloadComponent as DownloadComponent
     }
@@ -57,7 +57,7 @@ object MoeDH {
 
     fun searchComponent(): SearchComponent {
         if (searchComponent == null) {
-            searchComponent = DaggerSearchComponent.builder().mainComponent(mainComponent()).build()
+            searchComponent = DaggerSearchComponent.builder().coreComponent(App.coreComponent).build()
         }
         return searchComponent as SearchComponent
     }

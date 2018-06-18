@@ -4,6 +4,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
+import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.detail.model.DetailDataContract
@@ -11,7 +12,6 @@ import im.mash.moebooru.detail.model.DetailLocalData
 import im.mash.moebooru.detail.model.DetailRepository
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
-import im.mash.moebooru.main.di.MainComponent
 import im.mash.moebooru.main.model.DownloadDataContract
 import im.mash.moebooru.main.model.DownloadRepository
 import im.mash.moebooru.main.model.TagDataContract
@@ -21,7 +21,7 @@ import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
 
 @DetailScope
-@Component(dependencies = [MainComponent::class], modules = [DetailModule::class])
+@Component(dependencies = [CoreComponent::class], modules = [DetailModule::class])
 interface DetailComponent {
     fun inject(detailActivity: DetailActivity)
 }
