@@ -134,4 +134,11 @@
     <string name="origin_url_has_been_copied">Origin url has been copied</string>
 
     <string name="all_website">All website</string>
+
+    <string name="feedback">Feedback</string>
+    <string name="telegram">Telegram</string>
+    <string name="email">Email</string>
+    <string name="github">Github</string>
+    <string name="author">Author</string>
+
 </resources>

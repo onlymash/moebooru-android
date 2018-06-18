@@ -50,7 +50,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         private const val DRAWER_ITEM_DOWNLOADS = 2L
         private const val DRAWER_ITEM_LOCAL_GALLERY = 3L
         private const val DRAWER_ITEM_SETTINGS = 4L
-        private const val DRAWER_ITEM_ABOUT = 5L
+        private const val DRAWER_ITEM_FEEDBACK = 5L
+        private const val DRAWER_ITEM_ABOUT = 6L
 
         private val builder = getTextDrawableBuilder()
         private fun getTextDrawableBuilder(): TextDrawable.Builder {
@@ -115,12 +116,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 }
                 .build()
 
-        val aboutItem =  PrimaryDrawerItem()
-                .withIdentifier(DRAWER_ITEM_ABOUT)
-                .withName(R.string.about)
-                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_copyright_24dp))
-                .withIconTintingEnabled(true)
-
         drawerLayout = DrawerLayout(this)
 
         drawer = DrawerBuilder()
@@ -158,7 +153,16 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
                 )
                 .addStickyDrawerItems(
-                        aboutItem
+                        PrimaryDrawerItem()
+                                .withIdentifier(DRAWER_ITEM_FEEDBACK)
+                                .withName(R.string.feedback)
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_feedback_24dp))
+                                .withIconTintingEnabled(true),
+                        PrimaryDrawerItem()
+                                .withIdentifier(DRAWER_ITEM_ABOUT)
+                                .withName(R.string.about)
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_copyright_24dp))
+                                .withIconTintingEnabled(true)
                 )
                 .withStickyFooterDivider(true)
                 .withStickyFooterShadow(false)
@@ -253,6 +257,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 DRAWER_ITEM_DOWNLOADS -> displayFragment(DownloadFragment())
                 DRAWER_ITEM_LOCAL_GALLERY -> displayFragment(GalleryFragment())
                 DRAWER_ITEM_SETTINGS -> displayFragment(SettingsFragment())
+                DRAWER_ITEM_FEEDBACK -> displayFragment(FeedbackFragment())
                 DRAWER_ITEM_ABOUT -> displayFragment(AboutFragment())
             }
         }

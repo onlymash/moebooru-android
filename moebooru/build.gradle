@@ -96,6 +96,7 @@ dependencies {
     implementation "com.liulishuo.okdownload:okdownload:$okdownload_version"
     implementation "com.liulishuo.okdownload:sqlite:$okdownload_version"
     implementation "com.liulishuo.okdownload:okhttp:$okdownload_version"
+    implementation 'com.android.support:support-v4:27.1.1'
     kapt "com.github.bumptech.glide:compiler:$glide_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     implementation "com.squareup.okhttp3:okhttp:$okhttp3_version"

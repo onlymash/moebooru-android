@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:title="@string/author"
+        android:summary="http://mash.im">
+        <intent android:action="android.intent.action.VIEW"
+            android:data="http://mash.im"/>
+    </Preference>
+
+    <Preference
+        android:title="@string/email"
+        android:summary="feedback@fiepi.me">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="mailto:feedback@fiepi.me">
+        </intent>
+    </Preference>
+
+    <Preference
+        android:title="@string/telegram"
+        android:summary="https://t.me/Moebooru">
+        <intent android:action="android.intent.action.VIEW"
+            android:data="https://t.me/Moebooru"/>
+    </Preference>
+
+    <Preference
+        android:title="@string/github"
+        android:summary="https://github.com/onlymash/moebooru-android/issues">
+        <intent android:action="android.intent.action.VIEW"
+            android:data="https://github.com/onlymash/moebooru-android/issues"/>
+    </Preference>
+
+</PreferenceScreen>

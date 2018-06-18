@@ -12,5 +12,5 @@
 
 <full-backup-content>
     <include domain="sharedpref" path="im.mash.moebooru.debug_preferences.xml"/>
-    <include domain="database" path="database.db"/>
+    <include domain="database" path="room_database.db"/>
 </full-backup-content>

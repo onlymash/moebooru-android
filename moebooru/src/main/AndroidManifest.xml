@@ -20,8 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/MoeTheme"
-        tools:ignore="GoogleAppIndexingWarning"
-        tools:replace="android:supportsRtl">
+        tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".main.MainActivity"
             android:theme="@style/MoeTheme.Main">
@@ -38,13 +37,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-         <activity android:name=".search.SearchActivity">
-             <intent-filter>
-                 <action android:name="${applicationId}.action.SEARCH" />
+        <activity android:name=".search.SearchActivity">
+            <intent-filter>
+                <action android:name="${applicationId}.action.SEARCH" />
 
-                 <category android:name="android.intent.category.DEFAULT" />
-             </intent-filter>
-         </activity>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <provider
             android:name=".content.MoeProvider"
             android:authorities="${applicationId}.onlymash"
@@ -62,8 +62,7 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
 
-        <service
-            android:name=".download.DownloadService" />
+        <service android:name=".download.DownloadService" />
 
     </application>
 
