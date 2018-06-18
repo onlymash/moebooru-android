@@ -33,8 +33,8 @@ import im.mash.moebooru.detail.viewmodel.PositionViewModel
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.download.DownloadService
 import im.mash.moebooru.helper.getViewModel
-import im.mash.moebooru.main.viewmodel.DownloadViewModel
-import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.common.viewmodel.DownloadViewModel
+import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import im.mash.moebooru.util.launchUrl
 import im.mash.moebooru.util.logi

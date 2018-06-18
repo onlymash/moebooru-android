@@ -27,6 +27,7 @@ import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Booru
+import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.core.application.BaseActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.widget.TextDrawable
@@ -77,7 +78,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     @Inject
     lateinit var booruViewModelFactory: BooruViewModelFactory
-    internal val booruViewModel: BooruViewModel by lazy { this.getViewModel<BooruViewModel>(booruViewModelFactory) }
+    private val booruViewModel: BooruViewModel by lazy { this.getViewModel<BooruViewModel>(booruViewModelFactory) }
 
     @Inject
     lateinit var postViewModelFactory: PostViewModelFactory

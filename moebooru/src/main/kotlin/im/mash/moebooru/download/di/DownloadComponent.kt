@@ -7,9 +7,9 @@ import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.download.DownloadService
-import im.mash.moebooru.main.model.DownloadDataContract
-import im.mash.moebooru.main.model.DownloadRepository
-import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.common.model.DownloadDataContract
+import im.mash.moebooru.common.model.DownloadRepository
+import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
 
 @DownloadScope
@@ -29,7 +29,7 @@ class DownloadModule {
     @DownloadScope
     fun downloadViewModelFactory(repo: DownloadDataContract.Repository,
                                  compositeDisposable: CompositeDisposable): DownloadViewModelFactory
-            = DownloadViewModelFactory(repo,compositeDisposable)
+            = DownloadViewModelFactory(repo, compositeDisposable)
 
     @Provides
     @DownloadScope

@@ -317,7 +317,7 @@ class GalleryFragment : ToolbarFragment() {
                     AlertDialog.Builder(context)
                             .setTitle("Delete image")
                             .setMessage("Do you confirm the deletion of ${media[position].mediaData} ?")
-                            .setPositiveButton(context.getString(R.string.ok), { _, _ ->
+                            .setPositiveButton(context.getString(R.string.ok)) { _, _ ->
                                 try {
                                     val file = File(media[position].mediaData)
                                     file.delete()
@@ -334,7 +334,7 @@ class GalleryFragment : ToolbarFragment() {
                                 } catch (e: IOException) {
                                     e.printStackTrace()
                                 }
-                            })
+                            }
                             .setNegativeButton(context.getString(R.string.cancel), null)
                             .show()
 

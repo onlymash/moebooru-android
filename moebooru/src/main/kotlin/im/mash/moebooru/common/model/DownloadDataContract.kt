@@ -1,4 +1,4 @@
-package im.mash.moebooru.main.model
+package im.mash.moebooru.common.model
 
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.core.scheduler.Outcome

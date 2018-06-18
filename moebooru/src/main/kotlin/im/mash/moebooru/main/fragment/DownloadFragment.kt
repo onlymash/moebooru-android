@@ -21,7 +21,7 @@ import im.mash.moebooru.download.DownloadService
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.DownloadAdapter
-import im.mash.moebooru.main.viewmodel.DownloadViewModel
+import im.mash.moebooru.common.viewmodel.DownloadViewModel
 import im.mash.moebooru.util.logi
 
 class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {

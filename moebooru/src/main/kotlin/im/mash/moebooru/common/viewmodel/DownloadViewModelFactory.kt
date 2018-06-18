@@ -1,8 +1,8 @@
-package im.mash.moebooru.main.viewmodel
+package im.mash.moebooru.common.viewmodel
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import im.mash.moebooru.main.model.DownloadDataContract
+import im.mash.moebooru.common.model.DownloadDataContract
 import io.reactivex.disposables.CompositeDisposable
 
 @Suppress("UNCHECKED_CAST")

@@ -1,11 +1,11 @@
-package im.mash.moebooru.main.viewmodel
+package im.mash.moebooru.common.viewmodel
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.core.extensions.toLiveData
 import im.mash.moebooru.core.scheduler.Outcome
-import im.mash.moebooru.main.model.DownloadDataContract
+import im.mash.moebooru.common.model.DownloadDataContract
 import io.reactivex.disposables.CompositeDisposable
 
 class DownloadViewModel(private val repo: DownloadDataContract.Repository,

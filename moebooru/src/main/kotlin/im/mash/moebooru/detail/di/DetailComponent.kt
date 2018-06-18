@@ -12,11 +12,11 @@ import im.mash.moebooru.detail.model.DetailLocalData
 import im.mash.moebooru.detail.model.DetailRepository
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
-import im.mash.moebooru.main.model.DownloadDataContract
-import im.mash.moebooru.main.model.DownloadRepository
+import im.mash.moebooru.common.model.DownloadDataContract
+import im.mash.moebooru.common.model.DownloadRepository
 import im.mash.moebooru.main.model.TagDataContract
 import im.mash.moebooru.main.model.TagRepository
-import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
 

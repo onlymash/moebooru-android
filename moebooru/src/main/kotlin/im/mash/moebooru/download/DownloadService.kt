@@ -17,8 +17,8 @@ import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.content.UriRetriever
 import im.mash.moebooru.core.scheduler.Outcome
-import im.mash.moebooru.main.viewmodel.DownloadViewModel
-import im.mash.moebooru.main.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.common.viewmodel.DownloadViewModel
+import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.util.logi
 import java.io.File
 import javax.inject.Inject

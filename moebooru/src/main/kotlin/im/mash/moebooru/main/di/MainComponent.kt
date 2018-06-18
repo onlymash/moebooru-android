@@ -8,6 +8,9 @@ import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.media.MediaStoreDataSource
 import im.mash.moebooru.common.data.remote.PostService
 import im.mash.moebooru.common.di.CoreComponent
+import im.mash.moebooru.common.model.DownloadDataContract
+import im.mash.moebooru.common.model.DownloadRepository
+import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.model.*
@@ -104,7 +107,7 @@ class MainModule {
     @MainScope
     fun downloadViewModelFactory(repository: DownloadDataContract.Repository,
                                  compositeDisposable: CompositeDisposable): DownloadViewModelFactory
-            = DownloadViewModelFactory(repository,compositeDisposable)
+            = DownloadViewModelFactory(repository, compositeDisposable)
 
     @Provides
     @MainScope
