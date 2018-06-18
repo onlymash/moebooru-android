@@ -12,6 +12,7 @@ import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.common.di.DaggerCoreComponent
 import im.mash.moebooru.core.module.AppModule
 import im.mash.moebooru.download.DownloadManager
+import im.mash.moebooru.util.CrashHandler
 import im.mash.moebooru.util.DeviceContext
 import im.mash.moebooru.util.glideHeader
 import im.mash.moebooru.util.logi
@@ -35,6 +36,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         app = this
+        CrashHandler.getInstance().init(this)
         coreComponent = DaggerCoreComponent.builder().appModule(AppModule(this)).build()
         FirebaseApp.initializeApp(deviceContext)
         if (settings.enabledCrashReport && !Fabric.isInitialized()) {

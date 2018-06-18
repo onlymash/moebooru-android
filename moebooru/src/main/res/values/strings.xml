@@ -141,4 +141,6 @@
     <string name="github">Github</string>
     <string name="author">Author</string>
 
+    <string name="send_crash_log">Send crash log</string>
+    <string name="select_crash_log_file">Select crash log file and send to developer</string>
 </resources>

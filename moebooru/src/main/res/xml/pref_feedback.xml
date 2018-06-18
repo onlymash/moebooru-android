@@ -31,4 +31,9 @@
             android:data="https://github.com/onlymash/moebooru-android/issues"/>
     </Preference>
 
+    <Preference
+        android:title="@string/send_crash_log"
+        android:key="send_crash_log"
+        android:summary="@string/select_crash_log_file"/>
+
 </PreferenceScreen>
