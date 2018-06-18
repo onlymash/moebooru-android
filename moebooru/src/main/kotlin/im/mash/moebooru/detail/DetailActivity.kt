@@ -223,7 +223,18 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
 
                     }
                     is Outcome.Success -> {
-                        posts = outcome.data
+                        val data = outcome.data
+                        posts = if (app.settings.safeMode) {
+                            val postsSafe: MutableList<Post> = mutableListOf()
+                            data.forEach { post ->
+                                if (post.rating == "s") {
+                                    postsSafe.add(post)
+                                }
+                            }
+                            postsSafe
+                        } else {
+                            data
+                        }
                         if (posts.size > 0) {
                             toolbar.title = getString(R.string.post) + " " + posts[position].id
                             initDetailPager()
@@ -245,8 +256,18 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         logi(TAG, "Outcome.Progress")
                     }
                     is Outcome.Success -> {
-                        logi(TAG, "Outcome.Success")
-                        postsSearch = outcome.data
+                        val data = outcome.data
+                        postsSearch = if (app.settings.safeMode) {
+                            val postsSafe: MutableList<PostSearch> = mutableListOf()
+                            data.forEach { post ->
+                                if (post.rating == "s") {
+                                    postsSafe.add(post)
+                                }
+                            }
+                            postsSafe
+                        } else {
+                            data
+                        }
                         if (postsSearch.size > 0) {
                             toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
                             initDetailPager()

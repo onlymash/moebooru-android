@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
 import android.view.*
 import android.view.animation.AnimationUtils
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -61,6 +62,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     private lateinit var refreshLayout: SwipeRefreshLayout
 
+    private var safeMode = true
+
     private var spanCount = 3
     private var page = 1
     private var posts = mutableListOf<Post>()
@@ -91,6 +94,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         initDrawerListener()
         spanCount = mainActivity.screenWidth/mainActivity.resources.getDimension(R.dimen.item_width).toInt()
         limit = app.settings.postLimitInt
+        safeMode = app.settings.safeMode
         initRefresh(view)
         initPostList(view)
         observePosts()
@@ -114,10 +118,18 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     posts = data
                     if (loadingMore) {
                         loadingMore = false
-                        postAdapter.addData(posts)
+                        if (safeMode) {
+                            postAdapter.addData(getSafePosts())
+                        } else {
+                            postAdapter.addData(posts)
+                        }
                     } else {
                         refreshing = false
-                        postAdapter.updateData(posts)
+                        if (safeMode) {
+                            postAdapter.updateData(getSafePosts())
+                        } else {
+                            postAdapter.updateData(posts)
+                        }
                     }
                     refreshLayout.isRefreshing = false
                 }
@@ -131,6 +143,16 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 }
             }
         })
+    }
+
+    private fun getSafePosts(): MutableList<Post> {
+        val safePosts:MutableList<Post> = mutableListOf()
+        posts.forEach { post ->
+            if (post.rating == "s") {
+                safePosts.add(post)
+            }
+        }
+        return safePosts
     }
 
     private fun initRefresh(view: View) {
@@ -249,6 +271,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     }
                 }
                 R.id.action_search_open -> openRightDrawer()
+                R.id.action_safe_mode -> { app.settings.safeMode = !app.settings.safeMode }
             }
             return@setOnMenuItemClickListener true
         }
@@ -256,6 +279,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             Settings.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).isChecked = true
             Settings.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
         }
+        toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
     }
 
     private fun initRightDrawer(view: View) {
@@ -420,13 +444,21 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             Settings.ACTIVE_PROFILE_HOST -> {
                 posts.clear()
                 postAdapter.clearData()
-//                loadData()
                 mainActivity.supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_moebooru, PostFragment())
                         .commitAllowingStateLoss()
             }
             Settings.POST_LIMIT -> {
                 limit = app.settings.postLimitInt
+            }
+            Settings.SAFE_MODE -> {
+                safeMode = app.settings.safeMode
+                toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
+                if (safeMode) {
+                    postAdapter.updateData(getSafePosts())
+                } else {
+                    postAdapter.updateData(posts)
+                }
             }
         }
     }

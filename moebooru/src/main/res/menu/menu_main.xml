@@ -38,4 +38,10 @@
 
     </group>
 
+    <item
+        android:id="@+id/action_safe_mode"
+        android:title="@string/safe_mode"
+        android:checkable="true"
+        app:showAsAction="never"/>
+
 </menu>

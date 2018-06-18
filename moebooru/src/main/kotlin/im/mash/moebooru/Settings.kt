@@ -48,9 +48,7 @@ class Settings(private val sp: SharedPreferences) {
         const val STATUS_BAR_HEIGHT = "status_bar_height"
         const val USER_AGENT_WEB_VIEW = "user_agent_web_view"
         const val ENABLE_CRASH_REPORT = "enable_crash_report"
-        const val IMAGE_LOADER = "image_loader"
-        const val IMAGE_LOADER_GLIDE = "glide"
-        const val IMAGE_LOADER_SKETCH = "sketch"
+        const val SAFE_MODE = "safe_mode"
     }
 
     private val editor: SharedPreferences.Editor = sp.edit()
@@ -121,7 +119,7 @@ class Settings(private val sp: SharedPreferences) {
         get() = sp.getString(POST_SIZE_DOWNLOAD, POST_SIZE_LARGER)
         set(value) = editor.putString(POST_SIZE_DOWNLOAD, value).apply()
 
-    var imageLoader: String
-        get() = sp.getString(IMAGE_LOADER, IMAGE_LOADER_GLIDE)
-        set(value) = editor.putString(IMAGE_LOADER, value).apply()
+    var safeMode: Boolean
+        get() = sp.getBoolean(SAFE_MODE, true)
+        set(value) = editor.putBoolean(SAFE_MODE, value).apply()
 }

@@ -71,6 +71,15 @@
             android:icon="@drawable/ic_settings_file_download_24dp"
             app:iconSpaceReserved="true" />
 
+        <SwitchPreference
+            android:key="safe_mode"
+            android:title="@string/safe_mode"
+            android:defaultValue="true"
+            android:summaryOn="@string/on"
+            android:summaryOff="@string/off"
+            android:icon="@drawable/ic_settings_security_24dp"
+            app:iconSpaceReserved="true"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

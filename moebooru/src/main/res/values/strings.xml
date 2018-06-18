@@ -143,4 +143,6 @@
 
     <string name="send_crash_log">Send crash log</string>
     <string name="select_crash_log_file">Select crash log file and send to developer</string>
+
+    <string name="safe_mode">Safe mode</string>
 </resources>

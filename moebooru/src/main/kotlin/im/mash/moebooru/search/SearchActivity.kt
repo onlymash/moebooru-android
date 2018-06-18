@@ -51,6 +51,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     private var limit = 50
     private var keyword = ""
     private var firstStart = true
+    private var safeMode = true
 
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var appBarLayout: AppBarLayout
@@ -82,6 +83,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         if (keyword == "") finish()
         spanCount = this.screenWidth/resources.getDimension(R.dimen.item_width).toInt()
         limit = app.settings.postLimitInt
+        safeMode = app.settings.safeMode
         logi(TAG, keyword)
         initView()
         initRefresh()
@@ -102,14 +104,23 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                     logi(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
                     posts = data
                     if (loadingMore) {
-                        postSearchAdapter.addData(posts)
+                        if (safeMode) {
+                            postSearchAdapter.addData(getSafePosts())
+                        } else {
+                            postSearchAdapter.addData(posts)
+                        }
                         loadingMore = false
+                        refreshLayout.isRefreshing = false
                     } else {
                         if (data.size == 0 && firstStart) {
                             firstStart = false
                             refresh()
                         } else {
-                            postSearchAdapter.updateData(posts)
+                            if (safeMode) {
+                                postSearchAdapter.updateData(getSafePosts())
+                            } else {
+                                postSearchAdapter.updateData(posts)
+                            }
                             refreshing = false
                             refreshLayout.isRefreshing = false
                         }
@@ -128,13 +139,26 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         postSearchViewModel.loadPosts(getHttpUrl())
     }
 
+    private fun getSafePosts(): MutableList<PostSearch> {
+        val postsSafe: MutableList<PostSearch> = mutableListOf()
+        posts.forEach { post ->
+            if (post.rating == "s") {
+                postsSafe.add(post)
+            }
+        }
+        return postsSafe
+    }
+
     @SuppressLint("InflateParams")
     private fun initView() {
         appBarLayout = findViewById(R.id.appbar_layout)
         toolbar = layoutInflater.inflate(R.layout.layout_toolbar, null) as Toolbar
         appBarLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.toolbar_post))
         toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent))
+        toolbar.setTitle(R.string.posts)
+        toolbar.subtitle = keyword
         toolbar.inflateMenu(R.menu.menu_search)
+        toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
         when (app.settings.gridModeString) {
             Settings.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).isChecked = true
             Settings.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
@@ -153,11 +177,10 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                         app.settings.gridModeString = Settings.GRID_MODE_STAGGERED_GRID
                     }
                 }
+                R.id.action_safe_mode -> app.settings.safeMode = !app.settings.safeMode
             }
             return@setOnMenuItemClickListener true
         }
-        toolbar.setTitle(R.string.posts)
-        toolbar.subtitle = keyword
         appBarLayout.addView(toolbar)
         ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
             paddingTop = insets.systemWindowInsetTop
@@ -279,6 +302,15 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                         postSearchAdapter.updateData(mutableListOf())
                         postSearchAdapter.updateData(posts)
                     }
+                }
+            }
+            Settings.SAFE_MODE -> {
+                safeMode = app.settings.safeMode
+                toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
+                if (safeMode) {
+                    postSearchAdapter.updateData(getSafePosts())
+                } else {
+                    postSearchAdapter.updateData(posts)
                 }
             }
         }
