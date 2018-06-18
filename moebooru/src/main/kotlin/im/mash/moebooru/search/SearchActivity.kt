@@ -50,6 +50,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     private var notiNotMore = true
     private var limit = 50
     private var keyword = ""
+    private var firstStart = true
 
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var appBarLayout: AppBarLayout
@@ -97,17 +98,21 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    refreshLayout.isRefreshing = false
                     val data = outcome.data
                     logi(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
+                    posts = data
                     if (loadingMore) {
-                        posts = data
                         postSearchAdapter.addData(posts)
                         loadingMore = false
                     } else {
-                        posts = data
-                        postSearchAdapter.updateData(posts)
-                        refreshing = false
+                        if (data.size == 0 && firstStart) {
+                            firstStart = false
+                            refresh()
+                        } else {
+                            postSearchAdapter.updateData(posts)
+                            refreshing = false
+                            refreshLayout.isRefreshing = false
+                        }
                     }
                 }
                 is Outcome.Failure -> {
@@ -213,15 +218,19 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 R.color.orange,
                 R.color.red
         )
+        refreshLayout.isRefreshing = true
         refreshLayout.setOnRefreshListener {
             if (!loadingMore && !refreshing) {
-                notiNotMore = true
-                page = 1
-                refreshing = true
-                postSearchViewModel.refreshPosts(getHttpUrl())
+                refresh()
             }
         }
-        refreshLayout.isRefreshing = true
+    }
+
+    private fun refresh() {
+        notiNotMore = true
+        page = 1
+        refreshing = true
+        postSearchViewModel.refreshPosts(getHttpUrl())
     }
 
     private fun getHttpUrl(): HttpUrl {

@@ -109,18 +109,17 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    refreshLayout.isRefreshing = false
                     val data = outcome.data
                     logi(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
+                    posts = data
                     if (loadingMore) {
-                        posts = data
-                        postAdapter.addData(posts)
                         loadingMore = false
+                        postAdapter.addData(posts)
                     } else {
-                        posts = data
-                        postAdapter.updateData(posts)
                         refreshing = false
+                        postAdapter.updateData(posts)
                     }
+                    refreshLayout.isRefreshing = false
                 }
                 is Outcome.Failure -> {
                     refreshLayout.isRefreshing = false

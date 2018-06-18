@@ -38,10 +38,6 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ posts ->
                     postFetchOutcome.success(posts)
-                    if ((posts == null || posts.size == 0) && remoteFetch) {
-                        refreshPosts(httpUrl)
-                        remoteFetch = false
-                    }
                     logi(TAG, "fetchPosts. post size: ${posts.size}")
                 }, {
                     error -> handleError(error) })
