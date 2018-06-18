@@ -115,6 +115,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         }
         toolbar.inflateMenu(R.menu.menu_details)
         toolbar.setOnMenuItemClickListener(this)
+        toolbar.setNavigationOnClickListener { finish() }
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
