@@ -89,12 +89,12 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initToolbar()
-        initRightDrawer(view)
-        initDrawerListener()
         spanCount = mainActivity.screenWidth/mainActivity.resources.getDimension(R.dimen.item_width).toInt()
         limit = app.settings.postLimitInt
         safeMode = app.settings.safeMode
+        initToolbar()
+        initRightDrawer(view)
+        initDrawerListener()
         initRefresh(view)
         initPostList(view)
         observePosts()

@@ -5,6 +5,7 @@ import im.mash.moebooru.common.data.local.entity.Tag
 import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
+import im.mash.moebooru.util.logi
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
@@ -35,7 +36,7 @@ class TagRepository(private val database: MoeDatabase,
             database.tagDao().insertTag(tag)
         }
                 .performOnBack(scheduler)
-                .subscribe()
+                .subscribe({}, {error -> handleError(error)})
     }
 
     override fun deleteTag(tag: Tag) {
@@ -43,7 +44,7 @@ class TagRepository(private val database: MoeDatabase,
             database.tagDao().deleteTag(tag)
         }
                 .performOnBack(scheduler)
-                .subscribe()
+                .subscribe({}, {error -> handleError(error)})
     }
 
     override fun handleError(error: Throwable) {

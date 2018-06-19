@@ -19,7 +19,7 @@ import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.LinearLayout
 import android.widget.TextView
-import im.mash.moebooru.App.Companion.moePath
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarDialog
@@ -104,11 +104,11 @@ class GalleryFragment : ToolbarFragment() {
             override fun onItemClick(position: Int) {
                 if (position == 0) {
                     if (mayRequestStoragePermission(mainActivity, 0)) {
-                        mediaViewModel.loadMedia(moePath)
+                        mediaViewModel.loadMedia(app.getMoePath())
                     }
                 } else if (position > 0) {
                     if (mayRequestStoragePermission(mainActivity, 0)) {
-                        val path = moePath + File.separator + mainActivity.boorus[position - 1].host
+                        val path = app.getMoePath() + File.separator + mainActivity.boorus[position - 1].host
                         mediaViewModel.loadMedia(path)
                     }
                 }
@@ -138,7 +138,7 @@ class GalleryFragment : ToolbarFragment() {
         })
 
         if (mayRequestStoragePermission(mainActivity, 0)) {
-            mediaViewModel.loadMedia(moePath)
+            mediaViewModel.loadMedia(app.getMoePath())
         }
     }
     private fun initGalleryView(view: View) {

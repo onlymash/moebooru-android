@@ -13,6 +13,10 @@ class DownloadRepository(private val database: MoeDatabase,
                          private val scheduler: Scheduler,
                          private val compositeDisposable: CompositeDisposable) : DownloadDataContract.Repository {
 
+    companion object {
+        private const val TAG = "DownloadRepository"
+    }
+
     override val downloadPostsOutcome: PublishSubject<Outcome<MutableList<PostDownload>>>
             = PublishSubject.create<Outcome<MutableList<PostDownload>>>()
 
@@ -32,7 +36,7 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().save(post)
         }
                 .performOnBack(scheduler)
-                .subscribe()
+                .subscribe({}, { error -> handleError(error)})
     }
 
     override fun deletePost(post: PostDownload) {
@@ -40,7 +44,7 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().delete(post)
         }
                 .performOnBack(scheduler)
-                .subscribe()
+                .subscribe({}, { error -> handleError(error)})
     }
 
     override fun deletePosts(posts: MutableList<PostDownload>) {
@@ -48,7 +52,7 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().delete(posts)
         }
                 .performOnBack(scheduler)
-                .subscribe()
+                .subscribe({}, { error -> handleError(error)})
     }
 
     override fun deleteAll() {
@@ -56,7 +60,7 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().deleteAll()
         }
                 .performOnBack(scheduler)
-                .subscribe()
+                .subscribe({}, { error -> handleError(error)})
     }
 
     override fun handleError(error: Throwable) {

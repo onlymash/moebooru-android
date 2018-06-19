@@ -23,6 +23,7 @@ import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.DownloadAdapter
 import im.mash.moebooru.common.viewmodel.DownloadViewModel
 import im.mash.moebooru.util.logi
+import im.mash.moebooru.util.mayRequestStoragePermission
 
 class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
@@ -84,7 +85,9 @@ class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
                         }
                     }
                 })
-        downloadViewModel.loadAll()
+        if (mayRequestStoragePermission(mainActivity, 0)) {
+            downloadViewModel.loadAll()
+        }
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {

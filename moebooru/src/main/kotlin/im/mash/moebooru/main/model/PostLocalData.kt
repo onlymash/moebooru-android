@@ -5,12 +5,17 @@ import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.core.extensions.performOnBack
 import im.mash.moebooru.core.scheduler.Scheduler
+import im.mash.moebooru.util.logi
 import io.reactivex.Completable
 import io.reactivex.Flowable
 
 class PostLocalData(private val database: MoeDatabase,
                     private val scheduler: Scheduler)
     : PostDataContract.Local {
+
+    companion object {
+        private const val TAG = "PostLocalData"
+    }
 
     override fun getPosts(site: String): Flowable<MutableList<Post>> {
         return database.postDao().getPosts(site)
@@ -30,7 +35,7 @@ class PostLocalData(private val database: MoeDatabase,
             database.postDao().insertPosts(posts)
         }
                 .performOnBack(scheduler)
-                .subscribe()
+                .subscribe({}, {error -> logi(TAG, error.message.toString())})
     }
 
     override fun deletePosts(site: String) {
@@ -38,6 +43,6 @@ class PostLocalData(private val database: MoeDatabase,
             database.postDao().deletePosts(site)
         }
                 .performOnBack(scheduler)
-                .subscribe()
+                .subscribe({}, {error -> logi(TAG, error.message.toString())})
     }
 }

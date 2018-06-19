@@ -7,7 +7,6 @@ import com.liulishuo.okdownload.DownloadTask
 import com.liulishuo.okdownload.StatusUtil
 import com.liulishuo.okdownload.core.cause.EndCause
 import im.mash.moebooru.App.Companion.app
-import im.mash.moebooru.App.Companion.moePath
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.content.UriRetriever.getUriFromFilePath
 import im.mash.moebooru.util.logi
@@ -61,7 +60,7 @@ class DownloadManager : DownloadContextListener {
         for (index in 0 until size) {
             val url = posts[size - index - 1].url
             val fileName: String = URLDecoder.decode(url.substring(url.lastIndexOf("/") + 1), "UTF-8")
-            val booruPath = moePath + "/" + posts[size - index - 1].domain
+            val booruPath = app.getMoePath() + "/" + posts[size - index - 1].domain
             val booruDir = File(booruPath)
             if (!booruDir.exists()) {
                 if (!booruDir.mkdirs()) {
@@ -83,7 +82,7 @@ class DownloadManager : DownloadContextListener {
 
     private fun getPostUri(url: String, domain: String): Uri {
         val fileName: String = URLDecoder.decode(url.substring(url.lastIndexOf("/") + 1), "UTF-8")
-        val booruPath = "$moePath/$domain"
+        val booruPath = "${app.getMoePath()}/$domain"
         val booruDir = File(booruPath)
         if (!booruDir.exists()) {
             if (!booruDir.mkdirs()) {

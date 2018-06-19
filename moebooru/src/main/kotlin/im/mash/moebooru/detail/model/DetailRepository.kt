@@ -2,10 +2,7 @@ package im.mash.moebooru.detail.model
 
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostSearch
-import im.mash.moebooru.core.extensions.failed
-import im.mash.moebooru.core.extensions.loading
-import im.mash.moebooru.core.extensions.performOnBackOutOnMain
-import im.mash.moebooru.core.extensions.success
+import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.util.logi
@@ -33,6 +30,7 @@ class DetailRepository(private val local: DetailDataContract.Local,
                 .subscribe({ posts ->
                     postFetchOutcome.success(posts)
                 }, { error -> handleError(error) })
+                .addTo(compositeDisposable)
     }
 
     override fun fetchPosts(site: String, tags: String) {
@@ -43,6 +41,7 @@ class DetailRepository(private val local: DetailDataContract.Local,
                     logi(TAG, posts.size.toString())
                     postSearchFetchOutcome.success(posts)
                 }, { error -> handleSearchError(error) })
+                .addTo(compositeDisposable)
     }
 
     override fun handleError(error: Throwable) {

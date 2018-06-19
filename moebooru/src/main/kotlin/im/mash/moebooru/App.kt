@@ -25,7 +25,6 @@ class App : Application() {
         private const val TAG = "MoebooruApp"
         lateinit var app: App
         lateinit var coreComponent: CoreComponent
-        lateinit var moePath: String
         lateinit var glideHeaders: Headers
     }
 
@@ -43,35 +42,39 @@ class App : Application() {
             Fabric.with(this, Crashlytics())
         }
         AppCompatDelegate.setDefaultNightMode(settings.nightMode)
-        initPath()
         glideHeaders = this.glideHeader
     }
 
-    private fun initPath() {
+    fun getMoePath(): String {
+        var  path = ""
         val dir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Moebooru")
         when (dir.exists()){
             false -> {
-                if (!dir.mkdirs()) {
+                path = if (!dir.mkdirs()) {
                     logi(TAG, "Create dir failed!")
+                    File(app.getExternalFilesDir(""), "Moebooru").absolutePath
                 } else {
-                    moePath = dir.absolutePath
+                    dir.absolutePath
                 }
             }
             true -> {
-                if (dir.isFile) {
+                path = if (dir.isFile) {
                     if (dir.delete()) {
                         if (!dir.mkdir()) {
                             logi(TAG, "Create dir failed!")
+                            File(app.getExternalFilesDir(""), "Moebooru").absolutePath
                         } else {
-                            moePath = dir.absolutePath
+                            dir.absolutePath
                         }
                     } else {
                         logi(TAG, "Delete moe file failed!")
+                        File(app.getExternalFilesDir(""), "Moebooru").absolutePath
                     }
                 } else {
-                    moePath = dir.absolutePath
+                    dir.absolutePath
                 }
             }
         }
+        return path
     }
 }
