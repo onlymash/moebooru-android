@@ -62,7 +62,7 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
     override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
         childView = rv.findChildViewUnder(e.x, e.y)
         if (childView != null) {
-            position = rv.getChildLayoutPosition(childView)
+            position = rv.getChildLayoutPosition(childView!!)
         }
         //把事件交给 GestureDetector 处理
         return gestureDetector.onTouchEvent(e)

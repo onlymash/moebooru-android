@@ -5,10 +5,10 @@ buildscript {
         version_code = 5
         version_name = '0.0.5_alpha_3'
         min_sdk_version = 21
-        sdk_version = 27
-        build_tools_version = '27.0.3'
+        sdk_version = 28
+        build_tools_version = '28.0.0'
         kotlin_version = '1.2.50'
-        support_library_version = '27.1.1'
+        support_library_version = '28.0.0-alpha3'
         rikka_preference_version = '2.2.3'
         glide_version = '4.7.1'
         firebase_version = '16.0.1'

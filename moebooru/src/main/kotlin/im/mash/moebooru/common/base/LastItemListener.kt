@@ -18,17 +18,17 @@ import android.support.v7.widget.StaggeredGridLayoutManager
 
 abstract class LastItemListener : RecyclerView.OnScrollListener() {
 
-    override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
         super.onScrolled(recyclerView, dx, dy)
 
         // init
-        val layoutManager = recyclerView!!.layoutManager
-        val adapter = recyclerView.adapter
+        val layoutManager = recyclerView.layoutManager ?: return
+        val adapter = recyclerView.adapter ?: return
 
         if (layoutManager.childCount > 0) {
             // Calculations..
             val indexOfLastItemViewVisible = layoutManager.childCount - 1
-            val lastItemViewVisible = layoutManager.getChildAt(indexOfLastItemViewVisible)
+            val lastItemViewVisible = layoutManager.getChildAt(indexOfLastItemViewVisible) ?: return
             val adapterPosition = layoutManager.getPosition(lastItemViewVisible)
             val isLastItemVisible = adapterPosition == adapter.itemCount - 1
 
@@ -38,9 +38,9 @@ abstract class LastItemListener : RecyclerView.OnScrollListener() {
         }
     }
 
-    override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         super.onScrollStateChanged(recyclerView, newState)
-        if (recyclerView?.layoutManager is StaggeredGridLayoutManager) {
+        if (recyclerView.layoutManager is StaggeredGridLayoutManager) {
             (recyclerView.layoutManager as StaggeredGridLayoutManager).invalidateSpanAssignments()
         }
     }

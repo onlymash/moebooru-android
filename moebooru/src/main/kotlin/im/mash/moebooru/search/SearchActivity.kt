@@ -110,7 +110,6 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                             postSearchAdapter.addData(posts)
                         }
                         loadingMore = false
-                        refreshLayout.isRefreshing = false
                     } else {
                         if (data.size == 0 && firstStart) {
                             firstStart = false
@@ -122,9 +121,9 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                                 postSearchAdapter.updateData(posts)
                             }
                             refreshing = false
-                            refreshLayout.isRefreshing = false
                         }
                     }
+                    refreshLayout.isRefreshing = false
                 }
                 is Outcome.Failure -> {
                     refreshLayout.isRefreshing = false
