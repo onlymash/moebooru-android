@@ -34,7 +34,6 @@ dependencies {
     api "com.android.support:appcompat-v7:$support_library_version"
     api "android.arch.persistence.room:runtime:$room_version"
     api "android.arch.persistence.room:rxjava2:$room_version"
-    kapt "android.arch.persistence.room:compiler:$room_version"
     api "com.squareup.okhttp3:okhttp:$okhttp3_version"
     api "com.squareup.okhttp3:logging-interceptor:$okhttp3_version"
     api 'com.squareup.okio:okio:1.14.0'

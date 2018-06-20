@@ -33,6 +33,7 @@ import im.mash.moebooru.util.screenWidth
 import okhttp3.HttpUrl
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.math.log
 
 class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
     companion object {
@@ -50,8 +51,8 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     private var notiNotMore = true
     private var limit = 50
     private var keyword = ""
-    private var firstStart = true
     private var safeMode = true
+    private var firstStart = true
 
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var appBarLayout: AppBarLayout
@@ -84,11 +85,11 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         spanCount = this.screenWidth/resources.getDimension(R.dimen.item_width).toInt()
         limit = app.settings.postLimitInt
         safeMode = app.settings.safeMode
-        logi(TAG, keyword)
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         initView()
         initRefresh()
         observePosts()
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        loadPosts()
     }
 
     private fun observePosts() {
@@ -96,13 +97,10 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 Observer<Outcome<MutableList<PostSearch>>> { outcome ->
             when (outcome) {
                 is Outcome.Progress -> {
-                    if (!refreshLayout.isRefreshing) refreshLayout.isRefreshing = true
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    val data = outcome.data
-                    logi(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
-                    posts = data
+                    posts = outcome.data
                     if (loadingMore) {
                         if (safeMode) {
                             postSearchAdapter.addData(getSafePosts())
@@ -111,19 +109,18 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                         }
                         loadingMore = false
                     } else {
-                        if (data.size == 0 && firstStart) {
+                        if (safeMode) {
+                            postSearchAdapter.updateData(getSafePosts())
+                        } else {
+                            postSearchAdapter.updateData(posts)
+                        }
+                        refreshing = false
+                        if (firstStart && posts.size == 0) {
                             firstStart = false
                             refresh()
-                        } else {
-                            if (safeMode) {
-                                postSearchAdapter.updateData(getSafePosts())
-                            } else {
-                                postSearchAdapter.updateData(posts)
-                            }
-                            refreshing = false
                         }
                     }
-                    refreshLayout.isRefreshing = false
+                    logi(TAG, "postViewModel Outcome.Success. data.size: ${posts.size}")
                 }
                 is Outcome.Failure -> {
                     refreshLayout.isRefreshing = false
@@ -135,6 +132,9 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 }
             }
         })
+    }
+
+    private fun loadPosts() {
         postSearchViewModel.loadPosts(getHttpUrl())
     }
 
@@ -193,8 +193,6 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         postSearchView.itemAnimator = DefaultItemAnimator()
         postSearchView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation)
         postSearchView.setItemViewCacheSize(20)
-        postSearchView.isDrawingCacheEnabled = true
-        postSearchView.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
         when (app.settings.gridModeString) {
             Settings.GRID_MODE_GRID -> {
                 val layoutManager = GridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
@@ -269,7 +267,6 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     private fun loadMoreData() {
         val isNotMore = postSearchViewModel.isNotMore()
         if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
-            refreshLayout.isRefreshing = true
             loadingMore = true
             page = posts.size/(limit-1) + 1
             logi(TAG, "loadMoreData. page: $page")
@@ -292,14 +289,14 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                         postSearchView.setHasFixedSize(true)
                         postSearchAdapter.setGridMode(Settings.GRID_MODE_GRID)
                         postSearchAdapter.updateData(mutableListOf())
-                        postSearchAdapter.updateData(posts)
+                        if (safeMode) postSearchAdapter.updateData(getSafePosts()) else postSearchAdapter.updateData(posts)
                     }
                     Settings.GRID_MODE_STAGGERED_GRID -> {
                         postSearchView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                         postSearchView.setHasFixedSize(false)
                         postSearchAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
                         postSearchAdapter.updateData(mutableListOf())
-                        postSearchAdapter.updateData(posts)
+                        if (safeMode) postSearchAdapter.updateData(getSafePosts()) else postSearchAdapter.updateData(posts)
                     }
                 }
             }
@@ -312,12 +309,33 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                     postSearchAdapter.updateData(posts)
                 }
             }
+            Settings.IS_SEARCH_LOADING -> {
+                logi(TAG, "isLoading ${app.settings.isSearchLoading}")
+                refreshLayout.isRefreshing = app.settings.isSearchLoading
+            }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        logi(TAG, "onPause()")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        firstStart = true
+        logi(TAG, "onResume()")
     }
 
     override fun onDestroy() {
         super.onDestroy()
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         MoeDH.destroySearchComponent()
+    }
+
+    fun getKeyword(): String {
+        return keyword
     }
 }

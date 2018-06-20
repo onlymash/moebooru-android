@@ -1,10 +1,12 @@
 package im.mash.moebooru.search.model
 
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.util.logi
+import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import okhttp3.HttpUrl
@@ -18,11 +20,8 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
         private const val TAG = "PostSearchRepository"
     }
 
-    //Need to perform a remoteFetch or not?
-    private var remoteFetch = true
-
     private var notMore = false
-
+    private var deleting = false
     override fun isNotMore(): Boolean = notMore
 
     override val postFetchOutcome: PublishSubject<Outcome<MutableList<PostSearch>>>
@@ -30,22 +29,28 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
 
     override fun fetchPosts(httpUrl: HttpUrl) {
         postFetchOutcome.loading(true)
+        app.settings.isSearchLoading = true
         var tags = httpUrl.queryParameter("tags")
         if (tags == null) tags = ""
-        logi(TAG, "remoteFetch: $remoteFetch")
         //Observe changes to the db
         local.getPosts(httpUrl.host(), tags)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ posts ->
-                    postFetchOutcome.success(posts)
-                    logi(TAG, "fetchPosts. post size: ${posts.size}")
+                    if (!deleting) {
+                        postFetchOutcome.success(posts)
+                        app.settings.isSearchLoading = false
+                    }
+                    deleting = false
                 }, {
-                    error -> handleError(error) })
+                    error ->
+                    app.settings.isSearchLoading = false
+                    handleError(error)
+                })
                 .addTo(compositeDisposable)
     }
 
     override fun refreshPosts(httpUrl: HttpUrl) {
-        logi(TAG, "refreshPosts")
+        app.settings.isSearchLoading = true
         var tags = httpUrl.queryParameter("tags")
         if (tags == null) tags = ""
         notMore = false
@@ -57,10 +62,13 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                                 post.site = httpUrl.host()
                                 post.keyword = tags
                             }
-                            local.deletePosts(httpUrl.host(), tags)
-                            addPosts(posts)
+                            savePosts(httpUrl.host(), posts, tags)
+                            app.settings.isSearchLoading = false
                         },
-                        { error -> handleError(error) })
+                        { error ->
+                            app.settings.isSearchLoading = false
+                            handleError(error)
+                        })
                 .addTo(compositeDisposable)
     }
 
@@ -68,6 +76,7 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
         if (notMore) {
             return
         }
+        app.settings.isSearchLoading = true
         var tags = httpUrl.queryParameter("tags")
         if (tags == null) tags = ""
         remote.getPosts(httpUrl)
@@ -87,9 +96,27 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                             if (size < limit) {
                                 notMore = true
                             }
+                            app.settings.isSearchLoading = false
                         },
-                        { error -> handleError(error) })
+                        { error ->
+                            app.settings.isSearchLoading = false
+                            handleError(error)
+                        })
                 .addTo(compositeDisposable)
+    }
+
+    private fun savePosts(site: String, posts: MutableList<PostSearch>, tags: String) {
+        deleting = true
+        Completable.fromAction{
+            deletePosts(site, tags)
+        }
+                .performOnBack(scheduler)
+                .subscribe({
+                    addPosts(posts)
+                }, { error ->
+                    deleting = false
+                    handleError(error)
+                })
     }
 
     override fun deletePosts(site: String, tags: String) {

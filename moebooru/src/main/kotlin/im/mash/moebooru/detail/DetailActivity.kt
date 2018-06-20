@@ -83,16 +83,19 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     private lateinit var appBarLayout: AppBarLayout
     internal lateinit var toolbar: Toolbar
 
+    private var keyword = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         component.inject(this)
         val tags = intent.getStringExtra("tags")
         if (tags == null) finish()
+        keyword = tags
         position = intent.getIntExtra("position", 0)
         initView()
         positionViewModel.setPosition(position)
-        initViewModel(tags)
+        initViewModel(keyword)
     }
 
     @SuppressLint("InflateParams")
@@ -235,9 +238,12 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             data
                         }
-                        if (posts.size > 0) {
+                        detailViewModel.postSearchOutcome.removeObservers(this)
+                        if (posts.size > position) {
                             toolbar.title = getString(R.string.post) + " " + posts[position].id
                             initDetailPager()
+                        } else {
+                            logi(TAG, "position >= posts size")
                         }
                     }
                     is Outcome.Failure -> {
@@ -268,9 +274,13 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             data
                         }
-                        if (postsSearch.size > 0) {
+                        detailViewModel.postSearchOutcome.removeObservers(this)
+                        val size = postsSearch.size
+                        if (size > position) {
                             toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
                             initDetailPager()
+                        } else {
+                            logi(TAG, "position >= posts size")
                         }
                     }
                     is Outcome.Failure -> {
@@ -320,5 +330,9 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     override fun onDestroy() {
         super.onDestroy()
         MoeDH.destroyDetailComponent()
+    }
+
+    fun getKeyword(): String {
+        return keyword
     }
 }

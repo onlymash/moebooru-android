@@ -29,20 +29,7 @@ class PostLocalData(private val database: MoeDatabase,
                 .subscribe()
     }
 
-    override fun savePosts(site: String, posts: MutableList<Post>) {
-        Completable.fromAction{
-            database.postDao().deletePosts(site)
-            database.postDao().insertPosts(posts)
-        }
-                .performOnBack(scheduler)
-                .subscribe({}, {error -> logi(TAG, error.message.toString())})
-    }
-
     override fun deletePosts(site: String) {
-        Completable.fromAction{
-            database.postDao().deletePosts(site)
-        }
-                .performOnBack(scheduler)
-                .subscribe({}, {error -> logi(TAG, error.message.toString())})
+        database.postDao().deletePosts(site)
     }
 }

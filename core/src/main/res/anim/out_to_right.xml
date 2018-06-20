@@ -15,7 +15,7 @@
     android:zAdjustment="top">
 
     <translate
-        android:duration="200"
+        android:duration="100"
         android:fromXDelta="0.0"
         android:toXDelta="100.0%p" />
 </set>

@@ -4,6 +4,7 @@ import im.mash.moebooru.core.scheduler.Scheduler
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
@@ -19,6 +20,14 @@ fun Completable.performOnBackOutOnMain(scheduler: Scheduler): Completable {
  * Extension function to subscribe on the background thread and observe on the main thread  for a Flowable
  * */
 fun <T> Flowable<T>.performOnBackOutOnMain(scheduler: Scheduler): Flowable<T> {
+    return this.subscribeOn(scheduler.io())
+            .observeOn(scheduler.mainThread())
+}
+
+/**
+ * Extension function to subscribe on the background thread and observe on the main thread  for a [Single]
+ * */
+fun <T> Single<T>.performOnBackOutOnMain(scheduler: Scheduler): Single<T> {
     return this.subscribeOn(scheduler.io())
             .observeOn(scheduler.mainThread())
 }

@@ -109,13 +109,10 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
             when (outcome) {
                 is Outcome.Progress -> {
-                    if (!refreshLayout.isRefreshing) refreshLayout.isRefreshing = true
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    val data = outcome.data
-                    logi(TAG, "postViewModel Outcome.Success. data.size: ${data.size}")
-                    posts = data
+                    posts = outcome.data
                     if (loadingMore) {
                         loadingMore = false
                         if (safeMode) {
@@ -130,11 +127,13 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                         } else {
                             postAdapter.updateData(posts)
                         }
+                        if (posts.size <= 0) {
+                            refresh()
+                        }
                     }
-                    refreshLayout.isRefreshing = false
+                    logi(TAG, "postViewModel Outcome.Success. data.size: ${posts.size}")
                 }
                 is Outcome.Failure -> {
-                    refreshLayout.isRefreshing = false
                     loadingMore = false
                     if (outcome.e is IOException) {
                         outcome.e.printStackTrace()
@@ -167,12 +166,16 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         )
         refreshLayout.setOnRefreshListener {
             if (!loadingMore && !refreshing) {
-                notiNotMore = true
-                page = 1
-                refreshing = true
-                postViewModel.refreshPosts(getHttpUrl())
+                refresh()
             }
         }
+    }
+
+    private fun refresh() {
+        notiNotMore = true
+        page = 1
+        refreshing = true
+        postViewModel.refreshPosts(getHttpUrl())
     }
 
     private fun getHttpUrl(): HttpUrl {
@@ -191,8 +194,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postView.itemAnimator = DefaultItemAnimator()
         postView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postView.setItemViewCacheSize(20)
-        postView.isDrawingCacheEnabled = true
-        postView.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
         when (app.settings.gridModeString) {
             Settings.GRID_MODE_GRID -> {
                 val layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
@@ -332,22 +333,32 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 }
                 R.id.action_search -> {
                     var keyword = ""
+                    var i = 0
                     tags.forEach { tag ->
                         if (tag.is_selected) {
+                            i += 1
                             keyword = when (keyword) {
                                 "" -> tag.tag
                                 else -> "$keyword ${tag.tag}"
                             }
                         }
                     }
-                    if (keyword == "") {
-                        val snackbar: Snackbar = Snackbar.make(this.view!!, "Tag cant be null", Snackbar.LENGTH_SHORT)
-                        snackbar.view.setPadding(0, 0, 0, paddingBottom)
-                        snackbar.show()
-                    } else {
-                        val intent = Intent(this.requireContext(), SearchActivity::class.java)
-                        intent.putExtra("keyword", keyword)
-                        startActivity(intent)
+                    when {
+                        keyword == "" -> {
+                            val snackbar: Snackbar = Snackbar.make(this.view!!, "Tag cant be null", Snackbar.LENGTH_SHORT)
+                            snackbar.view.setPadding(0, 0, 0, paddingBottom)
+                            snackbar.show()
+                        }
+                        i > 6 -> {
+                            val snackbar: Snackbar = Snackbar.make(this.view!!, "You can only search up to six tags at once", Snackbar.LENGTH_SHORT)
+                            snackbar.view.setPadding(0, 0, 0, paddingBottom)
+                            snackbar.show()
+                        }
+                        else -> {
+                            val intent = Intent(this.requireContext(), SearchActivity::class.java)
+                            intent.putExtra("keyword", keyword)
+                            startActivity(intent)
+                        }
                     }
                 }
             }
@@ -430,14 +441,14 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                         postView.setHasFixedSize(true)
                         postAdapter.setGridMode(Settings.GRID_MODE_GRID)
                         postAdapter.updateData(mutableListOf())
-                        postAdapter.updateData(posts)
+                        if (safeMode) postAdapter.updateData(getSafePosts()) else postAdapter.updateData(posts)
                     }
                     Settings.GRID_MODE_STAGGERED_GRID -> {
                         postView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                         postView.setHasFixedSize(false)
                         postAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
                         postAdapter.updateData(mutableListOf())
-                        postAdapter.updateData(posts)
+                        if (safeMode) postAdapter.updateData(getSafePosts()) else postAdapter.updateData(posts)
                     }
                 }
             }
@@ -459,6 +470,9 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 } else {
                     postAdapter.updateData(posts)
                 }
+            }
+            Settings.IS_LOADING -> {
+                refreshLayout.isRefreshing = app.settings.isLoading
             }
         }
     }

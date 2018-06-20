@@ -304,20 +304,21 @@ abstract class CrashLog : Thread.UncaughtExceptionHandler {
                 if (packageInfo != null) {
 
                     val versionName = packageInfo.versionName
-                    val versionCode = "" + packageInfo.versionCode
                     val packName = packageInfo.packageName
 
                     crashLog["versionName"] = versionName
-                    crashLog["versionCode"] = versionCode
                     crashLog["packName"] = packName
-
+                    if (Build.VERSION.SDK_INT >= 28) {
+                        crashLog["versionCode"] = packageInfo.longVersionCode.toString()
+                    }
                 }
             }
 
             crashLog["Model:"] = android.os.Build.MODEL
             crashLog["CodeName"] = android.os.Build.VERSION.CODENAME
-            crashLog["Release"] = android.os.Build.VERSION.RELEASE
-
+            if (Build.VERSION.SDK_INT >= 23) {
+                crashLog["baseOS"] = android.os.Build.VERSION.BASE_OS
+            }
             val fields = Build::class.java.fields
 
             if (fields != null && fields.isNotEmpty()) {

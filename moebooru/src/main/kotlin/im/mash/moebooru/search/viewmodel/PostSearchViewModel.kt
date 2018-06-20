@@ -27,11 +27,6 @@ class PostSearchViewModel(private val repo: PostSearchDataContract.Repository,
     }
 
     fun loadPosts(httpUrl: HttpUrl) {
-        if (postsSearchOutcome.value == null)
-            repo.fetchPosts(httpUrl)
-    }
-
-    fun reLoadPosts(httpUrl: HttpUrl) {
         repo.fetchPosts(httpUrl)
     }
 
