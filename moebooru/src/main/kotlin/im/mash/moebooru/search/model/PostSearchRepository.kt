@@ -1,6 +1,5 @@
 package im.mash.moebooru.search.model
 
-import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
@@ -29,7 +28,6 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
 
     override fun fetchPosts(httpUrl: HttpUrl) {
         postFetchOutcome.loading(true)
-        app.settings.isSearchLoading = true
         var tags = httpUrl.queryParameter("tags")
         if (tags == null) tags = ""
         //Observe changes to the db
@@ -38,19 +36,17 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                 .subscribe({ posts ->
                     if (!deleting) {
                         postFetchOutcome.success(posts)
-                        app.settings.isSearchLoading = false
                     }
                     deleting = false
                 }, {
                     error ->
-                    app.settings.isSearchLoading = false
                     handleError(error)
                 })
                 .addTo(compositeDisposable)
     }
 
     override fun refreshPosts(httpUrl: HttpUrl) {
-        app.settings.isSearchLoading = true
+        logi(TAG, "refreshing")
         var tags = httpUrl.queryParameter("tags")
         if (tags == null) tags = ""
         notMore = false
@@ -63,10 +59,8 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                                 post.keyword = tags
                             }
                             savePosts(httpUrl.host(), posts, tags)
-                            app.settings.isSearchLoading = false
                         },
                         { error ->
-                            app.settings.isSearchLoading = false
                             handleError(error)
                         })
                 .addTo(compositeDisposable)
@@ -76,7 +70,6 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
         if (notMore) {
             return
         }
-        app.settings.isSearchLoading = true
         var tags = httpUrl.queryParameter("tags")
         if (tags == null) tags = ""
         remote.getPosts(httpUrl)
@@ -85,7 +78,6 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                         { posts ->
                             val limit = httpUrl.queryParameter("limit")!!.toInt()
                             val size = posts.size
-                            logi(TAG, "loadMorePosts. size: $size")
                             if (size > 0) {
                                 posts.forEach { post ->
                                     post.site = httpUrl.host()
@@ -96,12 +88,8 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                             if (size < limit) {
                                 notMore = true
                             }
-                            app.settings.isSearchLoading = false
-                        },
-                        { error ->
-                            app.settings.isSearchLoading = false
-                            handleError(error)
-                        })
+                            logi(TAG, "loadMorePosts. size: $size")
+                        }, { error -> handleError(error) })
                 .addTo(compositeDisposable)
     }
 

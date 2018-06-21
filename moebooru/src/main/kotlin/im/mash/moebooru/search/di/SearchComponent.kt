@@ -46,7 +46,7 @@ class SearchModule {
 
     @Provides
     @SearchScope
-    fun remotePostData(postSearchService: PostSearchService): PostSearchDataContract.Remote
+    fun remoteSearchData(postSearchService: PostSearchService): PostSearchDataContract.Remote
             = PostSearchRemoteData(postSearchService)
 
     @Provides

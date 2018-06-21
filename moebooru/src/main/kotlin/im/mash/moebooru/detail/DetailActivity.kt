@@ -98,6 +98,16 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         initViewModel(keyword)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val tags = intent?.getStringExtra("tags")
+        if (tags == null) finish()
+        keyword = tags!!
+        position = intent.getIntExtra("position", 0)
+        initViewModel(keyword)
+    }
+
     @SuppressLint("InflateParams")
     private fun initView() {
         detailPager = findViewById(R.id.detail_pager)
@@ -238,13 +248,13 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             data
                         }
-                        detailViewModel.postSearchOutcome.removeObservers(this)
                         if (posts.size > position) {
                             toolbar.title = getString(R.string.post) + " " + posts[position].id
                             initDetailPager()
                         } else {
                             logi(TAG, "position >= posts size")
                         }
+                        detailViewModel.postOutcome.removeObservers(this)
                     }
                     is Outcome.Failure -> {
 
@@ -274,7 +284,6 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             data
                         }
-                        detailViewModel.postSearchOutcome.removeObservers(this)
                         val size = postsSearch.size
                         if (size > position) {
                             toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
@@ -282,6 +291,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             logi(TAG, "position >= posts size")
                         }
+                        detailViewModel.postSearchOutcome.removeObservers(this)
                     }
                     is Outcome.Failure -> {
                         logi(TAG, "Outcome.Failure")

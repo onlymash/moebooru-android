@@ -30,14 +30,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".detail.DetailActivity">
+        <activity
+            android:name=".detail.DetailActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="${applicationId}.action.SHOW_DETAILS" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".search.SearchActivity">
+        <activity
+            android:name=".search.SearchActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="${applicationId}.action.SEARCH" />
 
