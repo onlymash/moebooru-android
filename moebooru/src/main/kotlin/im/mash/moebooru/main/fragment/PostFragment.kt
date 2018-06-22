@@ -13,12 +13,10 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
+import android.support.v7.widget.Toolbar
 import android.view.*
 import android.view.animation.AnimationUtils
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.FrameLayout
-import android.widget.LinearLayout
+import android.widget.*
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
@@ -36,10 +34,9 @@ import im.mash.moebooru.main.adapter.TagDrawerAdapter
 import im.mash.moebooru.main.viewmodel.PostViewModel
 import im.mash.moebooru.main.viewmodel.TagViewModel
 import im.mash.moebooru.search.SearchActivity
-import im.mash.moebooru.util.logi
-import im.mash.moebooru.util.screenWidth
-import im.mash.moebooru.util.toolbarHeight
+import im.mash.moebooru.util.*
 import okhttp3.HttpUrl
+import retrofit2.HttpException
 import java.io.IOException
 
 @SuppressLint("RtlHardcoded")
@@ -128,15 +125,27 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                             postAdapter.updateData(posts)
                         }
                         if (posts.size <= 0) {
-                            refresh()
+                            if (!mainActivity.isNetworkConnected) {
+                                takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
+                            } else {
+                                refresh()
+                            }
                         }
                     }
                     logi(TAG, "postViewModel Outcome.Success. data.size: ${posts.size}")
                 }
                 is Outcome.Failure -> {
                     loadingMore = false
-                    if (outcome.e is IOException) {
-                        outcome.e.printStackTrace()
+                    when (outcome.e) {
+                        is HttpException -> {
+                            val httpException = outcome.e as HttpException
+                            val message = httpException.response().message()
+                            val code = httpException.response().code()
+                            Toast.makeText(this.requireContext(), "code: $code, msg: $message", Toast.LENGTH_SHORT).show()
+                        }
+                        is IOException -> {
+                            outcome.e.printStackTrace()
+                        }
                     }
                     logi(TAG, "postViewModel Outcome.Failure")
                 }
@@ -165,8 +174,15 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 R.color.red
         )
         refreshLayout.setOnRefreshListener {
+            if (!mainActivity.isNetworkConnected) {
+                refreshLayout.isRefreshing = false
+                takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
+                return@setOnRefreshListener
+            }
             if (!loadingMore && !refreshing) {
                 refresh()
+            } else {
+                refreshLayout.isRefreshing = false
             }
         }
     }
@@ -311,9 +327,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                             .setPositiveButton(getString(R.string.ok)) { _, _->
                                 val input = editText.text.toString()
                                 if (input.isEmpty() || input == "") {
-                                    val snackbar = Snackbar.make(view, getString(R.string.tag_can_not_be_empty), Snackbar.LENGTH_SHORT)
-                                    snackbar.view.setPadding(0, 0, 0, paddingBottom)
-                                    snackbar.show()
+                                    takeSnackbarShort(view, getString(R.string.tag_can_not_be_empty), paddingBottom)
                                 } else {
                                     var isExist = false
                                     tags.forEach { tag ->
@@ -345,14 +359,10 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     }
                     when {
                         keyword == "" -> {
-                            val snackbar: Snackbar = Snackbar.make(this.view!!, "Tag cant be null", Snackbar.LENGTH_SHORT)
-                            snackbar.view.setPadding(0, 0, 0, paddingBottom)
-                            snackbar.show()
+                            takeSnackbarShort(view, getString(R.string.tag_can_not_be_empty), paddingBottom)
                         }
                         i > 6 -> {
-                            val snackbar: Snackbar = Snackbar.make(this.view!!, "You can only search up to six tags at once", Snackbar.LENGTH_SHORT)
-                            snackbar.view.setPadding(0, 0, 0, paddingBottom)
-                            snackbar.show()
+                            takeSnackbarShort(view, "You can only search up to six tags at once", paddingBottom)
                         }
                         else -> {
                             val intent = Intent(this.requireContext(), SearchActivity::class.java)
@@ -486,6 +496,9 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     }
 
     private fun loadMoreData() {
+        if (!mainActivity.isNetworkConnected) {
+            takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
+        }
         val isNotMore = postViewModel.isNotMore()
         if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
             logi(TAG, "loadMoreData()")
@@ -496,9 +509,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         }
         if (isNotMore && notiNotMore) {
             notiNotMore = false
-            val snackbar: Snackbar = Snackbar.make(this.view!!, "Not more data.", Snackbar.LENGTH_SHORT)
-            snackbar.view.setPadding(0, 0, 0, paddingBottom)
-            snackbar.show()
+            takeSnackbarShort(this.view!!, "Not more posts", paddingBottom)
         }
     }
 

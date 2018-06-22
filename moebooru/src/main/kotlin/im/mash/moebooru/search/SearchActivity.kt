@@ -14,6 +14,7 @@ import android.support.v7.widget.*
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
@@ -28,9 +29,12 @@ import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.search.adapter.PostSearchAdapter
 import im.mash.moebooru.search.viewmodel.PostSearchViewModel
 import im.mash.moebooru.search.viewmodel.PostSearchViewModelFactory
+import im.mash.moebooru.util.isNetworkConnected
 import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.screenWidth
+import im.mash.moebooru.util.takeSnackbarShort
 import okhttp3.HttpUrl
+import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
 
@@ -141,8 +145,16 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 is Outcome.Failure -> {
                     refreshLayout.isRefreshing = false
                     loadingMore = false
-                    if (outcome.e is IOException) {
-                        outcome.e.printStackTrace()
+                    when (outcome.e) {
+                        is HttpException -> {
+                            val httpException = outcome.e as HttpException
+                            val message = httpException.response().message()
+                            val code = httpException.response().code()
+                            Toast.makeText(this, "code: $code, msg: $message", Toast.LENGTH_SHORT).show()
+                        }
+                        is IOException -> {
+                            outcome.e.printStackTrace()
+                        }
                     }
                     logi(TAG, "Outcome.Failure")
                 }
@@ -256,8 +268,15 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         )
         refreshLayout.isRefreshing = true
         refreshLayout.setOnRefreshListener {
+            if (!this.isNetworkConnected) {
+                refreshLayout.isRefreshing = false
+                takeSnackbarShort(refreshLayout, "Network without connection", paddingBottom)
+                return@setOnRefreshListener
+            }
             if (!loadingMore && !refreshing) {
                 refresh()
+            } else {
+                refreshLayout.isRefreshing = false
             }
         }
     }
@@ -282,18 +301,21 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private fun loadMoreData() {
+        if (!this.isNetworkConnected) {
+            takeSnackbarShort(refreshLayout, "Network without connection", paddingBottom)
+            return
+        }
         val isNotMore = postSearchViewModel.isNotMore()
         if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
             loadingMore = true
+            refreshLayout.isRefreshing = true
             page = posts.size/(limit-1) + 1
-            logi(TAG, "loadMoreData. page: $page")
             postSearchViewModel.loadMorePosts(getHttpUrl())
+            logi(TAG, "loadMoreData. page: $page")
         }
         if (isNotMore && notiNotMore) {
             notiNotMore = false
-            val snackbar: Snackbar = Snackbar.make(refreshLayout, "Not more data.", Snackbar.LENGTH_SHORT)
-            snackbar.view.setPadding(0, 0, 0, paddingBottom)
-            snackbar.show()
+            takeSnackbarShort(refreshLayout, "Not more posts", paddingBottom)
         }
     }
 
