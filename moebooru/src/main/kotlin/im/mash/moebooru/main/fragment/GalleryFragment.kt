@@ -153,8 +153,6 @@ class GalleryFragment : ToolbarFragment() {
         galleryView.itemAnimator = DefaultItemAnimator()
         galleryView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         galleryView.setItemViewCacheSize(20)
-        galleryView.isDrawingCacheEnabled = true
-        galleryView.drawingCacheQuality = View.DRAWING_CACHE_QUALITY_HIGH
         val glideRequests: GlideRequests = GlideApp.with(this)
         galleryAdapter = GalleryAdapter(glideRequests)
         galleryView.adapter = galleryAdapter

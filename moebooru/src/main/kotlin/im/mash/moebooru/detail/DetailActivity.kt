@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
@@ -76,6 +77,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     internal var type = "post"
     internal var position = 0
     internal var keyword = ""
+    private var isNew = true
 
     private lateinit var bg: View
     private lateinit var appBarLayout: AppBarLayout
@@ -93,6 +95,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         initView()
         initDetailPager()
         initPositionViewModel()
+        initViewModel(keyword)
     }
 
     override fun onStart() {
@@ -109,12 +112,15 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     override fun onResume() {
         super.onResume()
         logi(TAG, "onResume")
-        val tags = intent?.getStringExtra("tags")
-        if (tags == null) finish()
-        keyword = tags!!
-        position = intent!!.getIntExtra("position", 0)
-        detailPager.currentItem = 1
-        initViewModel(keyword)
+        if (!isNew) {
+            val tags = intent?.getStringExtra("tags")
+            if (tags == null) finish()
+            keyword = tags!!
+            position = intent!!.getIntExtra("position", 0)
+            detailPager.currentItem = 1
+            initViewModel(keyword)
+        }
+        isNew = false
     }
 
     @SuppressLint("InflateParams")
@@ -315,12 +321,16 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                 position = pos
                 when (type) {
                     "post" -> {
-                        val post = posts[position]
-                        setToolbarTitle(post.id)
+                        if (posts.size > position) {
+                            val post = posts[position]
+                            setToolbarTitle(post.id)
+                        }
                     }
                     else -> {
-                        val postSearch = postsSearch[position]
-                        setToolbarTitle(postSearch.id)
+                        if (postsSearch.size > position) {
+                            val postSearch = postsSearch[position]
+                            setToolbarTitle(postSearch.id)
+                        }
                     }
                 }
             }
@@ -340,20 +350,24 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
             0 -> {
                 when (type) {
                     "post" -> {
-                        infoChangeListener?.onInfoChanged(posts[this.position])
+                        if (posts.size > this.position)
+                            infoChangeListener?.onInfoChanged(posts[this.position])
                     }
                     else -> {
-                        infoChangeListener?.onInfoChanged(postsSearch[this.position])
+                        if (postsSearch.size > this.position)
+                            infoChangeListener?.onInfoChanged(postsSearch[this.position])
                     }
                 }
             }
             2 -> {
                 when (type) {
                     "post" -> {
-                        tagsChangeListener?.onTagsChanged(posts[this.position])
+                        if (posts.size > this.position)
+                            tagsChangeListener?.onTagsChanged(posts[this.position])
                     }
                     else -> {
-                        tagsChangeListener?.onTagsChanged(postsSearch[this.position])
+                        if (postsSearch.size > this.position)
+                            tagsChangeListener?.onTagsChanged(postsSearch[this.position])
                     }
                 }
             }
