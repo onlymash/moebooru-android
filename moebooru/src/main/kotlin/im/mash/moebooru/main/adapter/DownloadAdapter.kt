@@ -17,9 +17,14 @@ import im.mash.moebooru.download.DownloadStatusListener
 import im.mash.moebooru.download.ProgressUtil
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.MoeGlideUrl
+import im.mash.moebooru.util.logi
 
 class DownloadAdapter(private val context: Context,
                       private val downloadManager: DownloadManager) : RecyclerView.Adapter<DownloadAdapter.DownloadViewHolder>()  {
+
+    companion object {
+        private const val TAG = "DownloadAdapter"
+    }
 
     private var posts: MutableList<PostDownload> = mutableListOf()
 
@@ -48,11 +53,13 @@ class DownloadAdapter(private val context: Context,
         }
         holder.itemView.setOnClickListener {
             val uri = downloadManager.getPostUriFromPosition(position)
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.setDataAndType(uri, "image/*")
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            val intent = Intent().apply {
+                action = Intent.ACTION_VIEW
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+                setDataAndType(uri, "image/*")
+            }
             try {
-                context.startActivity(intent)
+                context.startActivity(Intent.createChooser(intent, "Open as"))
             } catch (e: Exception) {
                 e.printStackTrace()
             }

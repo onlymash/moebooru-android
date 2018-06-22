@@ -54,6 +54,7 @@ class PagerFragment : Fragment(), DetailActivity.PostsChangeListener {
             }
         })
         detailActivity.setPostsChangeListener(this)
+        detailActivity.initViewModel()
     }
 
     override fun onPostsChanged(posts: MutableList<Post>, position: Int) {
@@ -102,6 +103,7 @@ class PagerFragment : Fragment(), DetailActivity.PostsChangeListener {
 
     override fun onResume() {
         super.onResume()
+        detailActivity.initViewModel()
         logi(TAG, "onResume")
     }
 }

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
@@ -95,7 +94,6 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         initView()
         initDetailPager()
         initPositionViewModel()
-        initViewModel(keyword)
     }
 
     override fun onStart() {
@@ -118,7 +116,6 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
             keyword = tags!!
             position = intent!!.getIntExtra("position", 0)
             detailPager.currentItem = 1
-            initViewModel(keyword)
         }
         isNew = false
     }
@@ -236,8 +233,8 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         detailPager.addOnPageChangeListener(this)
     }
 
-    private fun initViewModel(tags: String) {
-        if (tags == "") {
+    internal fun initViewModel() {
+        if (keyword == "") {
             type = "post"
             detailViewModel.postOutcome.observe(this,
                     Observer<Outcome<MutableList<Post>>> { outcome ->
@@ -311,7 +308,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                     }
                 }
             })
-            detailViewModel.loadPosts(app.settings.activeProfileHost, tags)
+            detailViewModel.loadPosts(app.settings.activeProfileHost, keyword)
         }
     }
 
