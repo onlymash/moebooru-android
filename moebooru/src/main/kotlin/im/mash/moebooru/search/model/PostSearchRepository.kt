@@ -20,7 +20,6 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
     }
 
     private var notMore = false
-    private var deleting = false
     override fun isNotMore(): Boolean = notMore
 
     override val postFetchOutcome: PublishSubject<Outcome<MutableList<PostSearch>>>
@@ -34,10 +33,7 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
         local.getPosts(httpUrl.host(), tags)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ posts ->
-                    if (!deleting) {
-                        postFetchOutcome.success(posts)
-                    }
-                    deleting = false
+                    postFetchOutcome.success(posts)
                 }, {
                     error ->
                     handleError(error)
@@ -54,6 +50,11 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                 .performOnBackOutOnMain(scheduler)
                 .subscribe(
                         { posts ->
+                            val limit = httpUrl.queryParameter("limit")!!.toInt()
+                            val size = posts.size
+                            if (size < limit) {
+                                notMore = true
+                            }
                             posts.forEach { post ->
                                 post.site = httpUrl.host()
                                 post.keyword = tags
@@ -94,7 +95,6 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
     }
 
     private fun savePosts(site: String, posts: MutableList<PostSearch>, tags: String) {
-        deleting = true
         Completable.fromAction{
             deletePosts(site, tags)
         }
@@ -102,7 +102,6 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                 .subscribe({
                     addPosts(posts)
                 }, { error ->
-                    deleting = false
                     handleError(error)
                 })
     }

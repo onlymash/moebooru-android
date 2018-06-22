@@ -1,6 +1,5 @@
 package im.mash.moebooru.detail.fragment
 
-import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -26,7 +25,7 @@ import im.mash.moebooru.util.*
 import java.util.*
 
 
-class InfoFragment : Fragment() {
+class InfoFragment : Fragment(), DetailActivity.InfoChangeListener {
 
     companion object {
         private const val TAG = "InfoFragment"
@@ -66,7 +65,6 @@ class InfoFragment : Fragment() {
     private var type = "post"
     private var post: Post? = null
     private var postSearch: PostSearch? = null
-    private var position = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_details_info, container, false)
@@ -75,29 +73,23 @@ class InfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initView(view)
-        type = detailActivity.type
-        initInfo(detailActivity.position)
-        detailActivity.positionViewModel.getPosition().observe(this, Observer { position ->
-            if (position != null && (position < detailActivity.postsSearch.size || position < detailActivity.posts.size)) {
-                logi(TAG, "$position")
-                this.position = position
-                initInfo(position)
-            }
-        })
         initClickListener(view)
+        detailActivity.setInfoChangeListener(this)
     }
 
-    private fun initInfo(position: Int) {
-        when (type) {
-            "post" -> {
-                post = detailActivity.posts[position]
-                if (post == null) {
-                    return
-                }
-                id.text = post!!.id.toString()
-                author.text = post!!.author
+    override fun onInfoChanged(post: Any) {
+        updateInfo(post)
+    }
+
+    private fun updateInfo(post: Any) {
+        when (post) {
+            is Post -> {
+                type = "post"
+                this.post = post
+                id.text = post.id.toString()
+                author.text = post.author
                 val date = Date()
-                date.time = post!!.created_at * 1000L
+                date.time = post.created_at * 1000L
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val df = android.icu.text.DateFormat.getDateInstance()
                     createdAt.text = df.format(date)
@@ -105,37 +97,34 @@ class InfoFragment : Fragment() {
                     val df = DateFormat.getDateFormat(this.requireContext())
                     createdAt.text = df.format(date)
                 }
-                creatorId.text = post!!.creator_id.toString()
-                val hw = "${post!!.height} x ${post!!.width}"
+                creatorId.text = post.creator_id.toString()
+                val hw = "${post.height} x ${post.width}"
                 heightWidth.text = hw
-                if (post!!.source != null) {
-                    source.text = post!!.source
+                if (post.source != null) {
+                    source.text = post.source
                 } else {
                     source.text = ""
                 }
-                rating.text = post!!.rating
-                score.text = post!!.score.toString()
-                if (post!!.parent_id != null) {
+                rating.text = post.rating
+                score.text = post.score.toString()
+                if (post.parent_id != null) {
                     parentIdLayout.visibility = View.VISIBLE
                 } else {
                     parentIdLayout.visibility = View.GONE
                 }
-                sampleSize.text = Formatter.formatFileSize(detailActivity, post!!.sample_file_size.toLong())
+                sampleSize.text = Formatter.formatFileSize(detailActivity, post.sample_file_size.toLong())
 
-                largerSize.text = Formatter.formatFileSize(detailActivity, post!!.jpeg_file_size.toLong())
+                largerSize.text = Formatter.formatFileSize(detailActivity, post.jpeg_file_size.toLong())
 
-                originSize.text = Formatter.formatFileSize(detailActivity, post!!.file_size.toLong())
+                originSize.text = Formatter.formatFileSize(detailActivity, post.file_size.toLong())
             }
-            else -> {
-                postSearch = detailActivity.postsSearch[position]
-                if (postSearch == null) {
-                    return
-                }
-                logi(TAG, "postSearch.site: ${postSearch!!.site}")
-                id.text = postSearch!!.id.toString()
-                author.text = postSearch!!.author
+            is PostSearch -> {
+                type = "search"
+                this.postSearch = post
+                id.text = post.id.toString()
+                author.text = post.author
                 val date = Date()
-                date.time = postSearch!!.created_at * 1000L
+                date.time = post.created_at * 1000L
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     val df = android.icu.text.DateFormat.getDateInstance()
                     createdAt.text = df.format(date)
@@ -143,26 +132,26 @@ class InfoFragment : Fragment() {
                     val df = DateFormat.getDateFormat(this.requireContext())
                     createdAt.text = df.format(date)
                 }
-                creatorId.text = postSearch!!.creator_id.toString()
-                val hw = "${postSearch!!.height} x ${postSearch!!.width}"
+                creatorId.text = post.creator_id.toString()
+                val hw = "${post.height} x ${post.width}"
                 heightWidth.text = hw
-                if (postSearch!!.source != null) {
-                    source.text = postSearch!!.source
+                if (post.source != null) {
+                    source.text = post.source
                 } else {
                     source.text = ""
                 }
-                rating.text = postSearch!!.rating
-                score.text = postSearch!!.score.toString()
-                if (postSearch!!.parent_id != null) {
+                rating.text = post.rating
+                score.text = post.score.toString()
+                if (post.parent_id != null) {
                     parentIdLayout.visibility = View.VISIBLE
                 } else {
                     parentIdLayout.visibility = View.GONE
                 }
-                sampleSize.text = Formatter.formatFileSize(detailActivity, postSearch!!.sample_file_size.toLong())
+                sampleSize.text = Formatter.formatFileSize(detailActivity, post.sample_file_size.toLong())
 
-                largerSize.text = Formatter.formatFileSize(detailActivity, postSearch!!.jpeg_file_size.toLong())
+                largerSize.text = Formatter.formatFileSize(detailActivity, post.jpeg_file_size.toLong())
 
-                originSize.text = Formatter.formatFileSize(detailActivity, postSearch!!.file_size.toLong())
+                originSize.text = Formatter.formatFileSize(detailActivity, post.file_size.toLong())
             }
         }
     }
@@ -202,7 +191,8 @@ class InfoFragment : Fragment() {
 
     private fun initClickListener(view: View) {
         sampleLayout.setOnLongClickListener {
-            copyText(detailActivity, "sample", getSampleUrl())
+            val url = getSampleUrl() ?: return@setOnLongClickListener true
+            copyText(detailActivity, "sample", url)
             takeSnackbarShort(view, getString(R.string.sample_url_has_been_copied), detailActivity.paddingBottom)
             return@setOnLongClickListener true
         }
@@ -213,7 +203,8 @@ class InfoFragment : Fragment() {
             actionOpen("sample")
         }
         largerLayout.setOnLongClickListener {
-            copyText(detailActivity, "larger", getLargerUrl())
+            val url = getLargerUrl() ?: return@setOnLongClickListener true
+            copyText(detailActivity, "larger", url)
             takeSnackbarShort(view, getString(R.string.larger_url_has_been_copied), detailActivity.paddingBottom)
             return@setOnLongClickListener true
         }
@@ -224,7 +215,8 @@ class InfoFragment : Fragment() {
             actionOpen("larger")
         }
         originLayout.setOnLongClickListener {
-            copyText(detailActivity, "origin", getOriginUrl())
+            val url = getOriginUrl() ?: return@setOnLongClickListener true
+            copyText(detailActivity, "origin", url)
             takeSnackbarShort(view, getString(R.string.origin_url_has_been_copied), detailActivity.paddingBottom)
             return@setOnLongClickListener true
         }
@@ -248,7 +240,7 @@ class InfoFragment : Fragment() {
                 else -> {
                     getDownloadPost(getOriginUrl())
                 }
-            }
+            } ?: return
             detailActivity.downloadViewModel.addTask(post)
             DownloadService.startTask(detailActivity)
         }
@@ -278,46 +270,53 @@ class InfoFragment : Fragment() {
             logi(TAG, e.toString())
         }
     }
-    private fun getSampleUrl(): String {
+    private fun getSampleUrl(): String? {
         return when (type) {
             "post" -> {
-                detailActivity.posts[position].sample_url
+                post?.sample_url
             }
             else -> {
-                detailActivity.postsSearch[position].sample_url
+                postSearch?.sample_url
             }
         }
     }
-    private fun getLargerUrl(): String {
+    private fun getLargerUrl(): String? {
         return when (type) {
             "post" -> {
-                detailActivity.posts[position].getJpegUrl()
+                post?.getJpegUrl()
             }
             else -> {
-                detailActivity.postsSearch[position].getJpegUrl()
+                postSearch?.getJpegUrl()
             }
         }
     }
-    private fun getOriginUrl(): String {
+    private fun getOriginUrl(): String? {
         return when (type) {
             "post" -> {
-                detailActivity.posts[position].getFileUrl()
+                post?.getFileUrl()
             }
             else -> {
-                detailActivity.postsSearch[position].getFileUrl()
+                postSearch?.getFileUrl()
             }
         }
     }
-    private fun getDownloadPost(url: String): PostDownload {
+    private fun getDownloadPost(url: String?): PostDownload? {
         return when (type) {
             "post" -> {
-                PostDownload(null, app.settings.activeProfileHost, detailActivity.posts[position].id,
-                        detailActivity.posts[position].preview_url, url,"")
+                if (post == null || url == null) return null
+                PostDownload(null, app.settings.activeProfileHost, post!!.id,
+                        post!!.preview_url, url,"")
             }
             else -> {
-                PostDownload(null, app.settings.activeProfileHost, detailActivity.postsSearch[position].id,
-                        detailActivity.postsSearch[position].preview_url, url,"")
+                if (postSearch == null || url == null) return null
+                PostDownload(null, app.settings.activeProfileHost, postSearch!!.id,
+                        postSearch!!.preview_url, url,"")
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        detailActivity.positionViewModel.getPosition().removeObservers(this)
     }
 }

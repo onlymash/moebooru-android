@@ -1,6 +1,5 @@
 package im.mash.moebooru.detail.fragment
 
-import android.arch.lifecycle.Observer
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -14,6 +13,8 @@ import android.view.View
 import android.view.ViewGroup
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
+import im.mash.moebooru.common.data.local.entity.Post
+import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.common.data.local.entity.Tag
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.detail.adapter.TagAdapter
@@ -24,7 +25,7 @@ import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.screenWidth
 import im.mash.moebooru.util.toolbarHeight
 
-class TagFragment : Fragment() {
+class TagFragment : Fragment(), DetailActivity.TagsChangeListener {
 
     companion object {
         private const val TAG = "TagFragment"
@@ -36,7 +37,6 @@ class TagFragment : Fragment() {
     private lateinit var tagAdapter: TagAdapter
 
     private var spanCount = 1
-    private var position = 0
     private var type = "post"
 
     private val detailActivity by lazy { activity as DetailActivity }
@@ -58,17 +58,8 @@ class TagFragment : Fragment() {
         tagView.setHasFixedSize(true)
         tagAdapter = TagAdapter()
         tagView.adapter = tagAdapter
-        position = detailActivity.position
-        type = detailActivity.type
-        setData()
-        detailActivity.positionViewModel.getPosition().observe(this, Observer { pos ->
-            if (pos != null) {
-                position = pos
-                setData()
-            }
-        })
-
         tagAdapter.setTagItemClickListener(object : TagAdapter.TagItemClickListener {
+
             override fun onClickItem(tag: String) {
                 val intent = Intent(this@TagFragment.requireContext(), SearchActivity::class.java)
                 intent.putExtra("keyword", tag)
@@ -77,7 +68,7 @@ class TagFragment : Fragment() {
 
             override fun onLongClickItem(tag: String) {
                 val cm = this@TagFragment.requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val cd = ClipData.newPlainText("Tag: $position", tag)
+                val cd = ClipData.newPlainText("Tag", tag)
                 cm.primaryClip = cd
             }
 
@@ -90,26 +81,31 @@ class TagFragment : Fragment() {
             }
 
         })
+        detailActivity.setTagsChangeListener(this)
     }
 
-    private fun setData() {
-        when (type) {
-            "post" -> {
-                val tagsString = detailActivity.posts[position].tags
+    override fun onTagsChanged(post: Any) {
+        updateTags(post)
+    }
+
+    private fun updateTags(post: Any) {
+        when (post) {
+            is Post -> {
+                type = "post"
+                val tagsString = post.tags
                 if (tagsString == "") {
                     return
                 }
-                val tagsList = tagsString.split(" ").toMutableList()
-                tags = tagsList
+                tags = tagsString.split(" ").toMutableList()
                 tagAdapter.updateData(tags)
             }
-            else -> {
-                val tagsString = detailActivity.postsSearch[position].tags
+            is PostSearch -> {
+                type = "search"
+                val tagsString = post.tags
                 if (tagsString == "") {
                     return
                 }
-                val tagsList = tagsString.split(" ").toMutableList()
-                tags = tagsList
+                tags = tagsString.split(" ").toMutableList()
                 tagAdapter.updateData(tags)
             }
         }

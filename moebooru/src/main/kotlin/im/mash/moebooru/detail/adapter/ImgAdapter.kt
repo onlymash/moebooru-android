@@ -14,6 +14,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
+import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.data.local.entity.Post
@@ -22,32 +23,17 @@ import im.mash.moebooru.core.widget.photoview.PhotoView
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.MoeGlideUrl
 
-class ImgAdapter(private val context: Context) : PagerAdapter() {
+class ImgAdapter(private val context: Context, private val posts: MutableList<Post>,
+                 private val postsSearch: MutableList<PostSearch>,
+                 private val type: String) : PagerAdapter() {
 
-    private var posts: MutableList<Post> = mutableListOf()
-    private var postsSearch: MutableList<PostSearch> = mutableListOf()
-    private var type = "post"
-    private var size = Settings.POST_SIZE_SAMPLE
-    private var itemCount = 0
+    private var imgSize = app.settings.postSizeBrowse
 
     override fun getCount(): Int {
-        return itemCount
-    }
-
-    fun updateData(posts: MutableList<Post>, size: String) {
-        this.posts = posts
-        itemCount = posts.size
-        type = "post"
-        this.size = size
-        notifyDataSetChanged()
-    }
-
-    fun updateSearchData(posts: MutableList<PostSearch>, size: String) {
-        this.postsSearch = posts
-        itemCount = posts.size
-        type = "search"
-        this.size = size
-        notifyDataSetChanged()
+        return when (type) {
+            "post" -> posts.size
+            else -> postsSearch.size
+        }
     }
 
     @SuppressLint("InflateParams")
@@ -65,14 +51,14 @@ class ImgAdapter(private val context: Context) : PagerAdapter() {
         progressBar.indeterminateDrawable.setColorFilter(Color.WHITE, PorterDuff.Mode.MULTIPLY)
         val url = when (type) {
             "post" -> {
-                when (size) {
+                when (imgSize) {
                     Settings.POST_SIZE_SAMPLE -> posts[position].sample_url
                     Settings.POST_SIZE_LARGER -> posts[position].getJpegUrl()
                     else -> posts[position].getFileUrl()
                 }
             }
             else -> {
-                when (size) {
+                when (imgSize) {
                     Settings.POST_SIZE_SAMPLE -> postsSearch[position].sample_url
                     Settings.POST_SIZE_LARGER -> postsSearch[position].getJpegUrl()
                     else -> postsSearch[position].getFileUrl()

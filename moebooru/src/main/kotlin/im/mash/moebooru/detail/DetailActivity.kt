@@ -24,9 +24,6 @@ import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.widget.VerticalViewPager
 import im.mash.moebooru.detail.adapter.DetailAdapter
-import im.mash.moebooru.detail.fragment.InfoFragment
-import im.mash.moebooru.detail.fragment.PagerFragment
-import im.mash.moebooru.detail.fragment.TagFragment
 import im.mash.moebooru.detail.viewmodel.DetailViewModel
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModel
@@ -73,38 +70,50 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     @Inject
     lateinit var tagViewModelFactory: TagViewModelFactory
 
-    internal var posts: MutableList<Post> = mutableListOf()
-    internal var postsSearch: MutableList<PostSearch> = mutableListOf()
+    private var posts: MutableList<Post> = mutableListOf()
+    private var postsSearch: MutableList<PostSearch> = mutableListOf()
 
     internal var type = "post"
     internal var position = 0
+    internal var keyword = ""
 
     private lateinit var bg: View
     private lateinit var appBarLayout: AppBarLayout
     internal lateinit var toolbar: Toolbar
 
-    private var keyword = ""
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         component.inject(this)
-        val tags = intent.getStringExtra("tags")
+        logi(TAG, "onCreate")
+        val tags = intent?.getStringExtra("tags")
         if (tags == null) finish()
-        keyword = tags
-        position = intent.getIntExtra("position", 0)
+        keyword = tags!!
+        position = intent!!.getIntExtra("position", 0)
         initView()
-        positionViewModel.setPosition(position)
-        initViewModel(keyword)
+        initDetailPager()
+        initPositionViewModel()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        logi(TAG, "onStart")
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
+        logi(TAG, "onNewIntent")
         setIntent(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        logi(TAG, "onResume")
         val tags = intent?.getStringExtra("tags")
         if (tags == null) finish()
         keyword = tags!!
-        position = intent.getIntExtra("position", 0)
+        position = intent!!.getIntExtra("position", 0)
+        detailPager.currentItem = 1
         initViewModel(keyword)
     }
 
@@ -215,11 +224,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     }
 
     private fun initDetailPager() {
-        detailAdapter = DetailAdapter(supportFragmentManager, mutableListOf(
-                InfoFragment(),
-                PagerFragment(),
-                TagFragment()
-        ))
+        detailAdapter = DetailAdapter(supportFragmentManager)
         detailPager.adapter = detailAdapter
         detailPager.currentItem = 1
         detailPager.addOnPageChangeListener(this)
@@ -228,14 +233,14 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     private fun initViewModel(tags: String) {
         if (tags == "") {
             type = "post"
-            logi(TAG, "type = post")
             detailViewModel.postOutcome.observe(this,
                     Observer<Outcome<MutableList<Post>>> { outcome ->
                 when (outcome) {
                     is Outcome.Progress -> {
-
+                        logi(TAG, "Outcome.Progress")
                     }
                     is Outcome.Success -> {
+                        logi(TAG, "Outcome.Success. type = post")
                         val data = outcome.data
                         posts = if (app.settings.safeMode) {
                             val postsSafe: MutableList<Post> = mutableListOf()
@@ -248,23 +253,23 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             data
                         }
+                        postsSearch.clear()
                         if (posts.size > position) {
-                            toolbar.title = getString(R.string.post) + " " + posts[position].id
-                            initDetailPager()
+                            setToolbarTitle(posts[position].id)
+                            postsChangeListener?.onPostsChanged(posts, position)
                         } else {
                             logi(TAG, "position >= posts size")
                         }
                         detailViewModel.postOutcome.removeObservers(this)
                     }
                     is Outcome.Failure -> {
-
+                        logi(TAG, "Outcome.Failure")
                     }
                 }
             })
             detailViewModel.loadPosts(app.settings.activeProfileHost)
         } else {
             type = "search"
-            logi(TAG, "type = search")
             detailViewModel.postSearchOutcome.observe(this,
                     Observer<Outcome<MutableList<PostSearch>>> { outcome ->
                 when (outcome) {
@@ -272,6 +277,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         logi(TAG, "Outcome.Progress")
                     }
                     is Outcome.Success -> {
+                        logi(TAG, "Outcome.Success. type = search")
                         val data = outcome.data
                         postsSearch = if (app.settings.safeMode) {
                             val postsSafe: MutableList<PostSearch> = mutableListOf()
@@ -284,10 +290,10 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             data
                         }
-                        val size = postsSearch.size
-                        if (size > position) {
-                            toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
-                            initDetailPager()
+                        posts.clear()
+                        if (postsSearch.size > position) {
+                            setToolbarTitle(postsSearch[position].id)
+                            postsChangeListener?.onPostsSearchChanged(postsSearch, position)
                         } else {
                             logi(TAG, "position >= posts size")
                         }
@@ -303,6 +309,24 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         }
     }
 
+    private fun initPositionViewModel() {
+        positionViewModel.getPosition().observe(this, Observer { pos ->
+            if (pos != null && pos != position) {
+                position = pos
+                when (type) {
+                    "post" -> {
+                        val post = posts[position]
+                        setToolbarTitle(post.id)
+                    }
+                    else -> {
+                        val postSearch = postsSearch[position]
+                        setToolbarTitle(postSearch.id)
+                    }
+                }
+            }
+        })
+    }
+
     override fun onPageScrollStateChanged(state: Int) {
         resetBg()
     }
@@ -312,19 +336,32 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     }
 
     override fun onPageSelected(position: Int) {
-
-    }
-
-    fun setToolbarTitle(position: Int) {
-        this.position = position
-        when (type) {
-            "post" -> {
-                toolbar.title = getString(R.string.post) + " " + posts[position].id
+        when (position) {
+            0 -> {
+                when (type) {
+                    "post" -> {
+                        infoChangeListener?.onInfoChanged(posts[this.position])
+                    }
+                    else -> {
+                        infoChangeListener?.onInfoChanged(postsSearch[this.position])
+                    }
+                }
             }
-            else -> {
-                toolbar.title = getString(R.string.post) + " " + postsSearch[position].id
+            2 -> {
+                when (type) {
+                    "post" -> {
+                        tagsChangeListener?.onTagsChanged(posts[this.position])
+                    }
+                    else -> {
+                        tagsChangeListener?.onTagsChanged(postsSearch[this.position])
+                    }
+                }
             }
         }
+    }
+
+    private fun setToolbarTitle(id: Int) {
+        toolbar.title = getString(R.string.post) + " " + id
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
@@ -339,10 +376,88 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
 
     override fun onDestroy() {
         super.onDestroy()
-        MoeDH.destroyDetailComponent()
+        logi(TAG, "onDestroy")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        logi(TAG, "onPause")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        logi(TAG, "onRestart")
+    }
+
+    fun getPosts(): MutableList<Post> {
+        return posts
+    }
+
+    fun getPostsSearch(): MutableList<PostSearch> {
+        return postsSearch
+    }
+
+    fun getPost(position: Int): Post {
+        return posts[position]
+    }
+
+    fun getPostSearch(position: Int): PostSearch {
+        return postsSearch[position]
+    }
+
+    fun getType(): String {
+        return type
+    }
+
+    fun setType(type: String) {
+        this.type = type
+    }
+
+    fun getPosition(): Int {
+        return position
+    }
+
+    fun setPosts(posts: MutableList<Post>) {
+        this.posts = posts
+    }
+
+    fun setPostsSearch(postsSearch: MutableList<PostSearch>) {
+        this.postsSearch = postsSearch
     }
 
     fun getKeyword(): String {
         return keyword
+    }
+
+    private var postsChangeListener: PostsChangeListener? = null
+
+    fun setPostsChangeListener(listener: PostsChangeListener) {
+        postsChangeListener = listener
+    }
+
+    interface PostsChangeListener {
+        fun onPostsChanged(posts: MutableList<Post>, position: Int)
+        fun onPostsSearchChanged(postsSearch: MutableList<PostSearch>, position: Int)
+    }
+
+
+    private var infoChangeListener: InfoChangeListener? = null
+
+    fun setInfoChangeListener(listener: InfoChangeListener) {
+        infoChangeListener = listener
+    }
+
+    interface InfoChangeListener {
+        fun onInfoChanged(post: Any)
+    }
+
+    private var tagsChangeListener: TagsChangeListener? = null
+
+    fun setTagsChangeListener(listener: TagsChangeListener) {
+        tagsChangeListener = listener
+    }
+
+    interface TagsChangeListener {
+        fun onTagsChanged(post: Any)
     }
 }
