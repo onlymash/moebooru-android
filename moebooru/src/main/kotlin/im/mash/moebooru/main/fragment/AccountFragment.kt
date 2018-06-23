@@ -185,7 +185,10 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
         setAccount.visibility = View.INVISIBLE
         progressBar.visibility = View.VISIBLE
         requesting = true
-        val passwordHash = HashUtil.sha1(hashSalt.replace("your-password", password))
+        val passwordHash = when (TextUtils.isEmpty(hashSalt)) {
+            true -> HashUtil.sha1(password)
+            else -> HashUtil.sha1(hashSalt.replace("your-password", password))
+        }
         userViewModel.getUser(getHttpUrl(username), passwordHash)
     }
 
