@@ -92,10 +92,20 @@ class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.action_start_all -> app.downloadManager.startAll(true)
-            R.id.action_stop_all -> app.downloadManager.stopAll()
+            R.id.action_start_all -> {
+                if (posts.size > 0) {
+                    app.downloadManager.startAll(true)
+                }
+            }
+            R.id.action_stop_all -> {
+                if (posts.size > 0) {
+                    app.downloadManager.stopAll()
+                }
+            }
             R.id.action_clear_completed -> {
-                downloadViewModel.delete(app.downloadManager.getCompleted())
+                if (posts.size > 0) {
+                    downloadViewModel.delete(app.downloadManager.getCompleted())
+                }
             }
             R.id.action_clear_all -> {
                 if (posts.size > 0) {
