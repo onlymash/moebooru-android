@@ -21,7 +21,7 @@
         android:paddingBottom="0dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingTop="8dp"
+        android:paddingTop="24dp"
         android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@+id/appbar_layout"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -31,20 +31,6 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/account_id"
-                android:textAllCaps="true"
-                style="?android:listSeparatorTextViewStyle"/>
-            <TextView
-                android:id="@+id/tv_id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:ellipsize="marquee"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:singleLine="true" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -60,6 +46,22 @@
                 android:ellipsize="marquee"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:singleLine="true" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/account_id"
+                android:textAllCaps="true"
+                style="?android:listSeparatorTextViewStyle"/>
+            <TextView
+                android:id="@+id/tv_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:ellipsize="marquee"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:singleLine="true" />
+
         </LinearLayout>
 
         <View

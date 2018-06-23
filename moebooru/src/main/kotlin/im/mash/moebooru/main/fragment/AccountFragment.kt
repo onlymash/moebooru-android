@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.design.widget.TextInputEditText
 import android.support.v4.view.ViewCompat
+import android.support.v7.app.AlertDialog
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
@@ -153,7 +154,14 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
         }
         removeAccount.setOnClickListener {
             if (user != null) {
-                userViewModel.deleteUser(user!!)
+                AlertDialog.Builder(this.requireContext())
+                        .setTitle("Remove account")
+                        .setMessage("Do you confirm remove the account?")
+                        .setPositiveButton(getString(R.string.ok)) { _, _ ->
+                            userViewModel.deleteUser(user!!)
+                        }
+                        .setNegativeButton(getString(R.string.cancel), null)
+                        .show()
             }
         }
     }
