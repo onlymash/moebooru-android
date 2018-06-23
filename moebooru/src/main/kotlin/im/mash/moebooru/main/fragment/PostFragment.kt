@@ -6,7 +6,6 @@ import android.content.*
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
@@ -70,6 +69,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private var notiNotMore = true
     private var limit = 50
 
+    private var firstStart = true
+
     private var paddingBottom = 0
     
     private val mainActivity by lazy { activity as MainActivity }
@@ -109,8 +110,11 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    posts = outcome.data
+                    refreshing = false
+                    refreshLayout.isRefreshing = false
+                    val data = outcome.data
                     if (loadingMore) {
+                        posts = data
                         loadingMore = false
                         if (safeMode) {
                             postAdapter.addData(getSafePosts())
@@ -118,13 +122,15 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                             postAdapter.addData(posts)
                         }
                     } else {
-                        refreshing = false
-                        if (safeMode) {
-                            postAdapter.updateData(getSafePosts())
-                        } else {
-                            postAdapter.updateData(posts)
-                        }
-                        if (posts.size <= 0) {
+                        if (data.size > 0) {
+                            posts = data
+                            if (safeMode) {
+                                postAdapter.updateData(getSafePosts())
+                            } else {
+                                postAdapter.updateData(posts)
+                            }
+                        } else if (firstStart) {
+                            firstStart = false
                             if (!mainActivity.isNetworkConnected) {
                                 takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
                             } else {
@@ -136,6 +142,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 }
                 is Outcome.Failure -> {
                     loadingMore = false
+                    refreshLayout.isRefreshing = false
+                    refreshing = false
                     when (outcome.e) {
                         is HttpException -> {
                             val httpException = outcome.e as HttpException
@@ -188,6 +196,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     }
 
     private fun refresh() {
+        refreshLayout.isRefreshing = true
         notiNotMore = true
         page = 1
         refreshing = true
@@ -480,9 +489,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 } else {
                     postAdapter.updateData(posts)
                 }
-            }
-            Settings.IS_LOADING -> {
-                refreshLayout.isRefreshing = app.settings.isLoading
             }
         }
     }

@@ -118,6 +118,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                     logi(TAG, "Outcome.Progress")
                 }
                 is Outcome.Success -> {
+                    refreshLayout.isRefreshing = false
                     posts = outcome.data
                     if (loadingMore) {
                         if (safeMode) {
@@ -138,7 +139,6 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                             refresh()
                         }
                     }
-                    refreshLayout.isRefreshing = false
                     logi(TAG, "Outcome.Success. data.size: ${posts.size}")
                 }
                 is Outcome.Failure -> {

@@ -7,10 +7,14 @@ import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.media.MediaStoreDataSource
 import im.mash.moebooru.common.data.remote.PostService
+import im.mash.moebooru.common.data.remote.UserService
 import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.common.model.DownloadDataContract
 import im.mash.moebooru.common.model.DownloadRepository
+import im.mash.moebooru.common.model.UserDataContract
+import im.mash.moebooru.common.model.UserRepository
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.model.*
@@ -115,4 +119,18 @@ class MainModule {
                      compositeDisposable: CompositeDisposable): DownloadDataContract.Repository
             = DownloadRepository(database, scheduler, compositeDisposable)
 
+    @Provides
+    @MainScope
+    fun userService(retrofit: Retrofit): UserService = retrofit.create(UserService::class.java)
+
+    @Provides
+    @MainScope
+    fun userRepo(database: MoeDatabase, userService: UserService,
+                 scheduler: Scheduler, compositeDisposable: CompositeDisposable): UserDataContract.Repository
+            = UserRepository(database, userService, scheduler, compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun userViewModelFactory(repository: UserDataContract.Repository, compositeDisposable: CompositeDisposable)
+            = UserViewModelFactory(repository, compositeDisposable)
 }

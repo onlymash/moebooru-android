@@ -92,7 +92,8 @@
     <string name="title_login">Login</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
-    <string name="action_login">Login</string>
+    <string name="password_hash_salt">Password hash salt</string>
+    <string name="set_account">Set account</string>
     <string name="error_invalid_username">This username is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -145,4 +146,10 @@
     <string name="select_crash_log_file">Select crash log file and send to developer</string>
 
     <string name="safe_mode">Safe mode</string>
+
+    <string name="account_id">Id</string>
+    <string name="account_name">Name</string>
+
+    <string name="my_favorites">My favorites</string>
+    <string name="remove_account">Remove account</string>
 </resources>
