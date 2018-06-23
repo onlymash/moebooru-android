@@ -16,8 +16,8 @@ class UserViewModel(private val repository: UserDataContract.Repository,
         repository.userOutcome.toLiveData(compositeDisposable)
     }
 
-    fun loadUser(site: String) {
-        repository.loadUser(site)
+    fun loadUsers() {
+        repository.loadUsers()
     }
 
     fun getUser(httpUrl: HttpUrl, passwordHash: String) {

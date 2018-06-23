@@ -27,9 +27,7 @@ import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Booru
-import im.mash.moebooru.common.data.local.entity.User
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
-import im.mash.moebooru.common.viewmodel.UserViewModel
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.core.application.BaseActivity
 import im.mash.moebooru.core.scheduler.Outcome
@@ -37,9 +35,7 @@ import im.mash.moebooru.core.widget.TextDrawable
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.fragment.*
 import im.mash.moebooru.main.viewmodel.*
-import im.mash.moebooru.util.HashUtil
 import im.mash.moebooru.util.logi
-import okhttp3.HttpUrl
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -96,7 +92,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     lateinit var downloadViewModelFactory: DownloadViewModelFactory
     @Inject
     lateinit var userViewModelFactory: UserViewModelFactory
-    private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(userViewModelFactory) }
 
     internal var boorus: MutableList<Booru> = mutableListOf()
 
@@ -239,26 +234,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             drawer.setSelection(DRAWER_ITEM_SETTINGS)
             app.settings.isChangedNightMode = false
         }
-
-        userViewModel.userOutcome.observe(this, Observer<Outcome<MutableList<User>>> { outcome ->
-            when (outcome) {
-                is Outcome.Progress -> {
-
-                }
-                is Outcome.Success -> {
-                    val users = outcome.data
-                    logi(TAG, "User: $users")
-                    if (users.size == 1) {
-
-                    }
-                }
-                is Outcome.Failure -> {
-                    outcome.e.printStackTrace()
-                }
-            }
-        })
-
-        userViewModel.loadUser(app.settings.activeProfileHost)
     }
 
     private fun getCustomizedColor(): Int {

@@ -6,6 +6,10 @@ import io.reactivex.Flowable
 
 @Dao
 interface UserDao {
+
+    @Query("SELECT * FROM user")
+    fun loadUsers(): Flowable<MutableList<User>>
+
     @Query("SELECT * FROM user WHERE site = :site")
     fun loadUser(site: String): Flowable<MutableList<User>>
 

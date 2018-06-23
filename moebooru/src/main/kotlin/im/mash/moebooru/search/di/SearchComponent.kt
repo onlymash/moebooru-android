@@ -5,7 +5,11 @@ import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.remote.PostSearchService
+import im.mash.moebooru.common.data.remote.UserService
 import im.mash.moebooru.common.di.CoreComponent
+import im.mash.moebooru.common.model.UserDataContract
+import im.mash.moebooru.common.model.UserRepository
+import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.search.SearchActivity
 import im.mash.moebooru.search.model.PostSearchDataContract
@@ -54,4 +58,19 @@ class SearchModule {
     fun postSearchRepo(local: PostSearchDataContract.Local, remote: PostSearchDataContract.Remote, scheduler: Scheduler,
                        compositeDisposable: CompositeDisposable): PostSearchDataContract.Repository
             = PostSearchRepository(local, remote, scheduler, compositeDisposable)
+
+    @Provides
+    @SearchScope
+    fun userService(retrofit: Retrofit): UserService = retrofit.create(UserService::class.java)
+
+    @Provides
+    @SearchScope
+    fun userRepo(database: MoeDatabase, userService: UserService,
+                 scheduler: Scheduler, compositeDisposable: CompositeDisposable): UserDataContract.Repository
+            = UserRepository(database, userService, scheduler, compositeDisposable)
+
+    @Provides
+    @SearchScope
+    fun userViewModelFactory(repository: UserDataContract.Repository, compositeDisposable: CompositeDisposable)
+            = UserViewModelFactory(repository, compositeDisposable)
 }

@@ -8,7 +8,7 @@ import okhttp3.HttpUrl
 interface UserDataContract {
     interface Repository {
         val userOutcome: PublishSubject<Outcome<MutableList<User>>>
-        fun loadUser(site: String)
+        fun loadUsers()
         fun saveUser(user: User)
         fun deleteUser(user: User)
         fun getUser(httpUrl: HttpUrl, passwordHash: String)

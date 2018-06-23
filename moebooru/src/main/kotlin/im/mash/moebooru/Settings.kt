@@ -39,18 +39,8 @@ class Settings(private val sp: SharedPreferences) {
         const val SPAN_COUNT = "span_count"
         const val IS_NOT_MORE_DATA = "not_more_data"
         const val IS_CHANGED_NIGHT_MODE = "changed_night_mode"
-        const val ITEMS_DATA = "items_data"
-        const val ITEM_POS = "item_position"
-        const val ITEM_ID = "item_id"
-        const val BUNDLE = "bundle"
-        const val TYPE = "type"
-        const val TAGS_SEARCH = "tags_search"
-        const val STATUS_BAR_HEIGHT = "status_bar_height"
-        const val USER_AGENT_WEB_VIEW = "user_agent_web_view"
         const val ENABLE_CRASH_REPORT = "enable_crash_report"
         const val SAFE_MODE = "safe_mode"
-        const val IS_LOADING = "is_loading"
-        const val IS_SEARCH_LOADING = "is_search_loading"
     }
 
     private val editor: SharedPreferences.Editor = sp.edit()
@@ -124,12 +114,4 @@ class Settings(private val sp: SharedPreferences) {
     var safeMode: Boolean
         get() = sp.getBoolean(SAFE_MODE, true)
         set(value) = editor.putBoolean(SAFE_MODE, value).apply()
-
-    var isLoading: Boolean
-        get() = sp.getBoolean(IS_LOADING, false)
-        set(value) = editor.putBoolean(IS_LOADING, value).apply()
-
-    var isSearchLoading: Boolean
-        get() = sp.getBoolean(IS_SEARCH_LOADING, false)
-        set(value) = editor.putBoolean(IS_SEARCH_LOADING, value).apply()
 }

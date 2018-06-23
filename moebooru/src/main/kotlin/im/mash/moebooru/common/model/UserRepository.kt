@@ -23,9 +23,9 @@ class UserRepository(private val database: MoeDatabase,
 
     override val userOutcome: PublishSubject<Outcome<MutableList<User>>> = PublishSubject.create<Outcome<MutableList<User>>>()
 
-    override fun loadUser(site: String) {
+    override fun loadUsers() {
         userOutcome.loading(true)
-        database.userDao().loadUser(site)
+        database.userDao().loadUsers()
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ users ->
                     userOutcome.success(users)
@@ -44,8 +44,7 @@ class UserRepository(private val database: MoeDatabase,
                                 rawUsers[0].id, passwordHash)
                         saveUser(user)
                     } else {
-                        userOutcome.loading(true)
-                        userOutcome.success(mutableListOf())
+                        loadUsers()
                     }
                 }, { error -> handleError(error)})
                 .addTo(compositeDisposable)

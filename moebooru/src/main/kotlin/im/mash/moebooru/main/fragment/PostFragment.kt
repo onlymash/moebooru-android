@@ -24,6 +24,8 @@ import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.Tag
+import im.mash.moebooru.common.data.local.entity.User
+import im.mash.moebooru.common.viewmodel.UserViewModel
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.helper.getViewModel
@@ -72,9 +74,12 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private var firstStart = true
 
     private var paddingBottom = 0
-    
+
     private val mainActivity by lazy { activity as MainActivity }
-    
+
+    private var user: User? = null
+    private var users: MutableList<User> = mutableListOf()
+    private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(mainActivity.userViewModelFactory) }
     private val postViewModel: PostViewModel by lazy { this.getViewModel<PostViewModel>(mainActivity.postViewModelFactory) }
     private val tagViewModel: TagViewModel by lazy { this.getViewModel<TagViewModel>(mainActivity.tagViewModelFactory) }
     private var tags: MutableList<Tag> = mutableListOf()
@@ -93,6 +98,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         initToolbar()
         initRightDrawer(view)
         initDrawerListener()
+        initUserViewModel()
         initRefresh(view)
         initPostList(view)
         observePosts()
@@ -101,6 +107,35 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             postViewModel.loadPosts(getHttpUrl())
         }
         mainActivity.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    private fun initUserViewModel() {
+        userViewModel.userOutcome.observe(this, Observer<Outcome<MutableList<User>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {
+
+                }
+                is Outcome.Success -> {
+                    users = outcome.data
+                    initUser()
+                }
+                is Outcome.Failure -> {
+                    outcome.e.printStackTrace()
+                }
+            }
+        })
+        userViewModel.loadUsers()
+    }
+
+    private fun initUser() {
+        val host = app.settings.activeProfileHost
+        user = null
+        users.forEach { user ->
+            if (user.site == host) {
+                this.user = user
+                return@forEach
+            }
+        }
     }
 
     private fun observePosts() {
@@ -204,6 +239,13 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     }
 
     private fun getHttpUrl(): HttpUrl {
+        val user = this.user
+        var username = ""
+        var passwordHash = ""
+        if (user != null) {
+            username = user.name
+            passwordHash = user.password_hash
+        }
         return HttpUrl.Builder()
                 .scheme(app.settings.activeProfileScheme)
                 .host(app.settings.activeProfileHost)
@@ -211,6 +253,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 .addQueryParameter("limit", limit.toString())
                 .addQueryParameter("page", page.toString())
                 .addQueryParameter("tags", "")
+                .addQueryParameter("login", username)
+                .addQueryParameter("password_hash", passwordHash)
                 .build()
     }
 

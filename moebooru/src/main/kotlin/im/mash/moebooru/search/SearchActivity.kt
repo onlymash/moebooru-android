@@ -21,6 +21,9 @@ import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.base.LastItemListener
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.data.local.entity.PostSearch
+import im.mash.moebooru.common.data.local.entity.User
+import im.mash.moebooru.common.viewmodel.UserViewModel
+import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
@@ -70,6 +73,13 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     @Inject
     lateinit var searchViewModelFactory: PostSearchViewModelFactory
 
+    private var user: User? = null
+    private var users: MutableList<User> = mutableListOf()
+
+    @Inject
+    lateinit var userViewModelFactory: UserViewModelFactory
+    private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(userViewModelFactory) }
+
     private val postSearchViewModel: PostSearchViewModel by lazy {
         this.getViewModel<PostSearchViewModel>(searchViewModelFactory)
     }
@@ -89,6 +99,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         spanCount = this.screenWidth/resources.getDimension(R.dimen.item_width).toInt()
         limit = app.settings.postLimitInt
         safeMode = app.settings.safeMode
+        initUserViewModel()
         initView()
         initRefresh()
         observePosts()
@@ -108,6 +119,35 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         toolbar.subtitle = keyword
         newStart = true
         loadPosts()
+    }
+
+    private fun initUserViewModel() {
+        userViewModel.userOutcome.observe(this, Observer<Outcome<MutableList<User>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {
+
+                }
+                is Outcome.Success -> {
+                    users = outcome.data
+                    initUser()
+                }
+                is Outcome.Failure -> {
+                    outcome.e.printStackTrace()
+                }
+            }
+        })
+        userViewModel.loadUsers()
+    }
+
+    private fun initUser() {
+        val host = app.settings.activeProfileHost
+        user = null
+        users.forEach { user ->
+            if (user.site == host) {
+                this.user = user
+                return@forEach
+            }
+        }
     }
 
     private fun observePosts() {
@@ -289,6 +329,13 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     }
 
     private fun getHttpUrl(): HttpUrl {
+        val user = this.user
+        var username = ""
+        var passwordHash = ""
+        if (user != null) {
+            username = user.name
+            passwordHash = user.password_hash
+        }
         return HttpUrl.Builder()
                 .scheme(app.settings.activeProfileScheme)
                 .host(app.settings.activeProfileHost)
@@ -296,6 +343,8 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 .addQueryParameter("limit", limit.toString())
                 .addQueryParameter("page", page.toString())
                 .addQueryParameter("tags", keyword)
+                .addQueryParameter("login", username)
+                .addQueryParameter("password_hash", passwordHash)
                 .build()
     }
 

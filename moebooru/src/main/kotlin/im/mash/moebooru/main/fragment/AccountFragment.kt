@@ -50,6 +50,7 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
     private lateinit var removeAccount: Button
 
     private var user: User? = null
+    private var users: MutableList<User> = mutableListOf()
 
     private var requesting = true
 
@@ -83,18 +84,9 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
                     requesting = false
                     progressBar.visibility = View.GONE
                     setAccount.visibility = View.VISIBLE
-                    val users = outcome.data
+                    users = outcome.data
+                    initUser()
                     logi(TAG, "User: $users, size: ${users.size}")
-                    if (users.size == 1) {
-                        infoLayout.visibility = View.VISIBLE
-                        loginLayout.visibility = View.GONE
-                        user = users[0]
-                        setInfo(user!!)
-                    } else {
-                        infoLayout.visibility = View.GONE
-                        loginLayout.visibility = View.VISIBLE
-                        takeSnackbarShort(this.view!!, "User not found", paddingButton)
-                    }
                 }
                 is Outcome.Failure -> {
                     requesting = false
@@ -106,7 +98,27 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
                 }
             }
         })
-        userViewModel.loadUser(app.settings.activeProfileHost)
+        userViewModel.loadUsers()
+    }
+
+    private fun initUser() {
+        val host = app.settings.activeProfileHost
+        user = null
+        users.forEach {  user ->
+            if (user.site == host) {
+                this.user = user
+                return@forEach
+            }
+        }
+        if (user != null) {
+            infoLayout.visibility = View.VISIBLE
+            loginLayout.visibility = View.GONE
+            setInfo(user!!)
+        } else {
+            infoLayout.visibility = View.GONE
+            loginLayout.visibility = View.VISIBLE
+            takeSnackbarShort(this.view!!, "User not found", paddingButton)
+        }
     }
 
     private fun setInfo(user: User) {
@@ -203,7 +215,7 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
     override fun onSharedPreferenceChanged(sp: SharedPreferences?, key: String?) {
         when (key) {
             Settings.ACTIVE_PROFILE_HOST -> {
-                userViewModel.loadUser(app.settings.activeProfileHost)
+                initUser()
             }
         }
     }

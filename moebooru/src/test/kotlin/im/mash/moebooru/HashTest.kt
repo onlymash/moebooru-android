@@ -8,11 +8,7 @@ class HashTest {
 
     @Test
     fun sha1() {
-        assertEquals("f013d66c7f6817d08b7eb2a93e6d0440c1f3e7f8", HashUtil.sha1("sha1"))
+        assertEquals("AC4CB8DB202C4E046136B56DDCA5BF02851DB5E5", HashUtil.sha1("So-I-Heard-You-Like-Mupkids-?--your-password--"))
     }
 
-    @Test
-    fun md5() {
-        assertEquals("", HashUtil.md5("md5"))
-    }
 }

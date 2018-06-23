@@ -8,9 +8,9 @@ import android.arch.persistence.room.PrimaryKey
 data class User(
         @PrimaryKey(autoGenerate = true)
         var uid: Int?,
-        var site: String?,
+        var site: String,
         var name: String,
         var blacklisted_tags: String,
         var id: Int,
-        var password_hash: String?
+        var password_hash: String
 )
