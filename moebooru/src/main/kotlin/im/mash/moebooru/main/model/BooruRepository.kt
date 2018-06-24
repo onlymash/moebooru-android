@@ -24,10 +24,8 @@ class BooruRepository(private val local: BooruDataContract.Local,
         local.getBoorus()
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ boorus ->
-                    logi(TAG, "LoadBoorus success")
                     booruFetchOutcome.success(boorus)
-                }, { error ->
-                    handleError(error) })
+                }, { error -> handleError(error) })
                 .addTo(compositeDisposable)
     }
 

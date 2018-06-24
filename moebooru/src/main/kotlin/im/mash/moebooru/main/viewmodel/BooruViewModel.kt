@@ -21,12 +21,10 @@ class BooruViewModel(private val repo: BooruDataContract.Repository,
     }
 
     fun loadBoorus() {
-        logi(TAG, "LoadBoorus")
         repo.loadBoorus()
     }
 
     fun addBooru(booru: Booru) {
-        logi(TAG, "AddBooru")
         repo.addBooru(booru)
     }
 
@@ -34,13 +32,12 @@ class BooruViewModel(private val repo: BooruDataContract.Repository,
         repo.addBoorus(boorus)
     }
 
-    fun clear() {
-        compositeDisposable.clear()
+    fun deleteBooru(booru: Booru) {
+        repo.deleteBooru(booru)
     }
 
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.clear()
-        MoeDH.destroyMainComponent()
     }
 }

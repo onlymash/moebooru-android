@@ -28,7 +28,7 @@ object HashUtil {
      * SHA-512	    1+
      */
     private fun hashString(type: String, input: String): String {
-        val hexChars = "0123456789ABCDEF"
+        val hexChars = "0123456789abcdef"
         val bytes = MessageDigest
                 .getInstance(type)
                 .digest(input.toByteArray())

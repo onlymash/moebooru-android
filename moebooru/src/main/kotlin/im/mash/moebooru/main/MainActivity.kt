@@ -3,6 +3,7 @@ package im.mash.moebooru.main
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -31,11 +32,15 @@ import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.core.application.BaseActivity
 import im.mash.moebooru.core.scheduler.Outcome
+import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.core.widget.TextDrawable
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.fragment.*
 import im.mash.moebooru.main.viewmodel.*
+import im.mash.moebooru.util.ColorUtil
+import im.mash.moebooru.util.TextUtil
 import im.mash.moebooru.util.logi
+import retrofit2.Retrofit
 import java.io.IOException
 import java.util.*
 import javax.inject.Inject
@@ -53,18 +58,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         private const val DRAWER_ITEM_SETTINGS = 4L
         private const val DRAWER_ITEM_FEEDBACK = 5L
         private const val DRAWER_ITEM_ABOUT = 6L
-
-        private val builder = getTextDrawableBuilder()
-        private fun getTextDrawableBuilder(): TextDrawable.Builder {
-            val builder = TextDrawable.builder()
-            builder.beginConfig().width(50)
-            builder.beginConfig().height(50)
-            builder.beginConfig().fontSize(30)
-            builder.beginConfig().useFont(Typeface.create("sans", Typeface.NORMAL))
-            builder.beginConfig().withBorder(2)
-            builder.beginConfig().endConfig()
-            return builder as TextDrawable.Builder
-        }
     }
 
     internal lateinit var drawer: Drawer
@@ -95,6 +88,14 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     internal var boorus: MutableList<Booru> = mutableListOf()
 
+    @Inject
+    lateinit var retrofit: Retrofit
+
+    @Inject
+    lateinit var scheduler: Scheduler
+
+    private var newCreate = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_moebooru)
@@ -113,7 +114,9 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                         app.settings.activeProfileScheme = boorus[profile.identifier.toInt()].scheme
                         app.settings.activeProfileHost = boorus[profile.identifier.toInt()].host
                     } else {
-
+                        drawer.setSelection(100)
+                        previousSelectedDrawer = 100
+                        displayFragment(BooruFragment())
                     }
                     false
                 }
@@ -183,52 +186,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-        booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome: Outcome<MutableList<Booru>>? ->
-            when (outcome) {
-                is Outcome.Progress -> {
-                    logi(TAG, "Booru Outcome.Progress")
-                }
-                is Outcome.Success -> {
-                    logi(TAG, "Booru Outcome.Success")
-                    boorus = outcome.data
-                    if (boorus.size <= 0) {
-                        booruViewModel.addBoorus(mutableListOf(
-                                Booru(0, 0, "Konachan", "https", "konachan.com", "https://konachan.com"),
-                                Booru(1, 1, "Yande.re", "https", "yande.re", "https://yande.re")
-                        ))
-                    } else {
-                        boorus.forEach { booru ->
-                            val icon = builder.buildRound(booru.name[0].toString(), getCustomizedColor())
-                            val profileDrawerItem: ProfileDrawerItem = ProfileDrawerItem()
-                                    .withName(booru.name)
-                                    .withEmail(booru.url)
-                                    .withIcon(icon)
-                            profileDrawerItem.withIdentifier(booru.id.toLong())
-                            header.addProfile(profileDrawerItem, booru.id)
-                        }
-                        header.addProfile(profileSettingDrawerItem, boorus.size)
-                        val activeProfileId = app.settings.activeProfileId
-                        header.setActiveProfile(activeProfileId)
-                        app.settings.activeProfileScheme = boorus[activeProfileId.toInt()].scheme
-                        app.settings.activeProfileHost = boorus[activeProfileId.toInt()].host
-                        if (savedInstanceState == null) {
-                            displayFragment(PostFragment())
-                        }
-                    }
-                }
-                is Outcome.Failure -> {
-                    if (outcome.e is IOException) {
-                        outcome.e.printStackTrace()
-                    }
-                    logi(TAG, "Booru Outcome.Failure")
-                }
-                null -> {
-                    logi(TAG, "Booru outcome == null")
-                }
-            }
-        })
-
-        booruViewModel.loadBoorus()
+        initBooru()
 
         if (savedInstanceState != null && app.settings.isChangedNightMode) {
             drawer.setSelection(DRAWER_ITEM_SETTINGS)
@@ -236,9 +194,63 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         }
     }
 
-    private fun getCustomizedColor(): Int {
-        val customizedColors = resources.getIntArray(R.array.customizedColors)
-        return customizedColors[Random().nextInt(customizedColors.size)]
+    internal fun initBooru() {
+        booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {
+                }
+                is Outcome.Success -> {
+                    val data = outcome.data
+                    logi(TAG, "Booru Outcome.Success. size: ${data.size}")
+                    initHeaderItem(data)
+                }
+                is Outcome.Failure -> {
+                    if (outcome.e is IOException) {
+                        outcome.e.printStackTrace()
+                    }
+                    logi(TAG, "Booru Outcome.Failure")
+                }
+            }
+        })
+        booruViewModel.loadBoorus()
+    }
+
+    internal fun initHeaderItem(boorus: MutableList<Booru>) {
+        this.boorus = boorus
+        if (boorus.size <= 0) {
+            header.clear()
+            header.addProfile(profileSettingDrawerItem, 0)
+            app.settings.activeProfileScheme = "http"
+            app.settings.activeProfileHost = "mash.im"
+            if (newCreate) {
+                newCreate = false
+                displayFragment(BooruFragment())
+            }
+
+        } else {
+            header.clear()
+            val size = boorus.size
+            for (index in 0 until size) {
+                val booru = boorus[index]
+                val text = booru.name[0].toString()
+                val icon = TextUtil.textDrawableBuilder().buildRound(text, ColorUtil.getCustomizedColor(this, text))
+                val profileDrawerItem: ProfileDrawerItem = ProfileDrawerItem()
+                        .withName(booru.name)
+                        .withEmail(booru.url)
+                        .withIcon(icon)
+                profileDrawerItem.withIdentifier(index.toLong())
+                header.addProfile(profileDrawerItem, index)
+            }
+            header.addProfile(profileSettingDrawerItem, size)
+            val activeProfileId = app.settings.activeProfileId
+            header.setActiveProfile(activeProfileId)
+            app.settings.activeProfileScheme = boorus[activeProfileId.toInt()].scheme
+            app.settings.activeProfileHost = boorus[activeProfileId.toInt()].host
+            if (newCreate) {
+                newCreate = false
+                displayFragment(PostFragment())
+            }
+        }
     }
 
     private fun displayFragment(fragment: Fragment) {

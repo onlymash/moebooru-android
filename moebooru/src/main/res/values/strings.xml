@@ -152,4 +152,8 @@
 
     <string name="my_favorites">My favorites</string>
     <string name="remove_account">Remove account</string>
+
+    <string name="boorus">Boorus</string>
+    <string name="scheme">Scheme</string>
+    <string name="domain">Domain</string>
 </resources>
