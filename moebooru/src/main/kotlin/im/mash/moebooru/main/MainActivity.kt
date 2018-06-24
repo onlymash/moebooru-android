@@ -3,8 +3,6 @@ package im.mash.moebooru.main
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
@@ -33,7 +31,6 @@ import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.core.application.BaseActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
-import im.mash.moebooru.core.widget.TextDrawable
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.fragment.*
 import im.mash.moebooru.main.viewmodel.*
@@ -42,7 +39,6 @@ import im.mash.moebooru.util.TextUtil
 import im.mash.moebooru.util.logi
 import retrofit2.Retrofit
 import java.io.IOException
-import java.util.*
 import javax.inject.Inject
 
 @SuppressLint("RtlHardcoded")
@@ -194,7 +190,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         }
     }
 
-    internal fun initBooru() {
+    private fun initBooru() {
         booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome ->
             when (outcome) {
                 is Outcome.Progress -> {
@@ -317,5 +313,11 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             e.printStackTrace()
         }
         return result
+    }
+
+    fun getHashSalt(): String {
+        val position = app.settings.activeProfileId.toInt()
+        if (position >= boorus.size) return ""
+        return boorus[position].hash_salt
     }
 }

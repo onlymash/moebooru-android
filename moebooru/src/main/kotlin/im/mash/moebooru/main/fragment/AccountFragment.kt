@@ -39,7 +39,6 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
 
     private lateinit var inputUsername: AutoCompleteTextView
     private lateinit var inputPassword: TextInputEditText
-    private lateinit var inputHashSalt: TextInputEditText
 
     private lateinit var progressBar: ProgressBar
     private lateinit var setAccount: Button
@@ -133,7 +132,6 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
 
         inputUsername = view.findViewById(R.id.username)
         inputPassword = view.findViewById(R.id.password)
-        inputHashSalt = view.findViewById(R.id.hash_salt)
 
         progressBar = view.findViewById(R.id.progress_bar)
         setAccount = view.findViewById(R.id.set_account)
@@ -197,11 +195,8 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
             takeSnackbarShort(this.view!!, "Username and password can not be null", paddingButton)
             return
         }
-        val hashSalt = inputHashSalt.text.toString()
-        if (!TextUtils.isEmpty(hashSalt) && !hashSalt.contains("your-password")) {
-            takeSnackbarShort(this.view!!, "Hash salt must contain 'your-password'", paddingButton)
-            return
-        }
+        val hashSalt = mainActivity.getHashSalt()
+
         setAccount.visibility = View.INVISIBLE
         progressBar.visibility = View.VISIBLE
         requesting = true

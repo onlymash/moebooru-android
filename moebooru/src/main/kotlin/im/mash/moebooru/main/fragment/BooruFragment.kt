@@ -1,17 +1,23 @@
 package im.mash.moebooru.main.fragment
 
+import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.TextInputEditText
 import android.support.v4.view.ViewCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Adapter
+import android.widget.AdapterView
 import android.widget.LinearLayout
+import android.widget.Spinner
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Booru
@@ -21,6 +27,7 @@ import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.BooruAdapter
 import im.mash.moebooru.main.viewmodel.BooruViewModel
 import im.mash.moebooru.util.logi
+import im.mash.moebooru.util.takeSnackbarShort
 
 class BooruFragment : ToolbarFragment() {
 
@@ -35,6 +42,8 @@ class BooruFragment : ToolbarFragment() {
 
     private var boorus: MutableList<Booru> = mutableListOf()
 
+    private var paddingButton = 0
+
     private val mainActivity: MainActivity by lazy { activity as MainActivity }
     private val booruViewModel: BooruViewModel by lazy { this.getViewModel<BooruViewModel>(mainActivity.booruViewModelFactory) }
 
@@ -48,11 +57,12 @@ class BooruFragment : ToolbarFragment() {
         initViewModel()
     }
 
+    @SuppressLint("InflateParams")
     private fun initView(view: View) {
         toolbar.setTitle(R.string.boorus)
         addBooru = view.findViewById(R.id.add_booru)
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
-            val paddingButton = insets.systemWindowInsetBottom
+            paddingButton = insets.systemWindowInsetBottom
             view.setPadding(0, 0, 0, paddingButton)
             insets
         }
@@ -77,6 +87,50 @@ class BooruFragment : ToolbarFragment() {
                         .show()
             }
         })
+        addBooru.setOnClickListener {
+            var schema = "http"
+            val v = layoutInflater.inflate(R.layout.layout_booru_add, null)
+            val schemaSpinner: Spinner = v.findViewById(R.id.schema)
+            val inputName: TextInputEditText = v.findViewById(R.id.booru_name)
+            val inputDomain: TextInputEditText = v.findViewById(R.id.domain)
+            val inputHashSalt: TextInputEditText = v.findViewById(R.id.hash_salt)
+            schemaSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    when (id) {
+                        0L -> schema = "http"
+                        1L -> schema = "https"
+                    }
+                }
+            }
+            val dialog = android.app.AlertDialog.Builder(context)
+                    .setTitle(R.string.add_booru)
+                    .setPositiveButton(R.string.add) { _, _ ->
+                        val name = inputName.text.toString()
+                        val domain = inputDomain.text.toString()
+                        var hashSalt = inputHashSalt.text.toString()
+                        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(domain)) {
+                            takeSnackbarShort(this.view!!, "Booru name and domain can not be null", paddingButton)
+                            return@setPositiveButton
+                        }
+                        if (!TextUtils.isEmpty(hashSalt) && !hashSalt.contains("your-password")) {
+                            takeSnackbarShort(this.view!!, "Hash salt must contain 'your-password'", paddingButton)
+                            return@setPositiveButton
+                        }
+                        if (TextUtils.isEmpty(hashSalt)) hashSalt = ""
+                        val booru = Booru(null, name, schema, domain, "$schema://$domain", hashSalt)
+                        booruViewModel.addBooru(booru)
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .create()
+            dialog.apply {
+                setView(v)
+                setCanceledOnTouchOutside(true)
+                show()
+            }
+        }
     }
 
     private fun initViewModel() {

@@ -83,7 +83,7 @@ class BooruAdapter(private val context: Context, private var boorus: MutableList
                     position == detailPosition + 1 -> {
                         val booru = boorus[detailPosition]
                         holder as BooruDetailViewHolder
-                        holder.scheme.text = booru.scheme
+                        holder.schema.text = booru.scheme
                         holder.domain.text = booru.host
                         holder.hashSalt.text = booru.hash_salt
                         holder.edit.setOnClickListener {
@@ -136,7 +136,7 @@ class BooruAdapter(private val context: Context, private var boorus: MutableList
     }
 
     inner class BooruDetailViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val scheme: TextView = itemView.findViewById(R.id.scheme)
+        val schema: TextView = itemView.findViewById(R.id.schema)
         val domain: TextView = itemView.findViewById(R.id.domain)
         val hashSalt: TextView = itemView.findViewById(R.id.hash_salt)
         val edit: Button = itemView.findViewById(R.id.btn_edit)

@@ -12,6 +12,11 @@
 
 <resources>
 
+    <string-array name="schema">
+        <item>http://</item>
+        <item>https://</item>
+    </string-array>
+
     <integer-array name="customizedColors">
         <item>@color/blue</item>
         <item>@color/purple</item>

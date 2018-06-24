@@ -154,6 +154,9 @@
     <string name="remove_account">Remove account</string>
 
     <string name="boorus">Boorus</string>
-    <string name="scheme">Scheme</string>
+    <string name="schema">Schema</string>
     <string name="domain">Domain</string>
+
+    <string name="add_booru">Add booru</string>
+    <string name="booru_name">Booru name</string>
 </resources>

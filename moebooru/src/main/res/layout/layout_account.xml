@@ -143,23 +143,6 @@
                     android:singleLine="true" />
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:counterEnabled="true">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/hash_salt"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/password_hash_salt"
-                    android:inputType="textMultiLine|textAutoComplete"
-                    android:scrollbars="vertical"
-                    android:singleLine="false"
-                    android:gravity="left|top"
-                    android:maxLines="3" />
-            </android.support.design.widget.TextInputLayout>
-
             <FrameLayout
                 android:layout_gravity="right"
                 android:layout_marginTop="16dp"

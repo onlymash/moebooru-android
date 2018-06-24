@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
-            android:text="@string/scheme"
+            android:text="@string/schema"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -34,7 +34,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp">
         <TextView
-            android:id="@+id/scheme"
+            android:id="@+id/schema"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
