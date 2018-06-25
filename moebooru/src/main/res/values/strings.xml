@@ -159,4 +159,7 @@
 
     <string name="add_booru">Add booru</string>
     <string name="booru_name">Booru name</string>
+    <string name="save">Save</string>
+    <string name="edit_booru">Edit booru</string>
+    <string name="delete_booru">Delete booru</string>
 </resources>

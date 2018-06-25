@@ -14,7 +14,6 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Adapter
 import android.widget.AdapterView
 import android.widget.LinearLayout
 import android.widget.Spinner
@@ -73,17 +72,64 @@ class BooruFragment : ToolbarFragment() {
         booruView.adapter = booruAdapter
         booruAdapter.setBooruChangeListener(object : BooruAdapter.BooruChangeListener {
             override fun onBooruEdit(booru: Booru) {
+                var schema = booru.scheme
+                val v = layoutInflater.inflate(R.layout.layout_booru_add, null)
+                val schemaSpinner: Spinner = v.findViewById(R.id.schema)
+                val inputName: TextInputEditText = v.findViewById(R.id.booru_name)
+                val inputDomain: TextInputEditText = v.findViewById(R.id.domain)
+                val inputHashSalt: TextInputEditText = v.findViewById(R.id.hash_salt)
+                inputName.setText(booru.name)
+                inputDomain.setText(booru.host)
+                inputHashSalt.setText(booru.hash_salt)
+                when (schema) {
+                    "http" -> schemaSpinner.setSelection(0)
+                    else -> schemaSpinner.setSelection(1)
+                }
+                schemaSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(parent: AdapterView<*>?) {
 
+                    }
+                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                        when (position) {
+                            0 -> schema = "http"
+                            1 -> schema = "https"
+                        }
+                    }
+                }
+                val dialog = android.app.AlertDialog.Builder(context)
+                        .setTitle(R.string.edit_booru)
+                        .setPositiveButton(R.string.save) { _, _ ->
+                            val name = inputName.text.toString()
+                            val domain = inputDomain.text.toString()
+                            var hashSalt = inputHashSalt.text.toString()
+                            if (TextUtils.isEmpty(name) || TextUtils.isEmpty(domain)) {
+                                takeSnackbarShort(this@BooruFragment.view!!, "Booru name and domain can not be null", paddingButton)
+                                return@setPositiveButton
+                            }
+                            if (!TextUtils.isEmpty(hashSalt) && !hashSalt.contains("your-password")) {
+                                takeSnackbarShort(this@BooruFragment.view!!, "Hash salt must contain 'your-password'", paddingButton)
+                                return@setPositiveButton
+                            }
+                            if (TextUtils.isEmpty(hashSalt)) hashSalt = ""
+                            val b = Booru(null, name, schema, domain, "$schema://$domain", hashSalt)
+                            booruViewModel.addBooru(b)
+                        }
+                        .setNegativeButton(R.string.cancel, null)
+                        .create()
+                dialog.apply {
+                    setView(v)
+                    setCanceledOnTouchOutside(true)
+                    show()
+                }
             }
-
             override fun onBooruDelete(booru: Booru) {
                 AlertDialog.Builder(mainActivity)
-                        .setTitle("Delete booru")
+                        .setTitle(R.string.delete_booru)
                         .setMessage("Do you confirm delete the booru?")
                         .setPositiveButton(getString(R.string.ok)) { _, _ ->
                             booruViewModel.deleteBooru(booru)
                         }
-                        .setNegativeButton(getString(R.string.cancel), null)
+                        .setNegativeButton(R.string.cancel, null)
                         .show()
             }
         })
@@ -99,9 +145,9 @@ class BooruFragment : ToolbarFragment() {
 
                 }
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                    when (id) {
-                        0L -> schema = "http"
-                        1L -> schema = "https"
+                    when (position) {
+                        0 -> schema = "http"
+                        1 -> schema = "https"
                     }
                 }
             }
