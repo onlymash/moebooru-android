@@ -37,7 +37,6 @@ import im.mash.moebooru.main.viewmodel.*
 import im.mash.moebooru.util.ColorUtil
 import im.mash.moebooru.util.TextUtil
 import im.mash.moebooru.util.logi
-import retrofit2.Retrofit
 import java.io.IOException
 import javax.inject.Inject
 
@@ -83,9 +82,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     lateinit var userViewModelFactory: UserViewModelFactory
 
     internal var boorus: MutableList<Booru> = mutableListOf()
-
-    @Inject
-    lateinit var retrofit: Retrofit
 
     @Inject
     lateinit var scheduler: Scheduler
