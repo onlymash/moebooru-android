@@ -158,6 +158,11 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                 }
             }
             R.id.action_download -> {
+                if (type == "post" && posts.size <= position) {
+                    return true
+                } else if (type == "search" && postsSearch.size <= position) {
+                    return true
+                }
                 if (mayRequestStoragePermission(this, 0)) {
                     downloadViewModel.addTask(getDownloadPost())
                     DownloadService.startTask(this)
