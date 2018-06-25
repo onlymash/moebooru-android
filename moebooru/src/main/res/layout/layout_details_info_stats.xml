@@ -217,8 +217,17 @@
                 android:layout_height="wrap_content"
                 android:text="@string/post_stats_parent_id"
                 android:layout_weight="1" />
+            <TextView
+                android:textAppearance="?android:textAppearance"
+                android:textColor="@color/white"
+                android:ellipsize="marquee"
+                android:gravity="right"
+                android:id="@+id/tv_parent_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"/>
             <ImageButton
-                android:id="@+id/btn_parent_id"
+                android:id="@+id/btn_parent_search"
                 android:background="?android:selectableItemBackgroundBorderless"
                 android:layout_width="@dimen/list_size"
                 android:layout_height="@dimen/list_size"

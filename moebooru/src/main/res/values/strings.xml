@@ -74,7 +74,7 @@
     <string name="post_stats_larger_url">Larger url</string>
     <string name="post_stats_origin_size">Origin size</string>
     <string name="post_stats_origin_url">Origin url</string>
-    <string name="post_stats_parent_id">Parent</string>
+    <string name="post_stats_parent_id">Parent id</string>
     <string name="post_stats_rating">Rating</string>
     <string name="post_stats_sample_size">Sample size</string>
     <string name="post_stats_sample_url">Sample url</string>

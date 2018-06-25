@@ -3,6 +3,7 @@ package im.mash.moebooru.main
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.SharedPreferences
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
@@ -12,6 +13,8 @@ import android.support.v7.content.res.AppCompatResources
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
 import com.mikepenz.materialdrawer.Drawer
@@ -26,17 +29,24 @@ import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Booru
+import im.mash.moebooru.common.data.local.entity.User
+import im.mash.moebooru.common.data.remote.PostSearchService
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.common.viewmodel.UserViewModel
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.core.application.BaseActivity
+import im.mash.moebooru.core.extensions.performOnBackOutOnMain
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
+import im.mash.moebooru.glide.GlideApp
+import im.mash.moebooru.glide.MoeGlideUrl
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.fragment.*
 import im.mash.moebooru.main.viewmodel.*
 import im.mash.moebooru.util.ColorUtil
 import im.mash.moebooru.util.TextUtil
 import im.mash.moebooru.util.logi
+import okhttp3.HttpUrl
 import java.io.IOException
 import javax.inject.Inject
 
@@ -69,6 +79,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     @Inject
     lateinit var booruViewModelFactory: BooruViewModelFactory
     private val booruViewModel: BooruViewModel by lazy { this.getViewModel<BooruViewModel>(booruViewModelFactory) }
+    internal var boorus: MutableList<Booru> = mutableListOf()
 
     @Inject
     lateinit var postViewModelFactory: PostViewModelFactory
@@ -80,9 +91,11 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     lateinit var downloadViewModelFactory: DownloadViewModelFactory
     @Inject
     lateinit var userViewModelFactory: UserViewModelFactory
+    private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(userViewModelFactory) }
+    private val users: MutableList<User> = mutableListOf()
 
-    internal var boorus: MutableList<Booru> = mutableListOf()
-
+    @Inject
+    lateinit var postSearchService: PostSearchService
     @Inject
     lateinit var scheduler: Scheduler
 
@@ -91,9 +104,15 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_moebooru)
+
         component.inject(this)
+
         isNullState = savedInstanceState == null
+
+        initUser()
+
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
                 .withIcon(R.drawable.ic_drawer_settings_24dp)
@@ -104,8 +123,11 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 .withOnAccountHeaderListener { _, profile, _ ->
                     if (profile.identifier != profileSettingDrawerItem.identifier) {
                         app.settings.activeProfileId = profile.identifier
-                        app.settings.activeProfileScheme = boorus[profile.identifier.toInt()].scheme
-                        app.settings.activeProfileHost = boorus[profile.identifier.toInt()].host
+                        val scheme = boorus[profile.identifier.toInt()].scheme
+                        val host = boorus[profile.identifier.toInt()].host
+                        app.settings.activeProfileScheme = scheme
+                        app.settings.activeProfileHost = host
+                        setHeaderBackground(scheme, host)
                     } else {
                         drawer.setSelection(100)
                         previousSelectedDrawer = 100
@@ -187,6 +209,66 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         }
     }
 
+    private fun setHeaderBackground(schema: String, host: String) {
+        header.headerBackgroundView.setImageResource(R.drawable.background_header)
+        var activeUser: User? = null
+        users.forEach { user ->
+            if (user.site == host) {
+                activeUser = user
+                return@forEach
+            }
+        }
+        if (activeUser != null) {
+            val username = activeUser!!.name
+            val passwordHash = activeUser!!.password_hash
+            val httpUrl = HttpUrl.Builder()
+                    .scheme(schema)
+                    .host(host)
+                    .addPathSegment("post.json")
+                    .addQueryParameter("limit", "1")
+                    .addQueryParameter("page", "1")
+                    .addQueryParameter("tags", "vote:3:$username order:vote")
+                    .addQueryParameter("login", username)
+                    .addQueryParameter("password_hash", passwordHash)
+                    .build()
+            logi(TAG, "host: $host, username: $username")
+            postSearchService.getPosts(httpUrl)
+                    .performOnBackOutOnMain(scheduler)
+                    .subscribe({ posts ->
+                        if (posts.size == 1) {
+                            val url = posts[0].sample_url
+                            logi(TAG, "lastFavOutcome Success. size: 1, url: $url")
+                            GlideApp.with(this)
+                                    .asBitmap()
+                                    .load(MoeGlideUrl(url))
+                                    .into(object : SimpleTarget<Bitmap>() {
+                                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                            header.headerBackgroundView.setImageBitmap(resource)
+                                        }
+                                    })
+                        }
+                    }, { error ->
+                        error.printStackTrace()
+                    })
+        }
+    }
+
+    private fun initUser() {
+        userViewModel.userOutcome.observe(this, Observer<Outcome<MutableList<User>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {}
+                is Outcome.Success -> {
+                    users.clear()
+                    users.addAll(outcome.data)
+                }
+                is Outcome.Failure -> {
+                    outcome.e.printStackTrace()
+                }
+            }
+        })
+        userViewModel.loadUsers()
+    }
+
     private fun initBooru() {
         booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome ->
             when (outcome) {
@@ -231,14 +313,31 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                         .withName(booru.name)
                         .withEmail(booru.url)
                         .withIcon(icon)
+                users.forEach { user ->
+                    if (user.site == booru.host) {
+                        val url = booru.url + "/data/avatars/" + user.id + ".jpg"
+                        GlideApp.with(this)
+                                .asBitmap()
+                                .load(MoeGlideUrl(url))
+                                .into(object : SimpleTarget<Bitmap>() {
+                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                        profileDrawerItem.withIcon(resource)
+                                    }
+                                })
+                        return@forEach
+                    }
+                }
                 profileDrawerItem.withIdentifier(index.toLong())
                 header.addProfile(profileDrawerItem, index)
             }
             header.addProfile(profileSettingDrawerItem, size)
             val activeProfileId = app.settings.activeProfileId
             header.setActiveProfile(activeProfileId)
-            app.settings.activeProfileScheme = boorus[activeProfileId.toInt()].scheme
-            app.settings.activeProfileHost = boorus[activeProfileId.toInt()].host
+            val scheme = boorus[activeProfileId.toInt()].scheme
+            val host = boorus[activeProfileId.toInt()].host
+            app.settings.activeProfileScheme = scheme
+            app.settings.activeProfileHost = host
+            setHeaderBackground(scheme, host)
             if (isNullState && isNewCreate) {
                 isNewCreate = false
                 displayFragment(PostFragment())

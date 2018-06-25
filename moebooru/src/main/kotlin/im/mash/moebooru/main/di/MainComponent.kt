@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.media.MediaStoreDataSource
+import im.mash.moebooru.common.data.remote.PostSearchService
 import im.mash.moebooru.common.data.remote.PostService
 import im.mash.moebooru.common.data.remote.UserService
 import im.mash.moebooru.common.di.CoreComponent
@@ -60,6 +61,10 @@ class MainModule {
     @Provides
     @MainScope
     fun postService(retrofit: Retrofit): PostService = retrofit.create(PostService::class.java)
+
+    @Provides
+    @MainScope
+    fun postSearchService(retrofit: Retrofit): PostSearchService = retrofit.create(PostSearchService::class.java)
 
     /*BooruViewModel*/
     @Provides

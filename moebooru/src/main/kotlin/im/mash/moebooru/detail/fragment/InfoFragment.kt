@@ -21,6 +21,7 @@ import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.download.DownloadService
+import im.mash.moebooru.search.SearchActivity
 import im.mash.moebooru.util.*
 import java.util.*
 
@@ -40,7 +41,8 @@ class InfoFragment : Fragment(), DetailActivity.InfoChangeListener {
     private lateinit var rating: TextView
     private lateinit var score: TextView
 
-    private lateinit var parentId: ImageButton
+    private lateinit var parentId: TextView
+    private lateinit var parentSearch: ImageButton
     private lateinit var parentIdLayout: LinearLayout
 
     private lateinit var sampleDownload: ImageButton
@@ -108,6 +110,7 @@ class InfoFragment : Fragment(), DetailActivity.InfoChangeListener {
                 rating.text = post.rating
                 score.text = post.score.toString()
                 if (post.parent_id != null) {
+                    parentId.text = post.parent_id.toString()
                     parentIdLayout.visibility = View.VISIBLE
                 } else {
                     parentIdLayout.visibility = View.GONE
@@ -143,6 +146,7 @@ class InfoFragment : Fragment(), DetailActivity.InfoChangeListener {
                 rating.text = post.rating
                 score.text = post.score.toString()
                 if (post.parent_id != null) {
+                    parentId.text = post.parent_id.toString()
                     parentIdLayout.visibility = View.VISIBLE
                 } else {
                     parentIdLayout.visibility = View.GONE
@@ -168,7 +172,9 @@ class InfoFragment : Fragment(), DetailActivity.InfoChangeListener {
         source = view.findViewById(R.id.tv_source)
         rating = view.findViewById(R.id.tv_rating)
         score = view.findViewById(R.id.tv_score)
-        parentId = view.findViewById(R.id.btn_parent_id)
+
+        parentId = view.findViewById(R.id.tv_parent_id)
+        parentSearch = view.findViewById(R.id.btn_parent_search)
         parentIdLayout = view.findViewById(R.id.container_parent_id)
 
         sampleDownload = view.findViewById(R.id.btn_download_sample)
@@ -187,6 +193,26 @@ class InfoFragment : Fragment(), DetailActivity.InfoChangeListener {
         originLayout = view.findViewById(R.id.origin_layout)
 
         scrollView = view.findViewById(R.id.scroll_view)
+
+        parentSearch.setOnClickListener {
+            val id = when (type) {
+                "post" -> {
+                    if (post?.parent_id != null) {
+                        post!!.parent_id
+                    } else null
+                }
+                else -> {
+                    if (postSearch?.parent_id != null) {
+                        postSearch!!.parent_id
+                    } else null
+                }
+            }
+            if (id != null) {
+                val intent = Intent(this.requireContext(), SearchActivity::class.java)
+                intent.putExtra("keyword", "id:$id")
+                startActivity(intent)
+            }
+        }
     }
 
     private fun initClickListener(view: View) {
