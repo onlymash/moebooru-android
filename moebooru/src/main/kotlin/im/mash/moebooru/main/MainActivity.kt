@@ -90,13 +90,14 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     @Inject
     lateinit var scheduler: Scheduler
 
-    private var newCreate = true
+    private var isNullState = true
+    private var isNewCreate = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_moebooru)
         component.inject(this)
-
+        isNullState = savedInstanceState == null
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
                 .withIcon(R.drawable.ic_drawer_settings_24dp)
@@ -184,7 +185,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
         initBooru()
 
-        if (savedInstanceState != null && app.settings.isChangedNightMode) {
+        if (!isNullState && app.settings.isChangedNightMode) {
             drawer.setSelection(DRAWER_ITEM_SETTINGS)
             app.settings.isChangedNightMode = false
         }
@@ -218,8 +219,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             header.addProfile(profileSettingDrawerItem, 0)
             app.settings.activeProfileScheme = "http"
             app.settings.activeProfileHost = "mash.im"
-            if (newCreate) {
-                newCreate = false
+            if (isNullState && isNewCreate) {
+                isNewCreate = false
                 displayFragment(BooruFragment())
             }
 
@@ -242,8 +243,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             header.setActiveProfile(activeProfileId)
             app.settings.activeProfileScheme = boorus[activeProfileId.toInt()].scheme
             app.settings.activeProfileHost = boorus[activeProfileId.toInt()].host
-            if (newCreate) {
-                newCreate = false
+            if (isNullState && isNewCreate) {
+                isNewCreate = false
                 displayFragment(PostFragment())
             }
         }
