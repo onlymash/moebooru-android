@@ -13,7 +13,6 @@
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:minWidth="300dp"
         android:textColor="?android:attr/textColorSecondary"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:gravity="center_vertical"

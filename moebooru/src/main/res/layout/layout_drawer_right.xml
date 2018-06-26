@@ -13,8 +13,8 @@
 <android.support.design.widget.NavigationView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/drawer_width"
     android:layout_height="match_parent"
+    android:layout_width="320dp"
     android:layout_gravity="right"
     android:orientation="vertical"
     android:id="@+id/right_drawer_view"

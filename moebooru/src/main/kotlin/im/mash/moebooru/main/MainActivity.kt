@@ -28,6 +28,7 @@ import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.base.ToolbarFragment
+import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.local.entity.Booru
 import im.mash.moebooru.common.data.local.entity.User
 import im.mash.moebooru.common.data.remote.PostSearchService
@@ -45,7 +46,9 @@ import im.mash.moebooru.main.fragment.*
 import im.mash.moebooru.main.viewmodel.*
 import im.mash.moebooru.util.ColorUtil
 import im.mash.moebooru.util.TextUtil
+import im.mash.moebooru.util.isNetworkConnected
 import im.mash.moebooru.util.logi
+import io.reactivex.Completable
 import okhttp3.HttpUrl
 import java.io.IOException
 import javax.inject.Inject
@@ -94,6 +97,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(userViewModelFactory) }
     private val users: MutableList<User> = mutableListOf()
 
+    @Inject
+    lateinit var database: MoeDatabase
     @Inject
     lateinit var postSearchService: PostSearchService
     @Inject
@@ -191,7 +196,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 .withActionBarDrawerToggle(true)
                 .withActionBarDrawerToggleAnimated(true)
                 .withSavedInstance(savedInstanceState)
-                .withDrawerWidthDp(300)
                 .build()
 
         ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, insets ->
@@ -210,7 +214,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     }
 
     private fun setHeaderBackground(schema: String, host: String) {
-        header.headerBackgroundView.setImageResource(R.drawable.background_header)
         var activeUser: User? = null
         users.forEach { user ->
             if (user.site == host) {
@@ -221,23 +224,13 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         if (activeUser != null) {
             val username = activeUser!!.name
             val passwordHash = activeUser!!.password_hash
-            val httpUrl = HttpUrl.Builder()
-                    .scheme(schema)
-                    .host(host)
-                    .addPathSegment("post.json")
-                    .addQueryParameter("limit", "1")
-                    .addQueryParameter("page", "1")
-                    .addQueryParameter("tags", "vote:3:$username order:vote")
-                    .addQueryParameter("login", username)
-                    .addQueryParameter("password_hash", passwordHash)
-                    .build()
-            logi(TAG, "host: $host, username: $username")
-            postSearchService.getPosts(httpUrl)
+            val keyword = "vote:3:$username order:vote"
+            database.postSearchDao()
+                    .getLastPost(host, keyword)
                     .performOnBackOutOnMain(scheduler)
-                    .subscribe({ posts ->
-                        if (posts.size == 1) {
-                            val url = posts[0].sample_url
-                            logi(TAG, "lastFavOutcome Success. size: 1, url: $url")
+                    .subscribe({ postSearch ->
+                        if (postSearch != null) {
+                            val url = postSearch.sample_url
                             GlideApp.with(this)
                                     .asBitmap()
                                     .load(MoeGlideUrl(url))
@@ -246,10 +239,36 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                                             header.headerBackgroundView.setImageBitmap(resource)
                                         }
                                     })
+                        } else {
+                            header.headerBackgroundView.setImageResource(R.drawable.background_header)
                         }
                     }, { error ->
+                        header.headerBackgroundView.setImageResource(R.drawable.background_header)
                         error.printStackTrace()
                     })
+
+            if (!this.isNetworkConnected) return
+
+            val httpUrl = HttpUrl.Builder()
+                    .scheme(schema)
+                    .host(host)
+                    .addPathSegment("post.json")
+                    .addQueryParameter("limit", "1")
+                    .addQueryParameter("page", "1")
+                    .addQueryParameter("tags", keyword)
+                    .addQueryParameter("login", username)
+                    .addQueryParameter("password_hash", passwordHash)
+                    .build()
+
+            postSearchService.getPosts(httpUrl)
+                    .performOnBackOutOnMain(scheduler)
+                    .subscribe({ posts ->
+                        if (posts.size == 1) {
+                            Completable.fromAction { database.postSearchDao().insertPosts(posts) }
+                                    .performOnBackOutOnMain(scheduler)
+                                    .subscribe({}, { error -> error.printStackTrace()})
+                        }
+                    }, { error -> error.printStackTrace() })
         }
     }
 
@@ -308,27 +327,34 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             for (index in 0 until size) {
                 val booru = boorus[index]
                 val text = booru.name[0].toString()
-                val icon = TextUtil.textDrawableBuilder().buildRound(text, ColorUtil.getCustomizedColor(this, text))
                 val profileDrawerItem: ProfileDrawerItem = ProfileDrawerItem()
                         .withName(booru.name)
                         .withEmail(booru.url)
-                        .withIcon(icon)
+                        .withIdentifier(index.toLong())
+                var url = ""
                 users.forEach { user ->
                     if (user.site == booru.host) {
-                        val url = booru.url + "/data/avatars/" + user.id + ".jpg"
-                        GlideApp.with(this)
-                                .asBitmap()
-                                .load(MoeGlideUrl(url))
-                                .into(object : SimpleTarget<Bitmap>() {
-                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                        profileDrawerItem.withIcon(resource)
-                                    }
-                                })
+                        url = booru.url + "/data/avatars/" + user.id + ".jpg"
                         return@forEach
                     }
                 }
-                profileDrawerItem.withIdentifier(index.toLong())
-                header.addProfile(profileDrawerItem, index)
+                if (url == "") {
+                    val icon = TextUtil.textDrawableBuilder().buildRound(text, ColorUtil.getCustomizedColor(this, text))
+                    profileDrawerItem.withIcon(icon)
+                    header.addProfile(profileDrawerItem, index)
+                } else {
+                    header.addProfile(profileDrawerItem, index)
+                    GlideApp.with(header.view.context)
+                            .asBitmap()
+                            .load(MoeGlideUrl(url))
+                            .into(object : SimpleTarget<Bitmap>() {
+                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                    header.removeProfile(profileDrawerItem)
+                                    profileDrawerItem.withIcon(resource)
+                                    header.addProfile(profileDrawerItem, index)
+                                }
+                            })
+                }
             }
             header.addProfile(profileSettingDrawerItem, size)
             val activeProfileId = app.settings.activeProfileId

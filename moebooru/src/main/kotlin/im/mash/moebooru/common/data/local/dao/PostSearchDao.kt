@@ -27,4 +27,7 @@ interface PostSearchDao {
 
     @Delete
     fun delete(postSearch: PostSearch)
+
+    @Query("SELECT * FROM posts_search AS a WHERE site=:site AND keyword = :tags AND id = (SELECT MAX(b.id) FROM posts_search AS b WHERE a.site = b.site AND a.keyword = b.keyword)")
+    fun getLastPost(site: String, tags: String): Flowable<PostSearch>
 }
