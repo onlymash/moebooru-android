@@ -96,7 +96,7 @@ class BooruFragment : ToolbarFragment() {
                         }
                     }
                 }
-                val dialog = android.app.AlertDialog.Builder(context)
+                val dialog = AlertDialog.Builder(this@BooruFragment.requireContext())
                         .setTitle(R.string.edit_booru)
                         .setPositiveButton(R.string.save) { _, _ ->
                             val name = inputName.text.toString()
@@ -151,7 +151,7 @@ class BooruFragment : ToolbarFragment() {
                     }
                 }
             }
-            val dialog = android.app.AlertDialog.Builder(context)
+            val dialog = AlertDialog.Builder(this.requireContext())
                     .setTitle(R.string.add_booru)
                     .setPositiveButton(R.string.add) { _, _ ->
                         val name = inputName.text.toString()

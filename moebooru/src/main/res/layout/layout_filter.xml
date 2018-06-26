@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:scrollbars="vertical"
+    android:layout_margin="12dp"
+    android:padding="16dp"
+    tools:ignore="RtlHardcoded">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Spinner
+                android:entries="@array/filter_type_1"
+                android:id="@+id/type"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="left|center_vertical"
+                style="@style/Widget.AppCompat.Spinner.DropDown" />
+
+            <Spinner
+                android:entries="@array/filter_compare"
+                android:id="@+id/compare"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="left|center_vertical"
+                style="@style/Widget.AppCompat.Spinner.DropDown" />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_marginRight="8dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/input_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:inputType="number"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/add_interval"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:src="@drawable/ic_action_add_circle_24dp"
+                android:contentDescription="@string/add" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:paddingTop="5dp"
+            android:layout_marginLeft="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <TextView
+                android:text="@string/filter_order"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <Spinner
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:entries="@array/filter_order"
+                android:id="@+id/type_order"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="left|center_vertical"
+                style="@style/Widget.AppCompat.Spinner.DropDown" />
+
+            <ImageView
+                android:id="@+id/add_order"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:src="@drawable/ic_action_add_circle_24dp"
+                android:contentDescription="@string/add" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center"
+            android:paddingTop="5dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginBottom="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <TextView
+                android:text="@string/filter_rating"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <Spinner
+                android:layout_marginLeft="12dp"
+                android:layout_marginRight="12dp"
+                android:entries="@array/filter_rating"
+                android:id="@+id/type_rating"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="left|center_vertical"
+                style="@style/Widget.AppCompat.Spinner.DropDown"/>
+
+            <ImageView
+                android:id="@+id/add_rating"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:src="@drawable/ic_action_add_circle_24dp"
+                android:contentDescription="@string/add" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

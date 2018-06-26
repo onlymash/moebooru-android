@@ -17,6 +17,42 @@
         <item>https://</item>
     </string-array>
 
+    <string-array name="filter_type_1">
+        <item>id</item>
+        <item>height</item>
+        <item>width</item>
+    </string-array>
+
+    <string-array name="filter_compare">
+        <item>:</item>
+        <item>:></item>
+        <item>:>=</item>
+        <item>:&lt;</item>
+        <item>:&lt;=</item>
+    </string-array>
+
+    <string-array name="filter_order">
+        <item>id</item>
+        <item>id_desc</item>
+        <item>fav</item>
+        <item>wide</item>
+        <item>nonwide</item>
+        <item>score</item>
+        <item>score_asc</item>
+        <item>mpixels</item>
+        <item>mpixels_asc</item>
+        <item>landscape</item>
+        <item>portrait</item>
+        <item>vote</item>
+        <item>favcount</item>
+    </string-array>
+
+    <string-array name="filter_rating">
+        <item>safe</item>
+        <item>questionable</item>
+        <item>explicit</item>
+    </string-array>
+
     <integer-array name="customizedColors">
         <item>@color/blue</item>
         <item>@color/purple</item>

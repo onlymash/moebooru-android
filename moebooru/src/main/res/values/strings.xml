@@ -164,4 +164,7 @@
     <string name="delete_booru">Delete booru</string>
 
     <string name="filter">Filter</string>
+    <string name="filter_order">order: </string>
+    <string name="filter_rating">rating: </string>
+    <string name="tag_filter">Tag filter</string>
 </resources>

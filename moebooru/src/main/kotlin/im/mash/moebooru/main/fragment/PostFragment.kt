@@ -6,6 +6,7 @@ import android.content.*
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
 import android.support.design.widget.NavigationView
+import android.support.design.widget.TextInputEditText
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
@@ -13,9 +14,11 @@ import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
 import android.support.v7.widget.Toolbar
+import android.text.TextUtils
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
+import android.widget.ListPopupWindow
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
@@ -352,6 +355,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
     }
 
+    @SuppressLint("InflateParams")
     private fun initRightDrawer(view: View) {
         drawerLayout = view.findViewById(R.id.drawer_layout_posts)
         drawer = view.findViewById(R.id.right_drawer_view)
@@ -422,6 +426,115 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                             intent.putExtra("keyword", keyword)
                             startActivity(intent)
                         }
+                    }
+                }
+                R.id.action_filter -> {
+                    val v = layoutInflater.inflate(R.layout.layout_filter, null)
+                    val inputNumber: TextInputEditText = v.findViewById(R.id.input_number)
+                    val typeSpinner: Spinner = v.findViewById(R.id.type)
+                    val compareSpinner: Spinner = v.findViewById(R.id.compare)
+                    val ratingSpinner: Spinner = v.findViewById(R.id.type_rating)
+                    val orderSpinner: Spinner = v.findViewById(R.id.type_order)
+                    try {
+                        val popup = Spinner::class.java.getDeclaredField("mPopup")
+                        popup.isAccessible = true
+                        val listPopupWindow = popup.get(orderSpinner) as ListPopupWindow
+                        listPopupWindow.height = mainActivity.screenHeight/2 - paddingBottom
+                    } catch (e: NoClassDefFoundError) {
+                        e.printStackTrace()
+                    }
+                    var type = "id"
+                    var compare = ":"
+                    var number = ""
+                    var order = "id"
+                    var rating = "safe"
+                    typeSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        }
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            when (position) {
+                                0 -> type = "id"
+                                1 -> type = "height"
+                                2 -> type = "width"
+                            }
+                        }
+                    }
+                    compareSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        }
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            when (position) {
+                                0 -> compare = ":"
+                                1 -> compare = ":>"
+                                2 -> compare = ":>="
+                                3 -> compare = ":<"
+                                4 -> compare = ":<="
+                            }
+                        }
+                    }
+                    orderSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        }
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            when (position) {
+                                0 -> order = "id"
+                                1 -> order = "id_desc"
+                                2 -> order = "fav"
+                                3 -> order = "wide"
+                                4 -> order = "nonwide"
+                                5 -> order = "score"
+                                6 -> order = "score_asc"
+                                7 -> order = "mpixels"
+                                8 -> order = "mpixels_asc"
+                                9 -> order = "landscape"
+                                10 -> order = "portrait"
+                                11 -> order = "vote"
+                                12 -> order = "favcount"
+                            }
+                        }
+                    }
+                    ratingSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                        override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                        }
+                        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                            when (position) {
+                                0 -> rating = "safe"
+                                1 -> rating = "questionable"
+                                2 -> rating = "explicit"
+                            }
+                        }
+                    }
+                    val site = app.settings.activeProfileHost
+                    val addInterval: ImageView = v.findViewById(R.id.add_interval)
+                    val addOrder: ImageView = v.findViewById(R.id.add_order)
+                    val addRating: ImageView = v.findViewById(R.id.add_rating)
+                    addInterval.setOnClickListener {
+                        number = inputNumber.text.toString()
+                        if (TextUtils.isEmpty(number)) {
+                            return@setOnClickListener
+                        }
+                        val tag = Tag(null, site, "$type$compare$number", false)
+                        tagViewModel.saveTag(tag)
+                    }
+                    addOrder.setOnClickListener {
+                        val tag = Tag(null, site, "order:$order", false)
+                        tagViewModel.saveTag(tag)
+                    }
+                    addRating.setOnClickListener {
+                        val tag = Tag(null, site, "rating:$rating", false)
+                        tagViewModel.saveTag(tag)
+                    }
+                    val dialog = AlertDialog.Builder(this.requireContext())
+                            .setTitle(R.string.tag_filter)
+                            .create()
+                    dialog.apply {
+                        setView(v)
+                        setCanceledOnTouchOutside(true)
+                        show()
                     }
                 }
             }
