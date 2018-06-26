@@ -2,6 +2,7 @@ package im.mash.moebooru.main.fragment
 
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.ViewCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,10 @@ class AboutFragment : ToolbarFragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
+            view.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            insets
+        }
         view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.window_background))
         toolbar.title = getString(R.string.about_title) + " " + BuildConfig.VERSION_NAME
         val web = view.findViewById<WebView>(R.id.web_view)

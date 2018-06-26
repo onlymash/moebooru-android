@@ -162,4 +162,6 @@
     <string name="save">Save</string>
     <string name="edit_booru">Edit booru</string>
     <string name="delete_booru">Delete booru</string>
+
+    <string name="filter">Filter</string>
 </resources>

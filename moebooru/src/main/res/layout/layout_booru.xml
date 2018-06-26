@@ -40,6 +40,7 @@
         android:scaleType="center"
         app:srcCompat="@drawable/ic_action_add_white_24dp"
         app:fabSize="normal"
+        app:backgroundTint="@color/primary_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

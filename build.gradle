@@ -3,7 +3,7 @@
 buildscript {
     ext {
         version_code = 7
-        version_name = '0.0.7_alpha_4'
+        version_name = '0.0.7_alpha_5'
         min_sdk_version = 21
         sdk_version = 28
         build_tools_version = '28.0.0'
@@ -15,7 +15,7 @@ buildscript {
         okdownload_version = '1.0.3'
         okhttp3_version = '3.10.0'
         retrofit2_version = '2.4.0'
-        room_version = '1.1.0'
+        room_version = '1.1.1'
         dagger_version = '2.16'
         lifecycle_version = '1.1.1'
     }

@@ -16,6 +16,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <item
+        android:id="@+id/action_filter"
+        android:title="@string/filter"
+        android:icon="@drawable/ic_action_filter_list_24dp"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+
+    <item
         android:id="@+id/action_add"
         android:title="@string/add"
         android:icon="@drawable/ic_action_add_white_24dp"
