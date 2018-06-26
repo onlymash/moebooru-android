@@ -87,7 +87,6 @@ dependencies {
     implementation "moe.shizuku.preference:preference:$rikka_preference_version"
     implementation "moe.shizuku.preference:preference-simplemenu:$rikka_preference_version"
     implementation "moe.shizuku.preference:preference-switchcompat:$rikka_preference_version"
-    implementation "moe.shizuku.preference:preference-dialog-android:$rikka_preference_version"
     implementation "com.google.firebase:firebase-core:$firebase_version"
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
     implementation "com.github.bumptech.glide:glide:$glide_version"

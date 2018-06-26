@@ -2,7 +2,6 @@ package im.mash.moebooru.main.viewmodel
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.ViewModel
-import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Booru
 import im.mash.moebooru.core.extensions.toLiveData
 import im.mash.moebooru.core.scheduler.Outcome

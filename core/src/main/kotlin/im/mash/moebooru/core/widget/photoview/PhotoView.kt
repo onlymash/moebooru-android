@@ -476,7 +476,7 @@ class PhotoView : AppCompatImageView {
     override fun setImageResource(resId: Int) {
         var drawable: Drawable? = null
         try {
-            drawable = resources.getDrawable(resId)
+            drawable = resources.getDrawable(resId, context.theme)
         } catch (e: Exception) {
         }
 

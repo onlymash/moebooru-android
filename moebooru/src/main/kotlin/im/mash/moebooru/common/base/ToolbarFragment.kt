@@ -15,7 +15,6 @@ abstract class ToolbarFragment: Fragment() {
 
     protected lateinit var appBarLayout: AppBarLayout
     protected lateinit var toolbar: Toolbar
-    protected var insetTopPadding = 0
 
     @SuppressLint("InflateParams")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,7 +34,7 @@ abstract class ToolbarFragment: Fragment() {
             is MainActivity -> {
                 activity.drawer.setToolbar(activity, toolbar, true)
                 ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
-                    insetTopPadding = insets.systemWindowInsetTop
+                    val insetTopPadding = insets.systemWindowInsetTop
                     appBarLayout.minimumHeight = insetTopPadding + toolbar.minimumHeight
                     toolbar.setPadding(0, insetTopPadding, 0, 0)
                     insets
