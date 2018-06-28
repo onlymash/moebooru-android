@@ -158,7 +158,7 @@ class GalleryFragment : ToolbarFragment() {
         galleryView.adapter = galleryAdapter
         galleryView.addOnItemTouchListener(RecyclerViewClickListener(this.requireContext(),
                 object : RecyclerViewClickListener.OnItemClickListener {
-                    override fun onItemClick(itemView: View?, position: Int) {
+                    override fun onItemClick(itemView: View, position: Int) {
                         val dialog = GalleryDialog(mainActivity, media, position)
                         dialog.setItemRemoveListener(object : GalleryDialog.ItemRemoveListener {
                             override fun onItemRemoved(position: Int) {
@@ -169,7 +169,7 @@ class GalleryFragment : ToolbarFragment() {
                         dialog.show()
                     }
 
-                    override fun onItemLongClick(itemView: View?, position: Int) {
+                    override fun onItemLongClick(itemView: View, position: Int) {
 
                     }
                 }))

@@ -42,6 +42,7 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentTransitions">true</item>
         <!--<item name="android:windowAnimationStyle">@style/MoeAnimation.SlidingBack</item>-->
     </style>
 

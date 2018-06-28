@@ -13,6 +13,7 @@ import android.support.v7.content.res.AppCompatResources
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.mikepenz.materialdrawer.AccountHeader
@@ -35,6 +36,7 @@ import im.mash.moebooru.common.data.remote.PostSearchService
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.common.viewmodel.UserViewModel
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
+import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.core.application.BaseActivity
 import im.mash.moebooru.core.extensions.performOnBackOutOnMain
 import im.mash.moebooru.core.scheduler.Outcome
@@ -66,6 +68,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         private const val DRAWER_ITEM_SETTINGS = 4L
         private const val DRAWER_ITEM_FEEDBACK = 5L
         private const val DRAWER_ITEM_ABOUT = 6L
+        private const val SETTING_PROFILE_ID = 100L
     }
 
     internal lateinit var drawer: Drawer
@@ -103,6 +106,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     lateinit var postSearchService: PostSearchService
     @Inject
     lateinit var scheduler: Scheduler
+    @Inject
+    lateinit var voteViewModelFactory: VoteViewModelFactory
 
     private var isNullState = true
     private var isNewCreate = true
@@ -120,19 +125,21 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
+                .withIdentifier(SETTING_PROFILE_ID)
                 .withIcon(R.drawable.ic_drawer_settings_24dp)
 
         header = AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.background_header)
                 .withOnAccountHeaderListener { _, profile, _ ->
-                    if (profile.identifier != profileSettingDrawerItem.identifier) {
-                        app.settings.activeProfileId = profile.identifier
-                        val scheme = boorus[profile.identifier.toInt()].scheme
-                        val host = boorus[profile.identifier.toInt()].host
-                        app.settings.activeProfileScheme = scheme
+                    val id = profile.identifier
+                    if (id != SETTING_PROFILE_ID) {
+                        app.settings.activeProfileId = id
+                        val schema = boorus[id.toInt()].scheme
+                        val host = boorus[id.toInt()].host
+                        app.settings.activeProfileSchema = schema
                         app.settings.activeProfileHost = host
-                        setHeaderBackground(scheme, host)
+                        setHeaderBackground(schema, host)
                     } else {
                         drawer.setSelection(100)
                         previousSelectedDrawer = 100
@@ -314,7 +321,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         if (boorus.size <= 0) {
             header.clear()
             header.addProfile(profileSettingDrawerItem, 0)
-            app.settings.activeProfileScheme = "http"
+            app.settings.activeProfileSchema = "http"
             app.settings.activeProfileHost = "mash.im"
             if (isNullState && isNewCreate) {
                 isNewCreate = false
@@ -324,21 +331,24 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         } else {
             header.clear()
             val size = boorus.size
+            val activeProfileId = app.settings.activeProfileId
             for (index in 0 until size) {
                 val booru = boorus[index]
-                val text = booru.name[0].toString()
                 val profileDrawerItem: ProfileDrawerItem = ProfileDrawerItem()
                         .withName(booru.name)
                         .withEmail(booru.url)
                         .withIdentifier(index.toLong())
                 var url = ""
+                var name = ""
                 users.forEach { user ->
                     if (user.site == booru.host) {
+                        name = user.name
                         url = booru.url + "/data/avatars/" + user.id + ".jpg"
                         return@forEach
                     }
                 }
                 if (url == "") {
+                    val text = booru.name[0].toString()
                     val icon = TextUtil.textDrawableBuilder().buildRound(text, ColorUtil.getCustomizedColor(this, text))
                     profileDrawerItem.withIcon(icon)
                     header.addProfile(profileDrawerItem, index)
@@ -351,19 +361,20 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                                     header.removeProfile(profileDrawerItem)
                                     profileDrawerItem.withIcon(resource)
+                                    profileDrawerItem.withName(name)
                                     header.addProfile(profileDrawerItem, index)
+                                    header.setActiveProfile(activeProfileId)
                                 }
                             })
                 }
             }
             header.addProfile(profileSettingDrawerItem, size)
-            val activeProfileId = app.settings.activeProfileId
             header.setActiveProfile(activeProfileId)
-            val scheme = boorus[activeProfileId.toInt()].scheme
+            val schema = boorus[activeProfileId.toInt()].scheme
             val host = boorus[activeProfileId.toInt()].host
-            app.settings.activeProfileScheme = scheme
+            app.settings.activeProfileSchema = schema
             app.settings.activeProfileHost = host
-            setHeaderBackground(scheme, host)
+            setHeaderBackground(schema, host)
             if (isNullState && isNewCreate) {
                 isNewCreate = false
                 displayFragment(PostFragment())

@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.data.local.entity.Post
@@ -23,9 +24,20 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
     private var spanCount = context.screenWidth/context.resources.getDimension(R.dimen.item_width).toInt()
     private val padding = context.resources.getDimension(R.dimen.item_padding).toInt()
 
+    private var idsOneTwo: MutableList<Int> = mutableListOf()
+    private var idsThree: MutableList<Int> = mutableListOf()
+
     fun updateData(posts: MutableList<Post>) {
         this.posts = posts
         notifyDataSetChanged()
+    }
+
+    fun updateVoteIdsOneTwo(idsOneTwo: MutableList<Int>) {
+        this.idsOneTwo = idsOneTwo
+    }
+
+    fun updateVoteIdsThree(idsThree: MutableList<Int>) {
+        this.idsThree = idsThree
     }
 
     fun setGridMode(gridMode: String) {
@@ -82,10 +94,36 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
                         .into(holder.fixedImageView)
             }
         }
+        val id = posts[position].id
+        holder.rate.tag = id
+        holder.itemView.setOnClickListener {
+            postItemClickListener?.onClickPostItem(position)
+        }
+        holder.rate.setOnClickListener {
+            postItemClickListener?.onClickRate(position, id, holder.rate)
+        }
+        if (idsThree.size > 0 && idsThree.contains(id)) {
+            holder.rate.setImageResource(R.drawable.ic_action_star_24dp)
+        } else if (idsOneTwo.size > 0 && idsOneTwo.contains(id)) {
+            holder.rate.setImageResource(R.drawable.ic_action_star_half_24dp)
+        } else {
+            holder.rate.setImageResource(R.drawable.ic_action_star_border_24dp)
+        }
+    }
 
+    private var postItemClickListener: PostItemClickListener? = null
+
+    fun setPostItemClickListener(listener: PostItemClickListener) {
+        this.postItemClickListener = listener
+    }
+
+    interface PostItemClickListener {
+        fun onClickPostItem(position: Int)
+        fun onClickRate(position: Int, id: Int, rate: ImageView)
     }
 
     inner class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val fixedImageView: FixedImageView = itemView.findViewById(R.id.post_item)
+        val rate: ImageView = itemView.findViewById(R.id.rate)
     }
 }

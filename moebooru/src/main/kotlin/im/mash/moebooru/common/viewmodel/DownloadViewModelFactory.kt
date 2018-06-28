@@ -7,8 +7,8 @@ import io.reactivex.disposables.CompositeDisposable
 
 @Suppress("UNCHECKED_CAST")
 class DownloadViewModelFactory(private val repository: DownloadDataContract.Repository,
-                               private val compositeDisposable: CompositeDisposable) :
-        ViewModelProvider.Factory {
+                               private val compositeDisposable: CompositeDisposable) : ViewModelProvider.Factory {
+
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return DownloadViewModel(repository, compositeDisposable) as T
     }

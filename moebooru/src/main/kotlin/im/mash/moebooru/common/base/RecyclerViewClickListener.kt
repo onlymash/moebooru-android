@@ -30,9 +30,9 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
     //内部接口，定义点击方法以及长按方法
     interface OnItemClickListener {
 
-        fun onItemClick(itemView: View?, position: Int)
+        fun onItemClick(itemView: View, position: Int)
 
-        fun onItemLongClick(itemView: View?, position: Int)
+        fun onItemLongClick(itemView: View, position: Int)
 
     }
 
@@ -42,7 +42,7 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
                     //单击事件
                     override fun onSingleTapUp(e: MotionEvent): Boolean {
                         if (childView != null) {
-                            listener.onItemClick(childView, position)
+                            listener.onItemClick(childView!!, position)
                             return true
                         }
                         return false
@@ -51,7 +51,7 @@ open class RecyclerViewClickListener(context: Context, private val listener: OnI
                     //长按事件
                     override fun onLongPress(e: MotionEvent) {
                         if (childView != null) {
-                            listener.onItemLongClick(childView, position)
+                            listener.onItemLongClick(childView!!, position)
                             //长按振动
                             childView!!.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                         }

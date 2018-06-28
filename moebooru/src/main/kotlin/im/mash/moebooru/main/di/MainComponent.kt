@@ -9,13 +9,12 @@ import im.mash.moebooru.common.data.media.MediaStoreDataSource
 import im.mash.moebooru.common.data.remote.PostSearchService
 import im.mash.moebooru.common.data.remote.PostService
 import im.mash.moebooru.common.data.remote.UserService
+import im.mash.moebooru.common.data.remote.VoteService
 import im.mash.moebooru.common.di.CoreComponent
-import im.mash.moebooru.common.model.DownloadDataContract
-import im.mash.moebooru.common.model.DownloadRepository
-import im.mash.moebooru.common.model.UserDataContract
-import im.mash.moebooru.common.model.UserRepository
+import im.mash.moebooru.common.model.*
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
+import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.model.*
@@ -114,9 +113,9 @@ class MainModule {
 
     @Provides
     @MainScope
-    fun downloadViewModelFactory(repository: DownloadDataContract.Repository,
+    fun downloadViewModelFactory(downloadRepo: DownloadDataContract.Repository,
                                  compositeDisposable: CompositeDisposable): DownloadViewModelFactory
-            = DownloadViewModelFactory(repository, compositeDisposable)
+            = DownloadViewModelFactory(downloadRepo, compositeDisposable)
 
     @Provides
     @MainScope
@@ -136,6 +135,22 @@ class MainModule {
 
     @Provides
     @MainScope
-    fun userViewModelFactory(repository: UserDataContract.Repository, compositeDisposable: CompositeDisposable)
-            = UserViewModelFactory(repository, compositeDisposable)
+    fun userViewModelFactory(userRepo: UserDataContract.Repository, compositeDisposable: CompositeDisposable)
+            = UserViewModelFactory(userRepo, compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun voteService(retrofit: Retrofit): VoteService = retrofit.create(VoteService::class.java)
+
+    @Provides
+    @MainScope
+    fun voteRepo(voteService: VoteService, database: MoeDatabase, scheduler: Scheduler,
+                 compositeDisposable: CompositeDisposable): VoteDataContract.Repository
+            = VoteRepository(voteService, database, scheduler, compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun voteViewModelFactory(voteRepo: VoteDataContract.Repository,
+                             compositeDisposable: CompositeDisposable): VoteViewModelFactory
+            = VoteViewModelFactory(voteRepo, compositeDisposable)
 }

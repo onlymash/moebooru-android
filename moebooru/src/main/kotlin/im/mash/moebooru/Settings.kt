@@ -83,7 +83,7 @@ class Settings(private val sp: SharedPreferences) {
         get() = sp.getString(ACTIVE_PROFILE_HOST, "mash.im")
         set(value) = editor.putString(ACTIVE_PROFILE_HOST, value).apply()
 
-    var activeProfileScheme: String
+    var activeProfileSchema: String
         get() = sp.getString(ACTIVE_PROFILE_SCHEME, "https")
         set(value) = editor.putString(ACTIVE_PROFILE_SCHEME, value).apply()
 

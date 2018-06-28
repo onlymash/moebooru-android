@@ -27,6 +27,7 @@ import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
+import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.search.adapter.PostSearchAdapter
 import im.mash.moebooru.search.viewmodel.PostSearchViewModel
@@ -257,7 +258,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         }
         toolbar.setNavigationOnClickListener { finish() }
         postSearchView = findViewById(R.id.posts_list)
-        postSearchView.itemAnimator = DefaultItemAnimator()
+        (postSearchView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postSearchView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation)
         postSearchView.setItemViewCacheSize(20)
         when (app.settings.gridModeString) {
@@ -279,17 +280,24 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             override fun onLastItemVisible() {
                 loadMoreData()
             }
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_SETTLING -> GlideApp.with(this@SearchActivity).pauseRequests()
+                    RecyclerView.SCROLL_STATE_IDLE -> GlideApp.with(this@SearchActivity).resumeRequests()
+                }
+            }
         })
         postSearchView.addOnItemTouchListener(RecyclerViewClickListener(this,
                 object : RecyclerViewClickListener.OnItemClickListener {
-                    override fun onItemClick(itemView: View?, position: Int) {
+                    override fun onItemClick(itemView: View, position: Int) {
                         val intent = Intent(this@SearchActivity, DetailActivity::class.java)
                         intent.putExtra("tags", keyword)
                         intent.putExtra("position", position)
                         startActivity(intent)
                     }
 
-                    override fun onItemLongClick(itemView: View?, position: Int) {
+                    override fun onItemLongClick(itemView: View, position: Int) {
                         logi(TAG, "Long click item: $position")
                     }
                 }))
@@ -337,7 +345,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             passwordHash = user.password_hash
         }
         return HttpUrl.Builder()
-                .scheme(app.settings.activeProfileScheme)
+                .scheme(app.settings.activeProfileSchema)
                 .host(app.settings.activeProfileHost)
                 .addPathSegment("post.json")
                 .addQueryParameter("limit", limit.toString())

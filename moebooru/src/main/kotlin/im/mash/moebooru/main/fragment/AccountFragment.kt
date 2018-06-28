@@ -178,7 +178,7 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
 
     private fun getHttpUrl(username: String): HttpUrl {
         return HttpUrl.Builder()
-                .scheme(app.settings.activeProfileScheme)
+                .scheme(app.settings.activeProfileSchema)
                 .host(app.settings.activeProfileHost)
                 .addPathSegment("user.json")
                 .addQueryParameter("name", username)

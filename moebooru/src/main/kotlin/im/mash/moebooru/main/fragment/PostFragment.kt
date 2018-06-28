@@ -23,14 +23,15 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.base.LastItemListener
-import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.Tag
 import im.mash.moebooru.common.data.local.entity.User
 import im.mash.moebooru.common.viewmodel.UserViewModel
+import im.mash.moebooru.common.viewmodel.VoteViewModel
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
+import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.PostAdapter
@@ -67,7 +68,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     private var spanCount = 3
     private var page = 1
-    private var posts = mutableListOf<Post>()
+    private var posts: MutableList<Post> = mutableListOf()
 
     private var refreshing = false
     private var loadingMore = false
@@ -85,7 +86,11 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(mainActivity.userViewModelFactory) }
     private val postViewModel: PostViewModel by lazy { this.getViewModel<PostViewModel>(mainActivity.postViewModelFactory) }
     private val tagViewModel: TagViewModel by lazy { this.getViewModel<TagViewModel>(mainActivity.tagViewModelFactory) }
+    private val voteViewModel: VoteViewModel by lazy { this.getViewModel<VoteViewModel>(mainActivity.voteViewModelFactory) }
     private var tags: MutableList<Tag> = mutableListOf()
+
+    private var voteChangedId = -1
+    private var voteChangedScore = 0
 
     @SuppressLint("InflateParams")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -101,15 +106,78 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         initToolbar()
         initRightDrawer(view)
         initDrawerListener()
-        initUserViewModel()
         initRefresh(view)
-        initPostList(view)
-        observePosts()
+        initPostView(view)
+        initVoteViewModel()
+        initPostViewModel()
+        initUserViewModel()
+        mainActivity.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         if (savedInstanceState == null) {
             refreshLayout.isRefreshing = true
             postViewModel.loadPosts(getHttpUrl())
         }
-        mainActivity.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    private fun initVoteViewModel() {
+        voteViewModel.idsOutcomeOneTwo.observe(this, Observer<Outcome<MutableList<Int>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {}
+                is Outcome.Success -> {
+                    if (voteChangedId > 0 && voteChangedScore == 0) {
+                        postView.findViewWithTag<ImageView>(voteChangedId)?.setImageResource(R.drawable.ic_action_star_border_24dp)
+                    }
+                    val data = outcome.data
+                    if (data.size > 0) {
+                        logi(TAG, "idsOutcomeOneTwo size: ${data.size}")
+                        postAdapter.updateVoteIdsOneTwo(data)
+                        if (postAdapter.itemCount > 0) {
+                            data.forEach { tag ->
+                                postView.findViewWithTag<ImageView>(tag)?.setImageResource(R.drawable.ic_action_star_half_24dp)
+                            }
+                        }
+                    }
+                }
+                is Outcome.Failure -> {
+                    val error = outcome.e
+                    when (error) {
+                        is HttpException -> {
+                            Toast.makeText(this.requireContext(), "code: ${error.code()}, msg: ${error.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                        is IOException -> {
+                            error.printStackTrace()
+                        }
+                    }
+                }
+            }
+        })
+        voteViewModel.idsOutcomeThree.observe(this, Observer<Outcome<MutableList<Int>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {}
+                is Outcome.Success -> {
+                    val data = outcome.data
+                    if (data.size > 0) {
+                        logi(TAG, "idsOutcomeThree size: ${data.size}")
+                        postAdapter.updateVoteIdsThree(data)
+                        if (postAdapter.itemCount > 0) {
+                            data.forEach { tag ->
+                                postView.findViewWithTag<ImageView>(tag)?.setImageResource(R.drawable.ic_action_star_24dp)
+                            }
+                        }
+                    }
+                }
+                is Outcome.Failure -> {
+                    val error = outcome.e
+                    when (error) {
+                        is HttpException -> {
+                            Toast.makeText(this.requireContext(), "code: ${error.code()}, msg: ${error.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                        is IOException -> {
+                            error.printStackTrace()
+                        }
+                    }
+                }
+            }
+        })
     }
 
     private fun initUserViewModel() {
@@ -139,9 +207,14 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 return@forEach
             }
         }
+        if (user != null) {
+            logi(TAG, "initUser user != null")
+            voteViewModel.getVoteIdsOneTwo(user!!.site, user!!.name)
+            voteViewModel.getVoteIdsThree(user!!.site, user!!.name)
+        }
     }
 
-    private fun observePosts() {
+    private fun initPostViewModel() {
         postViewModel.postsOutcome.observe( this, Observer<Outcome<MutableList<Post>>> { outcome: Outcome<MutableList<Post>>? ->
             when (outcome) {
                 is Outcome.Progress -> {
@@ -250,7 +323,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             passwordHash = user.password_hash
         }
         return HttpUrl.Builder()
-                .scheme(app.settings.activeProfileScheme)
+                .scheme(app.settings.activeProfileSchema)
                 .host(app.settings.activeProfileHost)
                 .addPathSegment("post.json")
                 .addQueryParameter("limit", limit.toString())
@@ -261,9 +334,10 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 .build()
     }
 
-    private fun initPostList(view: View) {
+    @SuppressLint("InflateParams")
+    private fun initPostView(view: View) {
         postView = view.findViewById(R.id.posts_list)
-        postView.itemAnimator = DefaultItemAnimator()
+        (postView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postView.setItemViewCacheSize(20)
         when (app.settings.gridModeString) {
@@ -286,21 +360,58 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             override fun onLastItemVisible() {
                 loadMoreData()
             }
+//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+//                super.onScrollStateChanged(recyclerView, newState)
+//                when (newState) {
+//                    RecyclerView.SCROLL_STATE_SETTLING -> GlideApp.with(this@PostFragment.requireContext()).pauseRequests()
+//                    RecyclerView.SCROLL_STATE_IDLE -> GlideApp.with(this@PostFragment.requireContext()).resumeRequests()
+//                }
+//            }
         })
+        postAdapter.setPostItemClickListener(object : PostAdapter.PostItemClickListener {
+            override fun onClickPostItem(position: Int) {
+                val intent = Intent(mainActivity, DetailActivity::class.java)
+                intent.putExtra("tags", "")
+                intent.putExtra("position", position)
+                startActivity(intent)
+            }
 
-        postView.addOnItemTouchListener(RecyclerViewClickListener(this.requireContext(),
-                object : RecyclerViewClickListener.OnItemClickListener {
-                    override fun onItemClick(itemView: View?, position: Int) {
-                        val intent = Intent(this@PostFragment.requireContext(), DetailActivity::class.java)
-                        intent.putExtra("tags", "")
-                        intent.putExtra("position", position)
-                        startActivity(intent)
-                    }
-
-                    override fun onItemLongClick(itemView: View?, position: Int) {
-                        logi(TAG, "Long click item: $position")
-                    }
-                }))
+            override fun onClickRate(position: Int, id: Int, rate: ImageView) {
+                voteChangedId = id
+                val user = this@PostFragment.user
+                if (user == null) {
+                    takeSnackbarShort(this@PostFragment.view!!, "This operation requires a user account.", paddingBottom)
+                    return
+                }
+                val v = layoutInflater.inflate(R.layout.layout_ratingbar, null)
+                voteChangedScore = 0
+                val scoreTv: TextView = v.findViewById(R.id.score)
+                scoreTv.text = "0"
+                val ratingBar: RatingBar = v.findViewById(R.id.rating_bar)
+                val cancel: Button = v.findViewById(R.id.cancel)
+                val vote: Button = v.findViewById(R.id.set_vote)
+                ratingBar.setOnRatingBarChangeListener { _, star, _ ->
+                    voteChangedScore = star.toInt()
+                    scoreTv.text = voteChangedScore.toString()
+                }
+                val dialog = AlertDialog.Builder(this@PostFragment.requireContext())
+                        .setTitle("Vote post")
+                        .create()
+                dialog.apply {
+                    setView(v)
+                    setCanceledOnTouchOutside(true)
+                    show()
+                }
+                cancel.setOnClickListener {
+                    dialog.dismiss()
+                }
+                vote.setOnClickListener {
+                    val url = app.settings.activeProfileSchema + "://" + user.site + "/post/vote.json"
+                    voteViewModel.votePost(url, id, voteChangedScore, user.name, user.password_hash)
+                    dialog.dismiss()
+                }
+            }
+        })
     }
 
     private fun initDrawerListener() {

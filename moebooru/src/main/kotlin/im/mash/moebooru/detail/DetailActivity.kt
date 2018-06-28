@@ -200,10 +200,10 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     private fun getPostUrl(): String {
         return when (type) {
             "post" -> {
-                app.settings.activeProfileScheme + "://"+ app.settings.activeProfileHost + "/post/show/" + posts[position].id
+                app.settings.activeProfileSchema + "://"+ app.settings.activeProfileHost + "/post/show/" + posts[position].id
             }
             else -> {
-                app.settings.activeProfileScheme + "://"+ app.settings.activeProfileHost + "/post/show/" + postsSearch[position].id
+                app.settings.activeProfileSchema + "://"+ app.settings.activeProfileHost + "/post/show/" + postsSearch[position].id
             }
         }
     }

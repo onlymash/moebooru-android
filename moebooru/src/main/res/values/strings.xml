@@ -167,4 +167,8 @@
     <string name="filter_order">order: </string>
     <string name="filter_rating">rating: </string>
     <string name="tag_filter">Tag filter</string>
+
+    <string name="transition_name_post" translatable="false">transition_name_post</string>
+
+    <string name="vote">Vote</string>
 </resources>

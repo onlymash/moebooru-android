@@ -23,8 +23,6 @@ class PagerFragment : Fragment(), DetailActivity.PostsChangeListener {
     private lateinit var postPager: ViewPager
     private lateinit var postPagerAdapter: ImgAdapter
 
-    private var position = 0
-
     private val detailActivity by lazy { activity as DetailActivity }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -49,7 +47,6 @@ class PagerFragment : Fragment(), DetailActivity.PostsChangeListener {
 
             }
             override fun onPageSelected(position: Int) {
-                this@PagerFragment.position = position
                 detailActivity.positionViewModel.setPosition(position)
             }
         })
