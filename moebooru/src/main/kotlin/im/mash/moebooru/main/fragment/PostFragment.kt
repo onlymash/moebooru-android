@@ -208,7 +208,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             }
         }
         if (user != null) {
-            logi(TAG, "initUser user != null")
             voteViewModel.getVoteIdsOneTwo(user!!.site, user!!.name)
             voteViewModel.getVoteIdsThree(user!!.site, user!!.name)
         }

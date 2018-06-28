@@ -6,10 +6,14 @@ import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.remote.PostSearchService
 import im.mash.moebooru.common.data.remote.UserService
+import im.mash.moebooru.common.data.remote.VoteService
 import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.common.model.UserDataContract
 import im.mash.moebooru.common.model.UserRepository
+import im.mash.moebooru.common.model.VoteDataContract
+import im.mash.moebooru.common.model.VoteRepository
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
+import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.search.SearchActivity
 import im.mash.moebooru.search.model.PostSearchDataContract
@@ -73,4 +77,20 @@ class SearchModule {
     @SearchScope
     fun userViewModelFactory(repository: UserDataContract.Repository, compositeDisposable: CompositeDisposable)
             = UserViewModelFactory(repository, compositeDisposable)
+
+    @Provides
+    @SearchScope
+    fun voteService(retrofit: Retrofit): VoteService = retrofit.create(VoteService::class.java)
+
+    @Provides
+    @SearchScope
+    fun voteRepo(voteService: VoteService, database: MoeDatabase, scheduler: Scheduler,
+                 compositeDisposable: CompositeDisposable): VoteDataContract.Repository
+            = VoteRepository(voteService, database, scheduler, compositeDisposable)
+
+    @Provides
+    @SearchScope
+    fun voteViewModelFactory(voteRepo: VoteDataContract.Repository,
+                             compositeDisposable: CompositeDisposable): VoteViewModelFactory
+            = VoteViewModelFactory(voteRepo, compositeDisposable)
 }

@@ -9,11 +9,13 @@ import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.SwipeRefreshLayout
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
+import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.Toast
+import android.widget.*
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
@@ -24,6 +26,8 @@ import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.common.data.local.entity.User
 import im.mash.moebooru.common.viewmodel.UserViewModel
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
+import im.mash.moebooru.common.viewmodel.VoteViewModel
+import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
@@ -73,6 +77,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
 
     @Inject
     lateinit var searchViewModelFactory: PostSearchViewModelFactory
+    private val postSearchViewModel: PostSearchViewModel by lazy { this.getViewModel<PostSearchViewModel>(searchViewModelFactory) }
 
     private var user: User? = null
     private var users: MutableList<User> = mutableListOf()
@@ -81,9 +86,12 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     lateinit var userViewModelFactory: UserViewModelFactory
     private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(userViewModelFactory) }
 
-    private val postSearchViewModel: PostSearchViewModel by lazy {
-        this.getViewModel<PostSearchViewModel>(searchViewModelFactory)
-    }
+    @Inject
+    lateinit var voteViewModelFactory: VoteViewModelFactory
+    private val voteViewModel: VoteViewModel by lazy { this.getViewModel<VoteViewModel>(voteViewModelFactory) }
+
+    private var voteChangedId = -1
+    private var voteChangedScore = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,10 +108,11 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         spanCount = this.screenWidth/resources.getDimension(R.dimen.item_width).toInt()
         limit = app.settings.postLimitInt
         safeMode = app.settings.safeMode
-        initUserViewModel()
         initView()
+        initVoteViewModel()
         initRefresh()
-        observePosts()
+        initPostSearchViewModel()
+        initUserViewModel()
         loadPosts()
     }
 
@@ -149,9 +158,13 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 return@forEach
             }
         }
+        if (user != null) {
+            voteViewModel.getVoteIdsOneTwo(user!!.site, user!!.name)
+            voteViewModel.getVoteIdsThree(user!!.site, user!!.name)
+        }
     }
 
-    private fun observePosts() {
+    private fun initPostSearchViewModel() {
         postSearchViewModel.postsSearchOutcome.observe( this,
                 Observer<Outcome<MutableList<PostSearch>>> { outcome ->
             when (outcome) {
@@ -160,21 +173,27 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 }
                 is Outcome.Success -> {
                     refreshLayout.isRefreshing = false
-                    posts = outcome.data
+                    val posts = outcome.data
                     if (loadingMore) {
-                        if (safeMode) {
-                            postSearchAdapter.addData(getSafePosts())
-                        } else {
-                            postSearchAdapter.addData(posts)
-                        }
                         loadingMore = false
-                    } else {
-                        if (safeMode) {
-                            postSearchAdapter.updateData(getSafePosts())
-                        } else {
-                            postSearchAdapter.updateData(posts)
+                        if (this.posts != posts) {
+                            this.posts = posts
+                            if (safeMode) {
+                                postSearchAdapter.addData(getSafePosts())
+                            } else {
+                                postSearchAdapter.addData(posts)
+                            }
                         }
+                    } else {
                         refreshing = false
+                        if (this.posts != posts ) {
+                            this.posts = posts
+                            if (safeMode) {
+                                postSearchAdapter.updateData(getSafePosts())
+                            } else {
+                                postSearchAdapter.updateData(posts)
+                            }
+                        }
                         if (newStart && posts.size == 0) {
                             newStart = false
                             refresh()
@@ -280,27 +299,122 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             override fun onLastItemVisible() {
                 loadMoreData()
             }
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                when (newState) {
-                    RecyclerView.SCROLL_STATE_SETTLING -> GlideApp.with(this@SearchActivity).pauseRequests()
-                    RecyclerView.SCROLL_STATE_IDLE -> GlideApp.with(this@SearchActivity).resumeRequests()
+//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+//                super.onScrollStateChanged(recyclerView, newState)
+//                when (newState) {
+//                    RecyclerView.SCROLL_STATE_SETTLING -> GlideApp.with(this@SearchActivity).pauseRequests()
+//                    RecyclerView.SCROLL_STATE_IDLE -> GlideApp.with(this@SearchActivity).resumeRequests()
+//                }
+//            }
+        })
+        postSearchAdapter.setPostItemClickListener(object : PostSearchAdapter.PostItemClickListener {
+
+            override fun onClickPostItem(position: Int) {
+                val intent = Intent(this@SearchActivity, DetailActivity::class.java)
+                intent.putExtra("tags", keyword)
+                intent.putExtra("position", position)
+                startActivity(intent)
+            }
+
+            override fun onClickRate(position: Int, id: Int, rate: ImageView) {
+                voteChangedId = id
+                val user = this@SearchActivity.user
+                if (user == null) {
+                    takeSnackbarShort(this@SearchActivity.postSearchView, "This operation requires a user account.", paddingBottom)
+                    return
+                }
+                val v = layoutInflater.inflate(R.layout.layout_ratingbar, null)
+                voteChangedScore = 0
+                val scoreTv: TextView = v.findViewById(R.id.score)
+                scoreTv.text = "0"
+                val ratingBar: RatingBar = v.findViewById(R.id.rating_bar)
+                val cancel: Button = v.findViewById(R.id.cancel)
+                val vote: Button = v.findViewById(R.id.set_vote)
+                ratingBar.setOnRatingBarChangeListener { _, star, _ ->
+                    voteChangedScore = star.toInt()
+                    scoreTv.text = voteChangedScore.toString()
+                }
+                val dialog = AlertDialog.Builder(this@SearchActivity)
+                        .setTitle("Vote post")
+                        .create()
+                dialog.apply {
+                    setView(v)
+                    setCanceledOnTouchOutside(true)
+                    show()
+                }
+                cancel.setOnClickListener {
+                    dialog.dismiss()
+                }
+                vote.setOnClickListener {
+                    val url = app.settings.activeProfileSchema + "://" + user.site + "/post/vote.json"
+                    voteViewModel.votePost(url, id, voteChangedScore, user.name, user.password_hash)
+                    dialog.dismiss()
+                }
+            }
+
+        })
+    }
+
+    private fun initVoteViewModel() {
+        voteViewModel.idsOutcomeOneTwo.observe(this, Observer<Outcome<MutableList<Int>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {}
+                is Outcome.Success -> {
+                    if (voteChangedId > 0 && voteChangedScore == 0) {
+                        postSearchView.findViewWithTag<ImageView>(voteChangedId)?.setImageResource(R.drawable.ic_action_star_border_24dp)
+                    }
+                    val data = outcome.data
+                    if (data.size > 0) {
+                        logi(TAG, "idsOutcomeOneTwo size: ${data.size}")
+                        postSearchAdapter.updateVoteIdsOneTwo(data)
+                        if (postSearchAdapter.itemCount > 0) {
+                            data.forEach { tag ->
+                                postSearchView.findViewWithTag<ImageView>(tag)?.setImageResource(R.drawable.ic_action_star_half_24dp)
+                            }
+                        }
+                    }
+                }
+                is Outcome.Failure -> {
+                    val error = outcome.e
+                    when (error) {
+                        is HttpException -> {
+                            Toast.makeText(this, "code: ${error.code()}, msg: ${error.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                        is IOException -> {
+                            error.printStackTrace()
+                        }
+                    }
                 }
             }
         })
-        postSearchView.addOnItemTouchListener(RecyclerViewClickListener(this,
-                object : RecyclerViewClickListener.OnItemClickListener {
-                    override fun onItemClick(itemView: View, position: Int) {
-                        val intent = Intent(this@SearchActivity, DetailActivity::class.java)
-                        intent.putExtra("tags", keyword)
-                        intent.putExtra("position", position)
-                        startActivity(intent)
+        voteViewModel.idsOutcomeThree.observe(this, Observer<Outcome<MutableList<Int>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {}
+                is Outcome.Success -> {
+                    val data = outcome.data
+                    if (data.size > 0) {
+                        logi(TAG, "idsOutcomeThree size: ${data.size}")
+                        postSearchAdapter.updateVoteIdsThree(data)
+                        if (postSearchAdapter.itemCount > 0) {
+                            data.forEach { tag ->
+                                postSearchView.findViewWithTag<ImageView>(tag)?.setImageResource(R.drawable.ic_action_star_24dp)
+                            }
+                        }
                     }
-
-                    override fun onItemLongClick(itemView: View, position: Int) {
-                        logi(TAG, "Long click item: $position")
+                }
+                is Outcome.Failure -> {
+                    val error = outcome.e
+                    when (error) {
+                        is HttpException -> {
+                            Toast.makeText(this, "code: ${error.code()}, msg: ${error.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                        is IOException -> {
+                            error.printStackTrace()
+                        }
                     }
-                }))
+                }
+            }
+        })
     }
 
     private fun initRefresh() {
