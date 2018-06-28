@@ -75,7 +75,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var header: AccountHeader
     private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
-    private var previousSelectedDrawer: Long = 0L    // it's actually lateinit
+    private var previousSelectedDrawer: Long = 0L
 
     private val component by lazy { MoeDH.mainComponent() }
 
@@ -141,8 +141,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                         app.settings.activeProfileHost = host
                         setHeaderBackground(schema, host)
                     } else {
-                        drawer.setSelection(100)
-                        previousSelectedDrawer = 100
+                        drawer.setSelection(-1L)
+                        previousSelectedDrawer = -1L
                         displayFragment(BooruFragment())
                     }
                     false
@@ -285,7 +285,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 is Outcome.Progress -> {}
                 is Outcome.Success -> {
                     users.clear()
-                    users.addAll(outcome.data)
+                    if (outcome.data.size > 0) users.addAll(outcome.data)
                 }
                 is Outcome.Failure -> {
                     outcome.e.printStackTrace()
@@ -352,6 +352,9 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                     val icon = TextUtil.textDrawableBuilder().buildRound(text, ColorUtil.getCustomizedColor(this, text))
                     profileDrawerItem.withIcon(icon)
                     header.addProfile(profileDrawerItem, index)
+                    if (index == size - 1 && activeProfileId <= index) {
+                        header.setActiveProfile(activeProfileId)
+                    }
                 } else {
                     header.addProfile(profileDrawerItem, index)
                     GlideApp.with(header.view.context)
@@ -363,7 +366,9 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                                     profileDrawerItem.withIcon(resource)
                                     profileDrawerItem.withName(name)
                                     header.addProfile(profileDrawerItem, index)
-                                    header.setActiveProfile(activeProfileId)
+                                    if (index == size - 1 && activeProfileId <= index) {
+                                        header.setActiveProfile(activeProfileId)
+                                    }
                                 }
                             })
                 }

@@ -21,7 +21,8 @@ import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.base.LastItemListener
-import im.mash.moebooru.common.base.RecyclerViewClickListener
+import im.mash.moebooru.common.base.SafeGridLayoutManager
+import im.mash.moebooru.common.base.SafeStaggeredGridLayoutManager
 import im.mash.moebooru.common.data.local.entity.PostSearch
 import im.mash.moebooru.common.data.local.entity.User
 import im.mash.moebooru.common.viewmodel.UserViewModel
@@ -31,7 +32,6 @@ import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
-import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.search.adapter.PostSearchAdapter
 import im.mash.moebooru.search.viewmodel.PostSearchViewModel
@@ -138,8 +138,11 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
 
                 }
                 is Outcome.Success -> {
-                    users = outcome.data
-                    initUser()
+                    users.clear()
+                    if (outcome.data.size > 0) {
+                        users = outcome.data
+                        initUser()
+                    }
                 }
                 is Outcome.Failure -> {
                     outcome.e.printStackTrace()
@@ -194,7 +197,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                                 postSearchAdapter.updateData(posts)
                             }
                         }
-                        if (newStart && posts.size == 0) {
+                        if (newStart && posts.isEmpty()) {
                             newStart = false
                             refresh()
                         }
@@ -282,12 +285,12 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         postSearchView.setItemViewCacheSize(20)
         when (app.settings.gridModeString) {
             Settings.GRID_MODE_GRID -> {
-                val layoutManager = GridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
+                val layoutManager = SafeGridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
                 postSearchView.layoutManager = layoutManager
                 postSearchView.setHasFixedSize(true)
             }
             else -> {
-                val layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                val layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                 layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
                 postSearchView.layoutManager = layoutManager
                 postSearchView.setHasFixedSize(false)
@@ -299,13 +302,6 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             override fun onLastItemVisible() {
                 loadMoreData()
             }
-//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                super.onScrollStateChanged(recyclerView, newState)
-//                when (newState) {
-//                    RecyclerView.SCROLL_STATE_SETTLING -> GlideApp.with(this@SearchActivity).pauseRequests()
-//                    RecyclerView.SCROLL_STATE_IDLE -> GlideApp.with(this@SearchActivity).resumeRequests()
-//                }
-//            }
         })
         postSearchAdapter.setPostItemClickListener(object : PostSearchAdapter.PostItemClickListener {
 
@@ -475,6 +471,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             takeSnackbarShort(refreshLayout, "Network without connection", paddingBottom)
             return
         }
+        if (posts.isEmpty() || posts.size < limit) return
         val isNotMore = postSearchViewModel.isNotMore()
         if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
             loadingMore = true
@@ -494,14 +491,14 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             Settings.GRID_MODE -> {
                 when (app.settings.gridModeString) {
                     Settings.GRID_MODE_GRID -> {
-                        postSearchView.layoutManager = GridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
+                        postSearchView.layoutManager = SafeGridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
                         postSearchView.setHasFixedSize(true)
                         postSearchAdapter.setGridMode(Settings.GRID_MODE_GRID)
                         postSearchAdapter.updateData(mutableListOf())
                         if (safeMode) postSearchAdapter.updateData(getSafePosts()) else postSearchAdapter.updateData(posts)
                     }
                     Settings.GRID_MODE_STAGGERED_GRID -> {
-                        postSearchView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                        postSearchView.layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                         postSearchView.setHasFixedSize(false)
                         postSearchAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
                         postSearchAdapter.updateData(mutableListOf())

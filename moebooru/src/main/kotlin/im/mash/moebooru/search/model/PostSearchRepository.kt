@@ -51,15 +51,19 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                 .subscribe(
                         { posts ->
                             val limit = httpUrl.queryParameter("limit")!!.toInt()
-                            val size = posts.size
-                            if (size < limit) {
+                            if (posts != null && posts.size > 0) {
+                                if (posts.size < limit) {
+                                    notMore = true
+                                }
+                                posts.forEach { post ->
+                                    post.site = httpUrl.host()
+                                    post.keyword = tags
+                                }
+                                savePosts(httpUrl.host(), posts, tags)
+                            } else {
                                 notMore = true
+                                handleError(Throwable("null"))
                             }
-                            posts.forEach { post ->
-                                post.site = httpUrl.host()
-                                post.keyword = tags
-                            }
-                            savePosts(httpUrl.host(), posts, tags)
                         },
                         { error ->
                             handleError(error)
@@ -78,18 +82,18 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                 .subscribe(
                         { posts ->
                             val limit = httpUrl.queryParameter("limit")!!.toInt()
-                            val size = posts.size
-                            if (size > 0) {
+                            if (posts != null && posts.size > 0) {
                                 posts.forEach { post ->
                                     post.site = httpUrl.host()
                                     post.keyword = tags
                                 }
                                 addPosts(posts)
+                            } else {
+                                handleError(Throwable("null"))
                             }
-                            if (size < limit) {
+                            if (posts == null || posts.size < limit) {
                                 notMore = true
                             }
-                            logi(TAG, "loadMorePosts. size: $size")
                         }, { error -> handleError(error) })
                 .addTo(compositeDisposable)
     }

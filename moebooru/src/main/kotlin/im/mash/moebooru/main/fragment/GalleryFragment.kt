@@ -22,6 +22,7 @@ import android.widget.TextView
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.RecyclerViewClickListener
+import im.mash.moebooru.common.base.SafeGridLayoutManager
 import im.mash.moebooru.common.base.ToolbarDialog
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.media.entity.MediaStoreData
@@ -147,8 +148,7 @@ class GalleryFragment : ToolbarFragment() {
         spanCount = mainActivity.screenWidth/mainActivity.resources.getDimension(R.dimen.item_width).toInt()
         if (spanCount == 0) spanCount = 1
         galleryView = view.findViewById(R.id.gallery)
-        galleryView.layoutManager = GridLayoutManager(this.requireContext(), spanCount,
-                GridLayoutManager.VERTICAL, false)
+        galleryView.layoutManager = SafeGridLayoutManager(this.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
         galleryView.setHasFixedSize(true)
         galleryView.itemAnimator = DefaultItemAnimator()
         galleryView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)

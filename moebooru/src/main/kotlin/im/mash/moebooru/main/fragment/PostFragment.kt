@@ -23,6 +23,8 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.base.LastItemListener
+import im.mash.moebooru.common.base.SafeGridLayoutManager
+import im.mash.moebooru.common.base.SafeStaggeredGridLayoutManager
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.Tag
@@ -124,7 +126,11 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 is Outcome.Progress -> {}
                 is Outcome.Success -> {
                     if (voteChangedId > 0 && voteChangedScore == 0) {
-                        postView.findViewWithTag<ImageView>(voteChangedId)?.setImageResource(R.drawable.ic_action_star_border_24dp)
+                        try {
+                            postView.findViewWithTag<ImageView>(voteChangedId)?.setImageResource(R.drawable.ic_action_star_border_24dp)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                     val data = outcome.data
                     if (data.size > 0) {
@@ -132,7 +138,11 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                         postAdapter.updateVoteIdsOneTwo(data)
                         if (postAdapter.itemCount > 0) {
                             data.forEach { tag ->
-                                postView.findViewWithTag<ImageView>(tag)?.setImageResource(R.drawable.ic_action_star_half_24dp)
+                                try {
+                                    postView.findViewWithTag<ImageView>(tag)?.setImageResource(R.drawable.ic_action_star_half_24dp)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                         }
                     }
@@ -160,7 +170,11 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                         postAdapter.updateVoteIdsThree(data)
                         if (postAdapter.itemCount > 0) {
                             data.forEach { tag ->
-                                postView.findViewWithTag<ImageView>(tag)?.setImageResource(R.drawable.ic_action_star_24dp)
+                                try {
+                                    postView.findViewWithTag<ImageView>(tag)?.setImageResource(R.drawable.ic_action_star_24dp)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                         }
                     }
@@ -187,8 +201,11 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
                 }
                 is Outcome.Success -> {
-                    users = outcome.data
-                    initUser()
+                    users.clear()
+                    if (outcome.data.isNotEmpty()) {
+                        users = outcome.data
+                        initUser()
+                    }
                 }
                 is Outcome.Failure -> {
                     outcome.e.printStackTrace()
@@ -224,15 +241,17 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     refreshLayout.isRefreshing = false
                     val data = outcome.data
                     if (loadingMore) {
-                        posts = data
                         loadingMore = false
-                        if (safeMode) {
-                            postAdapter.addData(getSafePosts())
-                        } else {
-                            postAdapter.addData(posts)
+                        if (posts != data) {
+                            posts = data
+                            if (safeMode) {
+                                postAdapter.addData(getSafePosts())
+                            } else {
+                                postAdapter.addData(posts)
+                            }
                         }
                     } else {
-                        if (data.size > 0) {
+                        if (posts != data) {
                             posts = data
                             if (safeMode) {
                                 postAdapter.updateData(getSafePosts())
@@ -341,12 +360,12 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postView.setItemViewCacheSize(20)
         when (app.settings.gridModeString) {
             Settings.GRID_MODE_GRID -> {
-                val layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                val layoutManager = SafeGridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
                 postView.layoutManager = layoutManager
                 postView.setHasFixedSize(true)
             }
             else -> {
-                val layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                val layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                 layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
                 postView.layoutManager = layoutManager
                 postView.setHasFixedSize(false)
@@ -723,14 +742,14 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             Settings.GRID_MODE -> {
                 when (app.settings.gridModeString) {
                     Settings.GRID_MODE_GRID -> {
-                        postView.layoutManager = GridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                        postView.layoutManager = SafeGridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
                         postView.setHasFixedSize(true)
                         postAdapter.setGridMode(Settings.GRID_MODE_GRID)
                         postAdapter.updateData(mutableListOf())
                         if (safeMode) postAdapter.updateData(getSafePosts()) else postAdapter.updateData(posts)
                     }
                     Settings.GRID_MODE_STAGGERED_GRID -> {
-                        postView.layoutManager = StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
+                        postView.layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                         postView.setHasFixedSize(false)
                         postAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
                         postAdapter.updateData(mutableListOf())
