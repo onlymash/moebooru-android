@@ -2,10 +2,12 @@ package im.mash.moebooru.main
 
 import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
+import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatDelegate
@@ -72,7 +74,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     }
 
     internal lateinit var drawer: Drawer
-    private lateinit var drawerLayout: DrawerLayout
     private lateinit var header: AccountHeader
     private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
     private var previousSelectedDrawer: Long = 0L
@@ -149,14 +150,11 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 }
                 .build()
 
-        drawerLayout = DrawerLayout(this)
-
         drawer = DrawerBuilder()
                 .withActivity(this)
-                .withDrawerLayout(drawerLayout)
                 .withTranslucentStatusBar(false)
                 .withDrawerGravity(Gravity.LEFT)
-                .withAccountHeader(header)
+                .withAccountHeader(header, false)
                 .addDrawerItems(
                         PrimaryDrawerItem()
                                 .withIdentifier(DRAWER_ITEM_POSTS)
@@ -205,7 +203,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 .withSavedInstance(savedInstanceState)
                 .build()
 
-        ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(drawer.drawerLayout) { _, insets ->
             drawer.stickyFooter.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
             insets
         }

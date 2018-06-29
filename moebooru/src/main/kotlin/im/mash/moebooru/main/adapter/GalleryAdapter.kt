@@ -1,5 +1,6 @@
 package im.mash.moebooru.main.adapter
 
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -15,8 +16,10 @@ import im.mash.moebooru.common.data.media.entity.MediaStoreData
 import im.mash.moebooru.core.widget.FixedImageView
 import im.mash.moebooru.glide.GlideRequest
 import im.mash.moebooru.glide.GlideRequests
+import im.mash.moebooru.util.statusBarHeight
+import im.mash.moebooru.util.toolbarHeight
 
-class GalleryAdapter(glideRequests: GlideRequests) :
+class GalleryAdapter(private val context: Context, private val spanCount: Int, glideRequests: GlideRequests) :
         RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>(),
         ListPreloader.PreloadModelProvider<MediaStoreData>,
         ListPreloader.PreloadSizeProvider<MediaStoreData> {
@@ -28,6 +31,8 @@ class GalleryAdapter(glideRequests: GlideRequests) :
             .format(DecodeFormat.PREFER_ARGB_8888)
 
     private var actualDimensions: IntArray? = null
+
+    private val padding = context.resources.getDimension(R.dimen.item_padding).toInt()
 
     init {
         setHasStableIds(true)
@@ -80,6 +85,11 @@ class GalleryAdapter(glideRequests: GlideRequests) :
     }
 
     override fun onBindViewHolder(holder: GalleryViewHolder, position: Int) {
+        if (position in 0 until spanCount) {
+            holder.itemView.setPadding(padding, padding + context.toolbarHeight + statusBarHeight, padding, padding)
+        } else {
+            holder.itemView.setPadding(padding, padding, padding, padding)
+        }
         val current = media[position]
         val signature = MediaStoreSignature(current.mimeType, current.dateModified, current.orientation)
         requestBuilder

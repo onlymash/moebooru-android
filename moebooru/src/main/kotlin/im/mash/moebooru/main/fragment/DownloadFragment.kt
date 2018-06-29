@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
@@ -51,7 +52,9 @@ class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(view){ _, insets ->
-            view.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            val lp = view.layoutParams as FrameLayout.LayoutParams
+            lp.setMargins(0, 0, 0, insets.systemWindowInsetBottom)
+            view.layoutParams = lp
             insets
         }
         toolbar.setTitle(R.string.downloads)

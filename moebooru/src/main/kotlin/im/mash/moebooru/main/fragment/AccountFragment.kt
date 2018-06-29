@@ -65,7 +65,9 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
         super.onViewCreated(view, savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
             paddingButton = insets.systemWindowInsetBottom
-            view.setPadding(0, 0, 0, paddingButton)
+            val lp = view.layoutParams as FrameLayout.LayoutParams
+            lp.setMargins(0, 0, 0, paddingButton)
+            view.layoutParams = lp
             insets
         }
         initView(view)

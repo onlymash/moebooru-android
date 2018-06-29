@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.view.View
+import android.widget.FrameLayout
 import com.crashlytics.android.Crashlytics
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
@@ -18,7 +19,9 @@ class SettingsPreferenceFragment : PreferenceFragment(), SharedPreferences.OnSha
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
-            view.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            val lp = view.layoutParams as FrameLayout.LayoutParams
+            lp.setMargins(0, 0, 0, insets.systemWindowInsetBottom)
+            view.layoutParams = lp
             insets
         }
         view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.background))

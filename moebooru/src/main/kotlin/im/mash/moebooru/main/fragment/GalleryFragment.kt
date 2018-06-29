@@ -144,6 +144,8 @@ class GalleryFragment : ToolbarFragment() {
     }
     private fun initGalleryView(view: View) {
         view.setBackgroundColor(ContextCompat.getColor(mainActivity, R.color.window_background))
+        appBarLayout.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.toolbar_post))
+        toolbar.setBackgroundColor(ContextCompat.getColor(this.requireContext(), R.color.transparent))
         toolbar.setTitle(R.string.local_gallery)
         spanCount = mainActivity.screenWidth/mainActivity.resources.getDimension(R.dimen.item_width).toInt()
         if (spanCount == 0) spanCount = 1
@@ -154,7 +156,7 @@ class GalleryFragment : ToolbarFragment() {
         galleryView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         galleryView.setItemViewCacheSize(20)
         val glideRequests: GlideRequests = GlideApp.with(this)
-        galleryAdapter = GalleryAdapter(glideRequests)
+        galleryAdapter = GalleryAdapter(this.requireContext(), spanCount, glideRequests)
         galleryView.adapter = galleryAdapter
         galleryView.addOnItemTouchListener(RecyclerViewClickListener(this.requireContext(),
                 object : RecyclerViewClickListener.OnItemClickListener {
