@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.view.View
+import android.widget.FrameLayout
 import im.mash.moebooru.R
 import im.mash.moebooru.content.UriRetriever
 import im.mash.moebooru.main.MainActivity
@@ -28,7 +29,9 @@ class FeedbackPreferenceFragment  : PreferenceFragment() {
         super.onViewCreated(view, savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
             paddingButton = insets.systemWindowInsetBottom
-            view.setPadding(0, 0, 0, paddingButton)
+            val lp = view.layoutParams as FrameLayout.LayoutParams
+            lp.setMargins(0, 0, 0, paddingButton)
+            view.layoutParams = lp
             insets
         }
         view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.background))

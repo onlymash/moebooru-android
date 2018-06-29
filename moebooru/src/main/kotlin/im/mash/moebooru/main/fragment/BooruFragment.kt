@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Spinner
 import im.mash.moebooru.R
@@ -62,7 +63,9 @@ class BooruFragment : ToolbarFragment() {
         addBooru = view.findViewById(R.id.add_booru)
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
             paddingButton = insets.systemWindowInsetBottom
-            view.setPadding(0, 0, 0, paddingButton)
+            val lp = view.layoutParams as FrameLayout.LayoutParams
+            lp.setMargins(0, 0, 0, paddingButton)
+            view.layoutParams = lp
             insets
         }
         booruView = view.findViewById(R.id.booru_list)
