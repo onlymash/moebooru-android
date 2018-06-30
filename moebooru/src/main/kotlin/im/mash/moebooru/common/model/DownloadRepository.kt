@@ -37,6 +37,7 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().save(post)
         }
                 .performOnBack(scheduler)
+                .subscribe()
     }
 
     override fun deletePost(post: PostDownload) {

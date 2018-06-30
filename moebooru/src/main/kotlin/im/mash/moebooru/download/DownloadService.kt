@@ -102,7 +102,7 @@ class DownloadService : LifecycleService() {
                         is Outcome.Success -> {
                             posts = outcome.data
                             app.downloadManager.updateData(posts)
-                            if (startFirst) {
+                            if (startFirst && posts.size > 0) {
                                 startFirst = false
                                 app.downloadManager.start(0)
                             }
