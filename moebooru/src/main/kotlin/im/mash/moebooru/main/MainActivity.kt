@@ -232,7 +232,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                     .doAfterNext { postSearch ->
                         if (postSearch != null) {
                             val url = postSearch.sample_url
-                            GlideApp.with(this)
+                            GlideApp.with(app)
                                     .asBitmap()
                                     .load(MoeGlideUrl(url))
                                     .into(object : SimpleTarget<Bitmap>() {
