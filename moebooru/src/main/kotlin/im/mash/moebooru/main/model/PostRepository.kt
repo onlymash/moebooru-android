@@ -76,9 +76,10 @@ class PostRepository(private val local: PostDataContract.Local,
             deletePosts(site)
         }
                 .performOnBack(scheduler)
-                .subscribe({
+                .doOnComplete {
                     addPosts(posts)
-                }, { error -> handleError(error) })
+                }
+                .subscribe()
     }
 
     override fun deletePosts(site: String) {

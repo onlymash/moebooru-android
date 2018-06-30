@@ -26,7 +26,7 @@ class PostSearchLocalData(private val database: MoeDatabase,
             database.postSearchDao().insertPosts(posts)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, {error -> logi(TAG, error.message.toString())})
+                .subscribe()
     }
 
     override fun deletePosts(site: String, tags: String) {

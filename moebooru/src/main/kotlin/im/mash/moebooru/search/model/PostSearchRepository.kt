@@ -103,11 +103,10 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
             deletePosts(site, tags)
         }
                 .performOnBack(scheduler)
-                .subscribe({
+                .doOnComplete {
                     addPosts(posts)
-                }, { error ->
-                    handleError(error)
-                })
+                }
+                .subscribe()
     }
 
     override fun deletePosts(site: String, tags: String) {

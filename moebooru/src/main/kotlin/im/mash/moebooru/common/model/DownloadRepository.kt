@@ -5,6 +5,7 @@ import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
+import im.mash.moebooru.util.logi
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
@@ -36,7 +37,6 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().save(post)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, { error -> handleError(error)})
     }
 
     override fun deletePost(post: PostDownload) {
@@ -44,7 +44,7 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().delete(post)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, { error -> handleError(error)})
+                .subscribe()
     }
 
     override fun deletePosts(posts: MutableList<PostDownload>) {
@@ -52,7 +52,7 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().delete(posts)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, { error -> handleError(error)})
+                .subscribe()
     }
 
     override fun deleteAll() {
@@ -60,7 +60,7 @@ class DownloadRepository(private val database: MoeDatabase,
             database.postDownloadDao().deleteAll()
         }
                 .performOnBack(scheduler)
-                .subscribe({}, { error -> handleError(error)})
+                .subscribe()
     }
 
     override fun handleError(error: Throwable) {

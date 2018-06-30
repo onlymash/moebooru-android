@@ -36,7 +36,7 @@ class TagRepository(private val database: MoeDatabase,
             database.tagDao().insertTag(tag)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, {error -> handleError(error)})
+                .subscribe()
     }
 
     override fun deleteTag(tag: Tag) {
@@ -44,7 +44,7 @@ class TagRepository(private val database: MoeDatabase,
             database.tagDao().deleteTag(tag)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, {error -> handleError(error)})
+                .subscribe()
     }
 
     override fun handleError(error: Throwable) {

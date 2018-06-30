@@ -53,13 +53,13 @@ class UserRepository(private val database: MoeDatabase,
     override fun saveUser(user: User) {
         Completable.fromAction { database.userDao().insertUser(user) }
                 .performOnBackOutOnMain(scheduler)
-                .subscribe({}, { error -> handleError(error)})
+                .subscribe()
     }
 
     override fun deleteUser(user: User) {
         Completable.fromAction { database.userDao().deleteUser(user) }
                 .performOnBackOutOnMain(scheduler)
-                .subscribe({}, { error -> handleError(error)})
+                .subscribe()
     }
 
     override fun handleError(error: Throwable) {

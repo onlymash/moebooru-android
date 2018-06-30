@@ -23,7 +23,7 @@ class BooruLocalData(private val database: MoeDatabase,
             database.booruDao().insertBooru(booru)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, {error -> logi(TAG, error.message.toString())})
+                .subscribe()
     }
 
     override fun saveBoorus(boorus: MutableList<Booru>) {
@@ -31,7 +31,7 @@ class BooruLocalData(private val database: MoeDatabase,
             database.booruDao().insertBoorus(boorus)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, { error -> logi(TAG, error.message.toString()) })
+                .subscribe()
     }
 
     override fun delete(booru: Booru) {
@@ -39,6 +39,6 @@ class BooruLocalData(private val database: MoeDatabase,
             database.booruDao().delete(booru)
         }
                 .performOnBack(scheduler)
-                .subscribe({}, {error -> logi(TAG, error.message.toString())})
+                .subscribe()
     }
 }
