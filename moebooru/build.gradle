@@ -106,7 +106,6 @@ dependencies {
     kapt "android.arch.lifecycle:compiler:$lifecycle_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation 'com.google.android.apps.muzei:muzei-api:2.0'
     testImplementation 'junit:junit:4.12'
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
