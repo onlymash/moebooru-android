@@ -233,7 +233,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             database.postSearchDao()
                     .getLastPost(host, keyword)
                     .performOnBackOutOnMain(scheduler)
-                    .subscribe({ postSearch ->
+                    .doAfterNext { postSearch ->
                         if (postSearch != null) {
                             val url = postSearch.sample_url
                             GlideApp.with(this)
@@ -247,10 +247,12 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                         } else {
                             header.headerBackgroundView.setImageResource(R.drawable.background_header)
                         }
-                    }, { error ->
+                    }
+                    .doOnError { error ->
                         header.headerBackgroundView.setImageResource(R.drawable.background_header)
                         error.printStackTrace()
-                    })
+                    }
+                    .subscribe()
 
             if (!this.isNetworkConnected) return
 
@@ -267,13 +269,18 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
             postSearchService.getPosts(httpUrl)
                     .performOnBackOutOnMain(scheduler)
-                    .subscribe({ posts ->
+                    .doAfterSuccess { posts ->
                         if (posts.size == 1) {
                             Completable.fromAction { database.postSearchDao().insertPosts(posts) }
                                     .performOnBackOutOnMain(scheduler)
                                     .subscribe({}, { error -> error.printStackTrace()})
                         }
-                    }, { error -> error.printStackTrace() })
+
+                    }
+                    .doOnError { error ->
+                        error.printStackTrace()
+                    }
+                    .subscribe()
         }
     }
 

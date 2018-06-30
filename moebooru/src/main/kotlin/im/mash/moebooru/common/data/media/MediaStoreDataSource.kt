@@ -64,11 +64,14 @@ class MediaStoreDataSource(private val context: Context) {
     private fun query(contentUri: Uri, projection: Array<String>, sortByCol: String, idCol: String, dateTakenCol: String,
                       dateModifiedCol: String, mimeTypeCol: String, orientationCol: String, mediaDataCol: String,
                       type: MediaStoreData.Type, selection: String, selectionArgs: Array<String>): MutableList<MediaStoreData> {
-        val data: MutableList<MediaStoreData> = mutableListOf()
-        val cursor = context.contentResolver
-                .query(contentUri, projection, selection, selectionArgs, "$sortByCol DESC") ?: return data
 
-        cursor.use { c ->
+        val data: MutableList<MediaStoreData> = mutableListOf()
+
+        val cr = context.contentResolver
+
+        val cursor = cr.query(contentUri, projection, selection, selectionArgs, "$sortByCol DESC")
+
+        cursor?.use { c ->
             val idColNum = c.getColumnIndexOrThrow(idCol)
             val dateTakenColNum = c.getColumnIndexOrThrow(dateTakenCol)
             val dateModifiedColNum = c.getColumnIndexOrThrow(dateModifiedCol)
