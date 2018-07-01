@@ -19,7 +19,10 @@ interface PostDao {
     @Query("DELETE FROM posts WHERE site = :site")
     fun deletePosts(site: String)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Query("DELETE FROM posts WHERE site = :site AND id NOT IN (SELECT id FROM posts WHERE site = :site ORDER BY id DESC LIMIT :limit)")
+    fun deletePosts(site: String, limit: Int)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertPosts(posts: MutableList<Post>)
 
     @Delete

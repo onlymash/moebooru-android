@@ -216,17 +216,19 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     }
 
     private fun initUser() {
+        val schema = app.settings.activeProfileSchema
         val host = app.settings.activeProfileHost
+        val baseUrl = "$schema://$host"
         user = null
         users.forEach { user ->
-            if (user.site == host) {
+            if (user.url == baseUrl) {
                 this.user = user
                 return@forEach
             }
         }
         if (user != null) {
-            voteViewModel.getVoteIdsOneTwo(user!!.site, user!!.name)
-            voteViewModel.getVoteIdsThree(user!!.site, user!!.name)
+            voteViewModel.getVoteIdsOneTwo(host, user!!.name)
+            voteViewModel.getVoteIdsThree(host, user!!.name)
         }
     }
 
@@ -285,6 +287,16 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                         }
                     }
                     logi(TAG, "postViewModel Outcome.Failure")
+                }
+            }
+        })
+
+        postViewModel.isEndOutcome.observe(this, Observer<Outcome<Boolean>> { outcome ->
+            when (outcome) {
+                is Outcome.Success -> {
+                    refreshing = false
+                    loadingMore = false
+                    refreshLayout.isRefreshing = false
                 }
             }
         })
@@ -424,7 +436,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     dialog.dismiss()
                 }
                 vote.setOnClickListener {
-                    val url = app.settings.activeProfileSchema + "://" + user.site + "/post/vote.json"
+                    val url = user.url + "/post/vote.json"
                     voteViewModel.votePost(url, id, voteChangedScore, user.name, user.password_hash)
                     dialog.dismiss()
                 }

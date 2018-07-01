@@ -19,14 +19,17 @@ interface PostSearchDao {
     @Query("SELECT * FROM posts_search WHERE site=:site AND keyword = :tags ORDER BY id DESC")
     fun getPosts(site: String, tags: String): Flowable<MutableList<PostSearch>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertPost(postSearch: PostSearch)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertPosts(posts: MutableList<PostSearch>)
 
     @Query("DELETE FROM posts_search WHERE site = :site AND keyword = :keyword")
     fun deletePosts(site: String, keyword: String)
+
+    @Query("DELETE FROM posts_search WHERE site = :site AND keyword = :keyword AND id NOT IN (SELECT id FROM posts_search WHERE site = :site AND keyword = :keyword ORDER BY id DESC LIMIT :limit)")
+    fun deletePosts(site: String, keyword: String, limit: Int)
 
     @Query("DELETE FROM posts_search WHERE site = :site AND keyword = :keyword AND id = :id")
     fun deletePost(site: String, keyword: String, id: Int)

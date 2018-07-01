@@ -25,6 +25,9 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
     override val postFetchOutcome: PublishSubject<Outcome<MutableList<PostSearch>>>
             = PublishSubject.create<Outcome<MutableList<PostSearch>>>()
 
+    override val isEndOutCome: PublishSubject<Outcome<Boolean>>
+            = PublishSubject.create<Outcome<Boolean>>()
+
     override fun fetchPosts(httpUrl: HttpUrl) {
         postFetchOutcome.loading(true)
         var tags = httpUrl.queryParameter("tags")
@@ -59,15 +62,13 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                                     post.site = httpUrl.host()
                                     post.keyword = tags
                                 }
-                                savePosts(httpUrl.host(), posts, tags)
+                                savePosts(httpUrl.host(), posts, tags, limit)
                             } else {
                                 notMore = true
                                 handleError(Throwable("null"))
                             }
-                        },
-                        { error ->
-                            handleError(error)
-                        })
+                            isEndOutCome.success(true)
+                        }, { error -> handleError(error) })
                 .addTo(compositeDisposable)
     }
 
@@ -79,28 +80,28 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
         if (tags == null) tags = ""
         remote.getPosts(httpUrl)
                 .performOnBackOutOnMain(scheduler)
-                .subscribe(
-                        { posts ->
-                            val limit = httpUrl.queryParameter("limit")!!.toInt()
-                            if (posts != null && posts.size > 0) {
-                                posts.forEach { post ->
-                                    post.site = httpUrl.host()
-                                    post.keyword = tags
-                                }
-                                addPosts(posts)
-                            } else {
-                                handleError(Throwable("null"))
-                            }
-                            if (posts == null || posts.size < limit) {
-                                notMore = true
-                            }
-                        }, { error -> handleError(error) })
+                .subscribe({ posts ->
+                    val limit = httpUrl.queryParameter("limit")!!.toInt()
+                    if (posts != null && posts.size > 0) {
+                        posts.forEach { post ->
+                            post.site = httpUrl.host()
+                            post.keyword = tags
+                        }
+                        addPosts(posts)
+                    } else {
+                        handleError(Throwable("null"))
+                    }
+                    if (posts == null || posts.size < limit) {
+                        notMore = true
+                    }
+                    isEndOutCome.success(true)
+                }, { error -> handleError(error) })
                 .addTo(compositeDisposable)
     }
 
-    private fun savePosts(site: String, posts: MutableList<PostSearch>, tags: String) {
+    private fun savePosts(site: String, posts: MutableList<PostSearch>, tags: String, limit: Int) {
         Completable.fromAction{
-            deletePosts(site, tags)
+            deletePosts(site, tags, limit)
         }
                 .performOnBack(scheduler)
                 .doOnComplete {
@@ -109,8 +110,8 @@ class PostSearchRepository(private val local: PostSearchDataContract.Local,
                 .subscribe()
     }
 
-    override fun deletePosts(site: String, tags: String) {
-        local.deletePosts(site, tags)
+    override fun deletePosts(site: String, tags: String, limit: Int) {
+        local.deletePosts(site, tags, limit)
     }
 
     override fun addPosts(posts: MutableList<PostSearch>) {

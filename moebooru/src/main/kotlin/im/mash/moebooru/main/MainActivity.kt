@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.arch.lifecycle.Observer
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
@@ -35,6 +36,7 @@ import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.common.viewmodel.UserViewModel
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
+import im.mash.moebooru.content.UriRetriever
 import im.mash.moebooru.core.application.BaseActivity
 import im.mash.moebooru.core.extensions.performOnBackOutOnMain
 import im.mash.moebooru.core.scheduler.Outcome
@@ -50,7 +52,7 @@ import im.mash.moebooru.util.isNetworkConnected
 import im.mash.moebooru.util.logi
 import io.reactivex.Completable
 import okhttp3.HttpUrl
-import java.io.IOException
+import java.io.*
 import javax.inject.Inject
 
 @SuppressLint("RtlHardcoded")
@@ -117,8 +119,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         component.inject(this)
 
         isNullState = savedInstanceState == null
-
-        initUser()
 
         profileSettingDrawerItem = ProfileSettingDrawerItem()
                 .withName(R.string.edit)
@@ -206,6 +206,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
+        initUser()
+
         initBooru()
 
         if (!isNullState && app.settings.isChangedNightMode) {
@@ -216,8 +218,9 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     private fun setHeaderBackground(schema: String, host: String) {
         var activeUser: User? = null
+        val baseUrl = "$schema://$host"
         users.forEach { user ->
-            if (user.site == host) {
+            if (user.url == baseUrl) {
                 activeUser = user
                 return@forEach
             }
@@ -226,29 +229,16 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             val username = activeUser!!.name
             val passwordHash = activeUser!!.password_hash
             val keyword = "vote:3:$username order:vote"
-            database.postSearchDao()
-                    .getLastPost(host, keyword)
-                    .performOnBackOutOnMain(scheduler)
-                    .doAfterNext { postSearch ->
-                        if (postSearch != null) {
-                            val url = postSearch.sample_url
-                            GlideApp.with(app)
-                                    .asBitmap()
-                                    .load(MoeGlideUrl(url))
-                                    .into(object : SimpleTarget<Bitmap>() {
-                                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                            header.headerBackgroundView.setImageBitmap(resource)
-                                        }
-                                    })
-                        } else {
-                            header.headerBackgroundView.setImageResource(R.drawable.background_header)
-                        }
-                    }
-                    .doOnError { error ->
-                        header.headerBackgroundView.setImageResource(R.drawable.background_header)
-                        error.printStackTrace()
-                    }
-                    .subscribe()
+            val dir = File(cacheDir, "background")
+            if (!dir.exists()) {
+                dir.mkdir()
+            }
+            val bg = File(dir, "$host-$username.jpg")
+            if (bg.exists()) {
+                header.headerBackgroundView.setImageURI(Uri.fromFile(bg))
+            } else {
+                header.headerBackgroundView.setImageResource(R.drawable.background_header)
+            }
 
             if (!this.isNetworkConnected) return
 
@@ -273,10 +263,44 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                         }
 
                     }
-                    .doOnError { error ->
-                        error.printStackTrace()
-                    }
+                    .doOnError { error -> error.printStackTrace() }
                     .subscribe()
+
+            database.postSearchDao()
+                    .getLastPost(host, keyword)
+                    .performOnBackOutOnMain(scheduler)
+                    .doAfterNext { postSearch ->
+                        if (postSearch != null) {
+                            val url = postSearch.sample_url
+                            GlideApp.with(app)
+                                    .asBitmap()
+                                    .load(MoeGlideUrl(url))
+                                    .into(object : SimpleTarget<Bitmap>() {
+                                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                            var fos: FileOutputStream? = null
+                                            try {
+                                                fos = FileOutputStream(bg)
+                                                resource.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+                                                fos.flush()
+                                            } catch (e: FileNotFoundException) {
+                                                e.printStackTrace()
+                                            } catch (e: IOException) {
+                                                e.printStackTrace()
+                                            } finally {
+                                                try {
+                                                    fos?.close()
+                                                } catch (e: IOException) {
+                                                    e.printStackTrace()
+                                                }
+                                            }
+                                        }
+                                    })
+                        }
+                    }
+                    .doOnError { error -> error.printStackTrace() }
+                    .subscribe()
+        } else {
+            header.headerBackgroundView.setImageResource(R.drawable.background_header)
         }
     }
 
@@ -286,7 +310,19 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 is Outcome.Progress -> {}
                 is Outcome.Success -> {
                     users.clear()
-                    if (outcome.data.size > 0) users.addAll(outcome.data)
+                    if (outcome.data.size > 0) {
+                        users.addAll(outcome.data)
+                        header.profiles.forEach { profile ->
+                            if (profile != profileSettingDrawerItem) {
+                                profile as ProfileDrawerItem
+                                users.forEach { user ->
+                                    if (user.url == profile.email.text) {
+                                        profile.withIcon(user.getAvatarBitmap())
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 is Outcome.Failure -> {
                     outcome.e.printStackTrace()
@@ -332,58 +368,60 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         } else {
             header.clear()
             val size = boorus.size
-            val activeProfileId = app.settings.activeProfileId
             for (index in 0 until size) {
                 val booru = boorus[index]
                 val profileDrawerItem: ProfileDrawerItem = ProfileDrawerItem()
                         .withName(booru.name)
                         .withEmail(booru.url)
                         .withIdentifier(index.toLong())
-                var url = ""
-                var name = ""
-                users.forEach { user ->
-                    if (user.site == booru.host) {
-                        name = user.name
-                        url = booru.url + "/data/avatars/" + user.id + ".jpg"
+                var user: User? = null
+                users.forEach { userOut ->
+                    if (userOut.url == booru.url) {
+                        user = userOut
                         return@forEach
                     }
                 }
-                if (url == "") {
+                if (user != null) {
+                    val name = user!!.name
+                    val avatar = user!!.getAvatarBitmap()
+                    profileDrawerItem.withName(name).withIcon(avatar)
+                    header.addProfile(profileDrawerItem, index)
+                } else {
                     val text = booru.name[0].toString()
                     val icon = TextUtil.textDrawableBuilder().buildRound(text, ColorUtil.getCustomizedColor(this, text))
                     profileDrawerItem.withIcon(icon)
                     header.addProfile(profileDrawerItem, index)
-                    if (index == size - 1 && activeProfileId <= index) {
-                        header.setActiveProfile(activeProfileId)
-                    }
-                } else {
-                    header.addProfile(profileDrawerItem, index)
+                }
+            }
+            header.addProfile(profileSettingDrawerItem, size)
+            val activeProfileId = app.settings.activeProfileId
+            if (activeProfileId < size) {
+                header.setActiveProfile(activeProfileId)
+                val schema = boorus[activeProfileId.toInt()].scheme
+                val host = boorus[activeProfileId.toInt()].host
+                app.settings.activeProfileSchema = schema
+                app.settings.activeProfileHost = host
+                setHeaderBackground(schema, host)
+            }
+            if (isNullState && isNewCreate) {
+                isNewCreate = false
+                //update Avatar
+                displayFragment(PostFragment())
+                if (!this.isNetworkConnected) return
+                users.forEach { user ->
+                    val url = user.url + "/data/avatars/" + user.id + ".jpg"
                     GlideApp.with(header.view.context)
                             .asBitmap()
                             .load(MoeGlideUrl(url))
                             .into(object : SimpleTarget<Bitmap>() {
                                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                    header.removeProfile(profileDrawerItem)
-                                    profileDrawerItem.withIcon(resource)
-                                    profileDrawerItem.withName(name)
-                                    header.addProfile(profileDrawerItem, index)
-                                    if (index == size - 1 && activeProfileId <= index) {
-                                        header.setActiveProfile(activeProfileId)
-                                    }
+                                    val os = ByteArrayOutputStream()
+                                    resource.compress(Bitmap.CompressFormat.JPEG, 100, os)
+                                    user.avatar = os.toByteArray()
+                                    userViewModel.updateUser(user)
                                 }
                             })
                 }
-            }
-            header.addProfile(profileSettingDrawerItem, size)
-            header.setActiveProfile(activeProfileId)
-            val schema = boorus[activeProfileId.toInt()].scheme
-            val host = boorus[activeProfileId.toInt()].host
-            app.settings.activeProfileSchema = schema
-            app.settings.activeProfileHost = host
-            setHeaderBackground(schema, host)
-            if (isNullState && isNewCreate) {
-                isNewCreate = false
-                displayFragment(PostFragment())
             }
         }
     }

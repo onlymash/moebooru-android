@@ -103,10 +103,12 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
     }
 
     private fun initUser() {
+        val schema = app.settings.activeProfileSchema
         val host = app.settings.activeProfileHost
+        val baseUrl = "$schema://$host"
         user = null
         users.forEach {  user ->
-            if (user.site == host) {
+            if (user.url == baseUrl) {
                 this.user = user
                 return@forEach
             }

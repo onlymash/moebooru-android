@@ -39,9 +39,12 @@ class UserRepository(private val database: MoeDatabase,
                 .subscribe({ rawUsers ->
                     logi(TAG, rawUsers.toString())
                     if (rawUsers.size == 1) {
-                        val user = User(null, httpUrl.host(), rawUsers[0].name,
-                                rawUsers[0].blacklisted_tags.toString().replace("[", "").replace("]", ""),
-                                rawUsers[0].id, passwordHash)
+                        val user = User(null, httpUrl.scheme() + "://" + httpUrl.host(),
+                                rawUsers[0].name,
+                                rawUsers[0].blacklisted_tags.toString()
+                                        .replace("[", "")
+                                        .replace("]", ""),
+                                rawUsers[0].id, passwordHash, null)
                         saveUser(user)
                     } else {
                         loadUsers()
@@ -50,15 +53,21 @@ class UserRepository(private val database: MoeDatabase,
                 .addTo(compositeDisposable)
     }
 
+    override fun updateUser(user: User) {
+        Completable.fromAction { database.userDao().updateUser(user) }
+                .performOnBack(scheduler)
+                .subscribe()
+    }
+
     override fun saveUser(user: User) {
         Completable.fromAction { database.userDao().insertUser(user) }
-                .performOnBackOutOnMain(scheduler)
+                .performOnBack(scheduler)
                 .subscribe()
     }
 
     override fun deleteUser(user: User) {
         Completable.fromAction { database.userDao().deleteUser(user) }
-                .performOnBackOutOnMain(scheduler)
+                .performOnBack(scheduler)
                 .subscribe()
     }
 

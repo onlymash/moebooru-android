@@ -69,16 +69,6 @@
 
         <service android:name=".download.DownloadService" />
 
-        <service
-            android:name=".muzei.MoeMuzeiArtSource"
-            android:label="@string/app_name"
-            android:icon="@mipmap/ic_launcher"
-            tools:ignore="ExportedService">
-            <intent-filter>
-                <action android:name="com.google.android.apps.muzei.api.MuzeiArtSource" />
-            </intent-filter>
-        </service>
-
     </application>
 
 </manifest>

@@ -11,6 +11,7 @@ interface UserDataContract {
         fun loadUsers()
         fun saveUser(user: User)
         fun deleteUser(user: User)
+        fun updateUser(user: User)
         fun getUser(httpUrl: HttpUrl, passwordHash: String)
         fun handleError(error: Throwable)
     }

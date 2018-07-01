@@ -10,18 +10,19 @@ import okhttp3.HttpUrl
 interface PostDataContract {
     interface Repository {
         val postFetchOutcome: PublishSubject<Outcome<MutableList<Post>>>
+        val isEndOutCome: PublishSubject<Outcome<Boolean>>
         fun isNotMore(): Boolean
         fun fetchPosts(httpUrl: HttpUrl)
         fun refreshPosts(httpUrl: HttpUrl)
         fun loadMorePosts(httpUrl: HttpUrl)
         fun addPosts(posts: MutableList<Post>)
-        fun deletePosts(site: String)
+        fun deletePosts(site: String, limit: Int)
         fun handleError(error: Throwable)
     }
     interface Local {
         fun getPosts(site: String): Flowable<MutableList<Post>>
         fun addPosts(posts: MutableList<Post>)
-        fun deletePosts(site: String)
+        fun deletePosts(site: String, limit: Int)
     }
     interface Remote {
         fun getPosts(httpUrl: HttpUrl): Single<MutableList<Post>>

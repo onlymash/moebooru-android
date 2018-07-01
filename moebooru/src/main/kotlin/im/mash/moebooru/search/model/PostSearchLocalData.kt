@@ -29,7 +29,7 @@ class PostSearchLocalData(private val database: MoeDatabase,
                 .subscribe()
     }
 
-    override fun deletePosts(site: String, tags: String) {
-        database.postSearchDao().deletePosts(site, tags)
+    override fun deletePosts(site: String, tags: String, limit: Int) {
+        database.postSearchDao().deletePosts(site, tags, limit)
     }
 }

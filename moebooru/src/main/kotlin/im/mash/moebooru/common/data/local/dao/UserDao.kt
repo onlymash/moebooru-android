@@ -10,12 +10,17 @@ interface UserDao {
     @Query("SELECT * FROM user")
     fun loadUsers(): Flowable<MutableList<User>>
 
-    @Query("SELECT * FROM user WHERE site = :site")
-    fun loadUser(site: String): Flowable<MutableList<User>>
+    @Query("SELECT * FROM user WHERE url = :url")
+    fun loadUser(url: String): Flowable<MutableList<User>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUser(user: User)
 
+    @Update
+    fun updateUser(user: User)
+
     @Delete
     fun deleteUser(user: User)
+
+
 }

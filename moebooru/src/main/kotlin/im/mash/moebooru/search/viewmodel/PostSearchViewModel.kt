@@ -22,6 +22,10 @@ class PostSearchViewModel(private val repo: PostSearchDataContract.Repository,
         repo.postFetchOutcome.toLiveData(compositeDisposable)
     }
 
+    val isEndOutcome: LiveData<Outcome<Boolean>> by lazy {
+        repo.isEndOutCome.toLiveData(compositeDisposable)
+    }
+
     fun isNotMore(): Boolean {
         return repo.isNotMore()
     }
@@ -39,8 +43,8 @@ class PostSearchViewModel(private val repo: PostSearchDataContract.Repository,
         repo.loadMorePosts(httpUrl)
     }
 
-    fun deletePosts(site: String, tags: String) {
-        repo.deletePosts(site, tags)
+    fun deletePosts(site: String, tags: String, limit: Int) {
+        repo.deletePosts(site, tags, limit)
     }
 
     fun clear() {

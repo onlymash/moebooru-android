@@ -28,4 +28,8 @@ class UserViewModel(private val repository: UserDataContract.Repository,
         repository.deleteUser(user)
     }
 
+    fun updateUser(user: User) {
+        repository.updateUser(user)
+    }
+
 }

@@ -29,7 +29,7 @@ class PostLocalData(private val database: MoeDatabase,
                 .subscribe()
     }
 
-    override fun deletePosts(site: String) {
-        database.postDao().deletePosts(site)
+    override fun deletePosts(site: String, limit: Int) {
+        database.postDao().deletePosts(site, limit)
     }
 }
