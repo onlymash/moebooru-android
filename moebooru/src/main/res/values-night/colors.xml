@@ -29,4 +29,8 @@
     <color name="drawer_divider">@color/material_drawer_dark_divider</color>
     <color name="drawer_selected">@color/material_drawer_dark_selected</color>
     <color name="drawer_header_selection_text">@color/material_drawer_dark_header_selection_text</color>
+
+    <color name="rating_e">#FF424242</color>
+    <color name="rating_q">#FF616161</color>
+    <color name="rating_s">#FF757575</color>
 </resources>

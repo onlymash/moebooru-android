@@ -24,7 +24,8 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".main.MainActivity"
-            android:theme="@style/MoeTheme.Main">
+            android:theme="@style/MoeTheme.Main"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -33,7 +34,7 @@
         </activity>
         <activity
             android:name=".detail.DetailActivity"
-            android:launchMode="singleInstance">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="${applicationId}.action.SHOW_DETAILS" />
 
@@ -42,7 +43,7 @@
         </activity>
         <activity
             android:name=".search.SearchActivity"
-            android:launchMode="singleInstance">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="${applicationId}.action.SEARCH" />
 

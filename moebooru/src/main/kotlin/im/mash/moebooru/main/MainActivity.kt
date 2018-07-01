@@ -36,8 +36,8 @@ import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
 import im.mash.moebooru.common.viewmodel.UserViewModel
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
-import im.mash.moebooru.content.UriRetriever
 import im.mash.moebooru.core.application.BaseActivity
+import im.mash.moebooru.core.extensions.performOnBack
 import im.mash.moebooru.core.extensions.performOnBackOutOnMain
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
@@ -206,8 +206,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-        initUser()
-
         initBooru()
 
         if (!isNullState && app.settings.isChangedNightMode) {
@@ -216,95 +214,27 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         }
     }
 
-    private fun setHeaderBackground(schema: String, host: String) {
-        var activeUser: User? = null
-        val baseUrl = "$schema://$host"
-        users.forEach { user ->
-            if (user.url == baseUrl) {
-                activeUser = user
-                return@forEach
-            }
-        }
-        if (activeUser != null) {
-            val username = activeUser!!.name
-            val passwordHash = activeUser!!.password_hash
-            val keyword = "vote:3:$username order:vote"
-            val dir = File(cacheDir, "background")
-            if (!dir.exists()) {
-                dir.mkdir()
-            }
-            val bg = File(dir, "$host-$username.jpg")
-            if (bg.exists()) {
-                header.headerBackgroundView.setImageURI(Uri.fromFile(bg))
-            } else {
-                header.headerBackgroundView.setImageResource(R.drawable.background_header)
-            }
-
-            if (!this.isNetworkConnected) return
-
-            val httpUrl = HttpUrl.Builder()
-                    .scheme(schema)
-                    .host(host)
-                    .addPathSegment("post.json")
-                    .addQueryParameter("limit", "1")
-                    .addQueryParameter("page", "1")
-                    .addQueryParameter("tags", keyword)
-                    .addQueryParameter("login", username)
-                    .addQueryParameter("password_hash", passwordHash)
-                    .build()
-
-            postSearchService.getPosts(httpUrl)
-                    .performOnBackOutOnMain(scheduler)
-                    .doAfterSuccess { posts ->
-                        if (posts.size == 1) {
-                            Completable.fromAction { database.postSearchDao().insertPosts(posts) }
-                                    .performOnBackOutOnMain(scheduler)
-                                    .subscribe({}, { error -> error.printStackTrace()})
-                        }
-
+    private fun initBooru() {
+        booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {
+                }
+                is Outcome.Success -> {
+                    boorus = outcome.data
+                    initUser()
+                }
+                is Outcome.Failure -> {
+                    if (outcome.e is IOException) {
+                        outcome.e.printStackTrace()
                     }
-                    .doOnError { error -> error.printStackTrace() }
-                    .subscribe()
-
-            database.postSearchDao()
-                    .getLastPost(host, keyword)
-                    .performOnBackOutOnMain(scheduler)
-                    .doAfterNext { postSearch ->
-                        if (postSearch != null) {
-                            val url = postSearch.sample_url
-                            GlideApp.with(app)
-                                    .asBitmap()
-                                    .load(MoeGlideUrl(url))
-                                    .into(object : SimpleTarget<Bitmap>() {
-                                        override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                            var fos: FileOutputStream? = null
-                                            try {
-                                                fos = FileOutputStream(bg)
-                                                resource.compress(Bitmap.CompressFormat.JPEG, 100, fos)
-                                                fos.flush()
-                                            } catch (e: FileNotFoundException) {
-                                                e.printStackTrace()
-                                            } catch (e: IOException) {
-                                                e.printStackTrace()
-                                            } finally {
-                                                try {
-                                                    fos?.close()
-                                                } catch (e: IOException) {
-                                                    e.printStackTrace()
-                                                }
-                                            }
-                                        }
-                                    })
-                        }
-                    }
-                    .doOnError { error -> error.printStackTrace() }
-                    .subscribe()
-        } else {
-            header.headerBackgroundView.setImageResource(R.drawable.background_header)
-        }
+                }
+            }
+        })
+        booruViewModel.loadBoorus()
     }
 
     private fun initUser() {
+        var init = true
         userViewModel.userOutcome.observe(this, Observer<Outcome<MutableList<User>>> { outcome ->
             when (outcome) {
                 is Outcome.Progress -> {}
@@ -312,19 +242,28 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                     users.clear()
                     if (outcome.data.size > 0) {
                         users.addAll(outcome.data)
-                        header.profiles.forEach { profile ->
-                            if (profile != profileSettingDrawerItem) {
-                                profile as ProfileDrawerItem
-                                users.forEach { user ->
-                                    if (user.url == profile.email.text) {
-                                        profile.withIcon(user.getAvatarBitmap())
-                                    }
-                                }
+                        if (this.isNetworkConnected && init) {
+                            init = false
+                            users.forEach { user ->
+                                val url = user.url + "/data/avatars/" + user.id + ".jpg"
+                                GlideApp.with(app)
+                                        .asBitmap()
+                                        .load(MoeGlideUrl(url))
+                                        .into(object : SimpleTarget<Bitmap>() {
+                                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                                val os = ByteArrayOutputStream()
+                                                resource.compress(Bitmap.CompressFormat.JPEG, 100, os)
+                                                user.avatar = os.toByteArray()
+                                                userViewModel.updateUser(user)
+                                            }
+                                        })
                             }
                         }
                     }
+                    initHeaderItem()
                 }
                 is Outcome.Failure -> {
+                    initHeaderItem()
                     outcome.e.printStackTrace()
                 }
             }
@@ -332,29 +271,12 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
         userViewModel.loadUsers()
     }
 
-    private fun initBooru() {
-        booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome ->
-            when (outcome) {
-                is Outcome.Progress -> {
-                }
-                is Outcome.Success -> {
-                    val data = outcome.data
-                    logi(TAG, "Booru Outcome.Success. size: ${data.size}")
-                    initHeaderItem(data)
-                }
-                is Outcome.Failure -> {
-                    if (outcome.e is IOException) {
-                        outcome.e.printStackTrace()
-                    }
-                    logi(TAG, "Booru Outcome.Failure")
-                }
-            }
-        })
-        booruViewModel.loadBoorus()
+    internal fun resetBoorus(boorus: MutableList<Booru>) {
+        this.boorus.clear()
+        this.boorus.addAll(boorus)
     }
 
-    internal fun initHeaderItem(boorus: MutableList<Booru>) {
-        this.boorus = boorus
+    internal fun initHeaderItem() {
         if (boorus.size <= 0) {
             header.clear()
             header.addProfile(profileSettingDrawerItem, 0)
@@ -405,24 +327,107 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             }
             if (isNullState && isNewCreate) {
                 isNewCreate = false
-                //update Avatar
                 displayFragment(PostFragment())
-                if (!this.isNetworkConnected) return
-                users.forEach { user ->
-                    val url = user.url + "/data/avatars/" + user.id + ".jpg"
-                    GlideApp.with(header.view.context)
-                            .asBitmap()
-                            .load(MoeGlideUrl(url))
-                            .into(object : SimpleTarget<Bitmap>() {
-                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                    val os = ByteArrayOutputStream()
-                                    resource.compress(Bitmap.CompressFormat.JPEG, 100, os)
-                                    user.avatar = os.toByteArray()
-                                    userViewModel.updateUser(user)
-                                }
-                            })
-                }
             }
+        }
+    }
+
+    internal fun setUsers(users: MutableList<User>) {
+        this.users.clear()
+        this.users.addAll(users)
+    }
+
+    internal fun setHeaderBackground(schema: String, host: String) {
+        var activeUser: User? = null
+        val baseUrl = "$schema://$host"
+        users.forEach { user ->
+            if (user.url == baseUrl) {
+                activeUser = user
+                return@forEach
+            }
+        }
+        if (activeUser != null) {
+            val username = activeUser!!.name
+            val passwordHash = activeUser!!.password_hash
+            val keyword = "vote:3:$username order:vote"
+            val dir = File(cacheDir, "background")
+            if (!dir.exists()) {
+                dir.mkdir()
+            }
+            var notBg = false
+            val bg = File(dir, "$host-$username.jpg")
+            if (bg.exists()) {
+                header.headerBackgroundView.setImageURI(Uri.fromFile(bg))
+            } else {
+                notBg = true
+                header.headerBackgroundView.setImageResource(R.drawable.background_header)
+            }
+
+            if (!this.isNetworkConnected) return
+
+            val limit = app.settings.postLimitInt
+
+            val httpUrl = HttpUrl.Builder()
+                    .scheme(schema)
+                    .host(host)
+                    .addPathSegment("post.json")
+                    .addQueryParameter("limit", limit.toString())
+                    .addQueryParameter("page", "1")
+                    .addQueryParameter("tags", keyword)
+                    .addQueryParameter("login", username)
+                    .addQueryParameter("password_hash", passwordHash)
+                    .build()
+
+            postSearchService.getPosts(httpUrl)
+                    .performOnBackOutOnMain(scheduler)
+                    .doAfterSuccess { posts ->
+                        if (posts.size > 0) {
+                            Completable.fromAction { database.postSearchDao().insertPosts(posts) }
+                                    .performOnBack(scheduler)
+                                    .doOnComplete {
+                                        database.postSearchDao()
+                                                .getLastPost(host, keyword)
+                                                .performOnBackOutOnMain(scheduler)
+                                                .doAfterNext { postSearch ->
+                                                    if (postSearch != null) {
+                                                        val url = postSearch.sample_url
+                                                        GlideApp.with(app)
+                                                                .asBitmap()
+                                                                .load(MoeGlideUrl(url))
+                                                                .into(object : SimpleTarget<Bitmap>() {
+                                                                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                                                        var fos: FileOutputStream? = null
+                                                                        try {
+                                                                            fos = FileOutputStream(bg)
+                                                                            resource.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+                                                                            fos.flush()
+                                                                        } catch (e: FileNotFoundException) {
+                                                                            e.printStackTrace()
+                                                                        } catch (e: IOException) {
+                                                                            e.printStackTrace()
+                                                                        } finally {
+                                                                            try {
+                                                                                fos?.close()
+                                                                            } catch (e: IOException) {
+                                                                                e.printStackTrace()
+                                                                            }
+                                                                            if (notBg) header.headerBackgroundView.setImageURI(Uri.fromFile(bg))
+                                                                        }
+                                                                    }
+                                                                })
+                                                    }
+                                                }
+                                                .doOnError { error -> error.printStackTrace() }
+                                                .subscribe()
+                                    }
+                                    .subscribe()
+                        }
+
+                    }
+                    .doOnError { error -> error.printStackTrace() }
+                    .subscribe()
+        } else {
+            header.headerBackgroundView.setImageResource(R.drawable.background_header)
         }
     }
 
@@ -435,9 +440,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     override fun onItemClick(view: View?, position: Int, drawerItem: IDrawerItem<*, *>?): Boolean {
         val id = drawerItem!!.identifier
-        if (id == previousSelectedDrawer) {
-            drawer.closeDrawer()
-        } else {
+        drawer.closeDrawer()
+        if (id != previousSelectedDrawer) {
             previousSelectedDrawer = id
             when (id) {
                 DRAWER_ITEM_POSTS -> displayFragment(PostFragment())

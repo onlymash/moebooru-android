@@ -191,8 +191,8 @@ class BooruFragment : ToolbarFragment() {
                 is Outcome.Success -> {
                     boorus = outcome.data
                     booruAdapter.updateData(boorus)
-                    mainActivity.initHeaderItem(boorus)
-                    logi(TAG, "Boorus size: ${boorus.size}")
+                    mainActivity.resetBoorus(boorus)
+                    mainActivity.initHeaderItem()
                 }
                 is Outcome.Failure -> {
 

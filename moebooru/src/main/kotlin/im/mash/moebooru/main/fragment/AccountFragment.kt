@@ -113,6 +113,8 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
                 return@forEach
             }
         }
+        mainActivity.setUsers(users)
+        mainActivity.initHeaderItem()
         if (user != null) {
             infoLayout.visibility = View.VISIBLE
             loginLayout.visibility = View.GONE
