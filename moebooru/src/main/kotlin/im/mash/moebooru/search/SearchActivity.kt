@@ -318,8 +318,15 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
 
             override fun onClickPostItem(position: Int) {
                 val intent = Intent(this@SearchActivity, DetailActivity::class.java)
-                intent.putExtra("tags", keyword)
+                intent.putExtra("keyword", keyword)
                 intent.putExtra("position", position)
+                if (user != null) {
+                    intent.putExtra("username", user!!.name)
+                    intent.putExtra("password_hash", user!!.password_hash)
+                } else {
+                    intent.putExtra("username", "")
+                    intent.putExtra("password_hash", "")
+                }
                 startActivity(intent)
             }
 

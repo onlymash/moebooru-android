@@ -401,8 +401,17 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postAdapter.setPostItemClickListener(object : PostAdapter.PostItemClickListener {
             override fun onClickPostItem(position: Int) {
                 val intent = Intent(mainActivity, DetailActivity::class.java)
-                intent.putExtra("tags", "")
+                intent.putExtra("keyword", "")
                 intent.putExtra("position", position)
+                if (user != null) {
+                    logi(TAG, "user != null, username: ${user!!.name}")
+                    intent.putExtra("username", user!!.name)
+                    intent.putExtra("password_hash", user!!.password_hash)
+                } else {
+                    logi(TAG, "user == null")
+                    intent.putExtra("username", "")
+                    intent.putExtra("password_hash", "")
+                }
                 startActivity(intent)
             }
 

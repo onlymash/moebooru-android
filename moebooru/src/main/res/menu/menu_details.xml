@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_vote"
+        android:title="@string/vote"
+        android:icon="@drawable/ic_action_star_border_24dp"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_share_url"
         android:title="@string/share"
         app:showAsAction="never"/>

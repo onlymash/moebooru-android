@@ -4,6 +4,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
+import im.mash.moebooru.common.data.remote.VoteService
 import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.detail.DetailActivity
@@ -14,11 +15,15 @@ import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.common.model.DownloadDataContract
 import im.mash.moebooru.common.model.DownloadRepository
+import im.mash.moebooru.common.model.VoteDataContract
+import im.mash.moebooru.common.model.VoteRepository
 import im.mash.moebooru.main.model.TagDataContract
 import im.mash.moebooru.main.model.TagRepository
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import io.reactivex.disposables.CompositeDisposable
+import retrofit2.Retrofit
 
 @DetailScope
 @Component(dependencies = [CoreComponent::class], modules = [DetailModule::class])
@@ -74,4 +79,20 @@ class DetailModule {
     @DetailScope
     fun tagRepo(database: MoeDatabase, scheduler: Scheduler, compositeDisposable: CompositeDisposable) : TagDataContract.Repository
             = TagRepository(database, scheduler, compositeDisposable)
+
+    @Provides
+    @DetailScope
+    fun voteService(retrofit: Retrofit): VoteService = retrofit.create(VoteService::class.java)
+
+    @Provides
+    @DetailScope
+    fun voteRepo(voteService: VoteService, database: MoeDatabase, scheduler: Scheduler,
+                 compositeDisposable: CompositeDisposable): VoteDataContract.Repository
+            = VoteRepository(voteService, database, scheduler, compositeDisposable)
+
+    @Provides
+    @DetailScope
+    fun voteViewModelFactory(voteRepo: VoteDataContract.Repository,
+                             compositeDisposable: CompositeDisposable): VoteViewModelFactory
+            = VoteViewModelFactory(voteRepo, compositeDisposable)
 }

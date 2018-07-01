@@ -13,6 +13,7 @@ import android.support.v7.content.res.AppCompatResources
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import com.bumptech.glide.request.target.SimpleTarget
 import com.bumptech.glide.request.transition.Transition
 import com.mikepenz.materialdrawer.AccountHeader
@@ -52,6 +53,7 @@ import im.mash.moebooru.util.isNetworkConnected
 import im.mash.moebooru.util.logi
 import io.reactivex.Completable
 import okhttp3.HttpUrl
+import retrofit2.HttpException
 import java.io.*
 import javax.inject.Inject
 
@@ -383,7 +385,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                     .doAfterSuccess { posts ->
                         if (posts.size > 0) {
                             Completable.fromAction { database.postSearchDao().insertPosts(posts) }
-                                    .performOnBack(scheduler)
+                                    .performOnBackOutOnMain(scheduler)
                                     .doOnComplete {
                                         database.postSearchDao()
                                                 .getLastPost(host, keyword)
@@ -424,7 +426,12 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                         }
 
                     }
-                    .doOnError { error -> error.printStackTrace() }
+                    .doOnError { error ->
+                        if (error is HttpException) {
+                            Toast.makeText(this, "code: ${error.code()}, msg: ${error.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                        error.printStackTrace()
+                    }
                     .subscribe()
         } else {
             header.headerBackgroundView.setImageResource(R.drawable.background_header)

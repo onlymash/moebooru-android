@@ -8,10 +8,15 @@ import android.support.design.widget.AppBarLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
+import android.widget.RatingBar
+import android.widget.TextView
+import android.widget.Toast
 import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
@@ -32,10 +37,15 @@ import im.mash.moebooru.download.DownloadService
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.common.viewmodel.DownloadViewModel
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
+import im.mash.moebooru.common.viewmodel.VoteViewModel
+import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import im.mash.moebooru.util.launchUrl
 import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.mayRequestStoragePermission
+import im.mash.moebooru.util.takeSnackbarShort
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolbar.OnMenuItemClickListener {
@@ -70,6 +80,10 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     @Inject
     lateinit var tagViewModelFactory: TagViewModelFactory
 
+    @Inject
+    lateinit var voteViewModelFactory: VoteViewModelFactory
+    private val voteViewModel: VoteViewModel by lazy { this.getViewModel<VoteViewModel>(voteViewModelFactory) }
+
     private var posts: MutableList<Post> = mutableListOf()
     private var postsSearch: MutableList<PostSearch> = mutableListOf()
 
@@ -82,18 +96,97 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     private lateinit var appBarLayout: AppBarLayout
     internal lateinit var toolbar: Toolbar
 
+    private var username = ""
+    private var passwordHash = ""
+
+    private var idsOneTwo: MutableList<Int> = mutableListOf()
+    private var idsThree: MutableList<Int> = mutableListOf()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         component.inject(this)
         logi(TAG, "onCreate")
-        val tags = intent?.getStringExtra("tags")
+        val tags = intent?.getStringExtra("keyword")
         if (tags == null) finish()
         keyword = tags!!
         position = intent!!.getIntExtra("position", 0)
+        username = intent!!.getStringExtra("username")
+        passwordHash = intent!!.getStringExtra("password_hash")
         initView()
+        if (username != "") {
+            initVoteViewModel()
+        }
         initDetailPager()
         initPositionViewModel()
+    }
+
+    private fun initVoteViewModel() {
+        voteViewModel.idsOutcomeOneTwo.observe(this, Observer<Outcome<MutableList<Int>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {}
+                is Outcome.Success -> {
+                    idsOneTwo = outcome.data
+                    when (type) {
+                        "post" -> {
+                            if (posts.size > position) {
+                                setToolbarStar(posts[position].id)
+                            }
+                        }
+                        "search" -> {
+                            if (postsSearch.size > position) {
+                                setToolbarStar(postsSearch[position].id)
+                            }
+                        }
+                    }
+                }
+                is Outcome.Failure -> {
+                    val error = outcome.e
+                    when (error) {
+                        is HttpException -> {
+                            Toast.makeText(this, "code: ${error.code()}, msg: ${error.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                        is IOException -> {
+                            error.printStackTrace()
+                        }
+                    }
+                }
+            }
+        })
+        voteViewModel.idsOutcomeThree.observe(this, Observer<Outcome<MutableList<Int>>> { outcome ->
+            when (outcome) {
+                is Outcome.Progress -> {}
+                is Outcome.Success -> {
+                    idsThree = outcome.data
+                    when (type) {
+                        "post" -> {
+                            if (posts.size > position) {
+                                setToolbarStar(posts[position].id)
+                            }
+                        }
+                        "search" -> {
+                            if (postsSearch.size > position) {
+                                setToolbarStar(postsSearch[position].id)
+                            }
+                        }
+                    }
+                }
+                is Outcome.Failure -> {
+                    val error = outcome.e
+                    when (error) {
+                        is HttpException -> {
+                            Toast.makeText(this, "code: ${error.code()}, msg: ${error.message()}", Toast.LENGTH_SHORT).show()
+                        }
+                        is IOException -> {
+                            error.printStackTrace()
+                        }
+                    }
+                }
+            }
+        })
+        val host = app.settings.activeProfileHost
+        voteViewModel.getVoteIdsOneTwo(host, username)
+        voteViewModel.getVoteIdsThree(host, username)
     }
 
     override fun onStart() {
@@ -143,6 +236,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         toolbar.setNavigationOnClickListener { finish() }
     }
 
+    @SuppressLint("InflateParams")
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.action_share_url -> {
@@ -170,6 +264,55 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
             }
             R.id.action_browser -> {
                 this.launchUrl(getPostUrl())
+            }
+            R.id.action_vote -> {
+                if (username == "") {
+                    takeSnackbarShort(this.bg, "This operation requires a user account.", paddingBottom)
+                    return true
+                }
+                var score = 0
+                val v = layoutInflater.inflate(R.layout.layout_ratingbar, null)
+                val scoreTv: TextView = v.findViewById(R.id.score)
+                scoreTv.text = "0"
+                val ratingBar: RatingBar = v.findViewById(R.id.rating_bar)
+                val cancel: Button = v.findViewById(R.id.cancel)
+                val vote: Button = v.findViewById(R.id.set_vote)
+                ratingBar.setOnRatingBarChangeListener { _, star, _ ->
+                    score = star.toInt()
+                    scoreTv.text = score.toString()
+                }
+                val dialog = AlertDialog.Builder(this)
+                        .setTitle("Vote post")
+                        .create()
+                dialog.apply {
+                    setView(v)
+                    setCanceledOnTouchOutside(true)
+                    show()
+                }
+                cancel.setOnClickListener {
+                    dialog.dismiss()
+                }
+                vote.setOnClickListener {
+                    var id = -1
+                    when (type) {
+                        "post" -> {
+                            if (posts.size > position) {
+                                id = posts[position].id
+                            }
+                        }
+                        "search" -> {
+                            if (postsSearch.size > position) {
+                                id = postsSearch[position].id
+                            }
+                        }
+                    }
+                    if (id > 0) {
+                        val baseUrl = app.settings.activeProfileSchema + "://" + app.settings.activeProfileHost
+                        val url = "$baseUrl/post/vote.json"
+                        voteViewModel.votePost(url, id, score, username, passwordHash)
+                    }
+                    dialog.dismiss()
+                }
             }
         }
         return true
@@ -263,7 +406,9 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         }
                         postsSearch.clear()
                         if (posts.size > position) {
-                            setToolbarTitle(posts[position].id)
+                            val id = posts[position].id
+                            setToolbarTitle(id)
+                            setToolbarStar(id)
                             postsChangeListener?.onPostsChanged(posts, position)
                         } else {
                             logi(TAG, "position >= posts size")
@@ -300,7 +445,9 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         }
                         posts.clear()
                         if (postsSearch.size > position) {
-                            setToolbarTitle(postsSearch[position].id)
+                            val id = postsSearch[position].id
+                            setToolbarTitle(id)
+                            setToolbarStar(id)
                             postsChangeListener?.onPostsSearchChanged(postsSearch, position)
                         } else {
                             logi(TAG, "position >= posts size")
@@ -325,18 +472,30 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                     "post" -> {
                         if (posts.size > position) {
                             val post = posts[position]
-                            setToolbarTitle(post.id)
+                            val id = post.id
+                            setToolbarTitle(id)
+                            setToolbarStar(id)
                         }
                     }
                     else -> {
                         if (postsSearch.size > position) {
                             val postSearch = postsSearch[position]
-                            setToolbarTitle(postSearch.id)
+                            val id = postSearch.id
+                            setToolbarTitle(id)
+                            setToolbarStar(id)
                         }
                     }
                 }
             }
         })
+    }
+
+    private fun setToolbarStar(id: Int) {
+        when {
+            idsOneTwo.contains(id) -> toolbar.menu.findItem(R.id.action_vote).setIcon(R.drawable.ic_action_star_half_24dp)
+            idsThree.contains(id) -> toolbar.menu.findItem(R.id.action_vote).setIcon(R.drawable.ic_action_star_24dp)
+            else -> toolbar.menu.findItem(R.id.action_vote).setIcon(R.drawable.ic_action_star_border_24dp)
+        }
     }
 
     override fun onPageScrollStateChanged(state: Int) {
