@@ -90,7 +90,6 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     internal var type = "post"
     internal var position = 0
     internal var keyword = ""
-    private var isNew = true
 
     private lateinit var bg: View
     private lateinit var appBarLayout: AppBarLayout
@@ -197,20 +196,29 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         logi(TAG, "onNewIntent")
+        intent?.putExtra("new", true)
         setIntent(intent)
     }
 
     override fun onResume() {
         super.onResume()
         logi(TAG, "onResume")
-        if (!isNew) {
-            val tags = intent?.getStringExtra("tags")
+        val new = intent?.getBooleanExtra("new", false)
+        if (new != null && new) {
+            intent.putExtra("new", false)
+            val tags = intent?.getStringExtra("keyword")
             if (tags == null) finish()
             keyword = tags!!
             position = intent!!.getIntExtra("position", 0)
-            detailPager.currentItem = 1
+            username = intent!!.getStringExtra("username")
+            passwordHash = intent!!.getStringExtra("password_hash")
+            if (username != "") {
+                val host = app.settings.activeProfileHost
+                voteViewModel.getVoteIdsOneTwo(host, username)
+                voteViewModel.getVoteIdsThree(host, username)
+            }
+            initViewModel()
         }
-        isNew = false
     }
 
     @SuppressLint("InflateParams")
