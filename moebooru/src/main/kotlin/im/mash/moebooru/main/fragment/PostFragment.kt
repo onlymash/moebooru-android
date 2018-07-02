@@ -390,13 +390,13 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             override fun onLastItemVisible() {
                 loadMoreData()
             }
-//            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-//                super.onScrollStateChanged(recyclerView, newState)
-//                when (newState) {
-//                    RecyclerView.SCROLL_STATE_SETTLING -> GlideApp.with(this@PostFragment.requireContext()).pauseRequests()
-//                    RecyclerView.SCROLL_STATE_IDLE -> GlideApp.with(this@PostFragment.requireContext()).resumeRequests()
-//                }
-//            }
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_SETTLING -> GlideApp.with(this@PostFragment.requireContext()).pauseRequests()
+                    RecyclerView.SCROLL_STATE_IDLE -> GlideApp.with(this@PostFragment.requireContext()).resumeRequests()
+                }
+            }
         })
         postAdapter.setPostItemClickListener(object : PostAdapter.PostItemClickListener {
             override fun onClickPostItem(position: Int) {
@@ -817,7 +817,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             logi(TAG, "loadMoreData()")
             refreshLayout.isRefreshing = true
             loadingMore = true
-            page = posts.size/(limit-1) + 1
+            page = posts.size/(limit-10) + 1
             postViewModel.loadMorePosts(getHttpUrl())
         }
         if (isNotMore && notiNotMore) {

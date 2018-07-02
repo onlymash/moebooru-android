@@ -32,6 +32,7 @@ import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.detail.DetailActivity
+import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.search.adapter.PostSearchAdapter
 import im.mash.moebooru.search.viewmodel.PostSearchViewModel
@@ -313,6 +314,13 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             override fun onLastItemVisible() {
                 loadMoreData()
             }
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_SETTLING -> GlideApp.with(this@SearchActivity).pauseRequests()
+                    RecyclerView.SCROLL_STATE_IDLE -> GlideApp.with(this@SearchActivity).resumeRequests()
+                }
+            }
         })
         postSearchAdapter.setPostItemClickListener(object : PostSearchAdapter.PostItemClickListener {
 
@@ -494,7 +502,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
             loadingMore = true
             refreshLayout.isRefreshing = true
-            page = posts.size/(limit-1) + 1
+            page = posts.size/(limit-10) + 1
             postSearchViewModel.loadMorePosts(getHttpUrl())
             logi(TAG, "loadMoreData. page: $page")
         }

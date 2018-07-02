@@ -38,7 +38,6 @@ import im.mash.moebooru.common.viewmodel.UserViewModel
 import im.mash.moebooru.common.viewmodel.UserViewModelFactory
 import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.core.application.BaseActivity
-import im.mash.moebooru.core.extensions.performOnBack
 import im.mash.moebooru.core.extensions.performOnBackOutOnMain
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
@@ -359,7 +358,14 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             var notBg = false
             val bg = File(dir, "$host-$username.jpg")
             if (bg.exists()) {
-                header.headerBackgroundView.setImageURI(Uri.fromFile(bg))
+                GlideApp.with(app)
+                        .asBitmap()
+                        .load(Uri.fromFile(bg))
+                        .into(object : SimpleTarget<Bitmap>() {
+                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                header.headerBackgroundView.setImageBitmap(resource)
+                            }
+                        })
             } else {
                 notBg = true
                 header.headerBackgroundView.setImageResource(R.drawable.background_header)
@@ -413,7 +419,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                                                                             } catch (e: IOException) {
                                                                                 e.printStackTrace()
                                                                             }
-                                                                            if (notBg) header.headerBackgroundView.setImageURI(Uri.fromFile(bg))
+                                                                            if (notBg) header.headerBackgroundView.setImageBitmap(resource)
                                                                         }
                                                                     }
                                                                 })

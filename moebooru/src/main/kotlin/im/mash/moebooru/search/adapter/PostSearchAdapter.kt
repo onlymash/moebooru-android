@@ -28,16 +28,19 @@ class PostSearchAdapter(private val context: Context, private var gridMode: Stri
     private var idsThree: MutableList<Int> = mutableListOf()
 
     fun updateData(posts: MutableList<PostSearch>) {
-        this.posts = posts
+        this.posts.clear()
+        this.posts.addAll(posts)
         notifyDataSetChanged()
     }
 
     fun updateVoteIdsOneTwo(idsOneTwo: MutableList<Int>) {
-        this.idsOneTwo = idsOneTwo
+        this.idsOneTwo.clear()
+        this.idsOneTwo.addAll(idsOneTwo)
     }
 
     fun updateVoteIdsThree(idsThree: MutableList<Int>) {
-        this.idsThree = idsThree
+        this.idsThree.clear()
+        this.idsThree.addAll(idsThree)
     }
 
     fun setGridMode(gridMode: String) {
@@ -46,7 +49,8 @@ class PostSearchAdapter(private val context: Context, private var gridMode: Stri
 
     fun addData(posts: MutableList<PostSearch>) {
         val countBefore = itemCount
-        this.posts = posts
+        this.posts.clear()
+        this.posts.addAll(posts)
         notifyItemRangeInserted(countBefore, itemCount)
     }
 
@@ -82,7 +86,7 @@ class PostSearchAdapter(private val context: Context, private var gridMode: Stri
                 GlideApp.with(context)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .centerCrop()
-                        .placeholder(placeHolderId)
+                        .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
                         .into(holder.fixedImageView)
             }
             else -> {
@@ -90,7 +94,7 @@ class PostSearchAdapter(private val context: Context, private var gridMode: Stri
                 GlideApp.with(context)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .fitCenter()
-                        .placeholder(placeHolderId)
+                        .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
                         .into(holder.fixedImageView)
             }
         }
