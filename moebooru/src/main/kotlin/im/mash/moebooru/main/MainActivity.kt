@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewCompat
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatDelegate
 import android.support.v7.content.res.AppCompatResources
 import android.view.Gravity
@@ -57,7 +58,7 @@ import java.io.*
 import javax.inject.Inject
 
 @SuppressLint("RtlHardcoded")
-class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
+class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLayout.DrawerListener,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     companion object {
@@ -76,6 +77,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
     private lateinit var header: AccountHeader
     private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
     private var previousSelectedDrawer: Long = 0L
+    private var selectedNewItem = false
 
     private val component by lazy { MoeDH.mainComponent() }
 
@@ -204,6 +206,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
             drawer.stickyFooter.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
             insets
         }
+
+        drawer.drawerLayout.addDrawerListener (this)
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
@@ -453,10 +457,26 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
 
     override fun onItemClick(view: View?, position: Int, drawerItem: IDrawerItem<*, *>?): Boolean {
         val id = drawerItem!!.identifier
-        drawer.closeDrawer()
         if (id != previousSelectedDrawer) {
+            selectedNewItem = true
             previousSelectedDrawer = id
-            when (id) {
+        }
+        drawer.closeDrawer()
+        return true
+    }
+
+    override fun onDrawerStateChanged(newState: Int) {
+
+    }
+
+    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+
+    }
+
+    override fun onDrawerClosed(drawerView: View) {
+        if (selectedNewItem) {
+            selectedNewItem = false
+            when (previousSelectedDrawer) {
                 DRAWER_ITEM_POSTS -> displayFragment(PostFragment())
                 DRAWER_ITEM_ACCOUNT -> displayFragment(AccountFragment())
                 DRAWER_ITEM_DOWNLOADS -> displayFragment(DownloadFragment())
@@ -466,7 +486,10 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener,
                 DRAWER_ITEM_ABOUT -> displayFragment(AboutFragment())
             }
         }
-        return true
+    }
+
+    override fun onDrawerOpened(drawerView: View) {
+
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
