@@ -13,7 +13,6 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.*
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
-import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.*
 import im.mash.moebooru.App.Companion.app
@@ -49,6 +48,10 @@ import javax.inject.Inject
 class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceChangeListener {
     companion object {
         private const val TAG = "SearchActivity"
+        private const val STATUS_LOADING = 0
+        private const val STATUS_REFRESH = 1
+        private const val STATUS_LOAD_MORE = 2
+        private const val STATUS_IDLE = -1
     }
     private var paddingBottom = 0
     private var paddingTop = 0
@@ -57,13 +60,12 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     private var page = 1
     private var posts = mutableListOf<PostSearch>()
 
-    private var refreshing = false
-    private var loadingMore = false
     private var notiNotMore = true
     private var limit = 50
     private var keyword = ""
     private var safeMode = true
     private var newStart = true
+    private var status = STATUS_LOADING
 
     private lateinit var refreshLayout: SwipeRefreshLayout
     private lateinit var appBarLayout: AppBarLayout
@@ -129,6 +131,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         if (keyword == "") finish()
         toolbar.subtitle = keyword
         newStart = true
+        status = STATUS_LOADING
         loadPosts()
     }
 
@@ -170,6 +173,18 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         }
     }
 
+    private fun disableRefreshLayout() {
+        if (refreshLayout.isRefreshing) {
+            refreshLayout.isRefreshing = false
+        }
+    }
+
+    private fun enableRefreshLayout() {
+        if (!refreshLayout.isRefreshing) {
+            refreshLayout.isRefreshing = true
+        }
+    }
+
     private fun initPostSearchViewModel() {
         postSearchViewModel.postsSearchOutcome.observe( this,
                 Observer<Outcome<MutableList<PostSearch>>> { outcome ->
@@ -178,11 +193,36 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                     logi(TAG, "Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    refreshLayout.isRefreshing = false
+                    logi(TAG, "postViewModel Outcome.Success. status: $status")
+                    disableRefreshLayout()
                     val posts = outcome.data
-                    if (loadingMore) {
-                        loadingMore = false
-                        if (this.posts != posts) {
+                    when (status) {
+                        STATUS_LOADING -> {
+                            status = STATUS_IDLE
+                            this.posts = posts
+                            if (safeMode) {
+                                postSearchAdapter.updateData(getSafePosts())
+                            } else {
+                                postSearchAdapter.updateData(posts)
+                            }
+                            if (newStart && posts.isEmpty()) {
+                                newStart = false
+                                refresh()
+                            }
+                        }
+                        STATUS_REFRESH -> {
+                            status = STATUS_IDLE
+                            if (this.posts != posts ) {
+                                this.posts = posts
+                                if (safeMode) {
+                                    postSearchAdapter.updateData(getSafePosts())
+                                } else {
+                                    postSearchAdapter.updateData(posts)
+                                }
+                            }
+                        }
+                        STATUS_LOAD_MORE -> {
+                            status = STATUS_IDLE
                             this.posts = posts
                             if (safeMode) {
                                 postSearchAdapter.addData(getSafePosts())
@@ -190,26 +230,11 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                                 postSearchAdapter.addData(posts)
                             }
                         }
-                    } else {
-                        refreshing = false
-                        if (this.posts != posts ) {
-                            this.posts = posts
-                            if (safeMode) {
-                                postSearchAdapter.updateData(getSafePosts())
-                            } else {
-                                postSearchAdapter.updateData(posts)
-                            }
-                        }
-                        if (newStart && posts.isEmpty()) {
-                            newStart = false
-                            refresh()
-                        }
                     }
-                    logi(TAG, "Outcome.Success. data.size: ${posts.size}")
                 }
                 is Outcome.Failure -> {
-                    refreshLayout.isRefreshing = false
-                    loadingMore = false
+                    status = STATUS_IDLE
+                    disableRefreshLayout()
                     when (outcome.e) {
                         is HttpException -> {
                             val httpException = outcome.e as HttpException
@@ -227,16 +252,14 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         postSearchViewModel.isEndOutcome.observe(this, Observer<Outcome<Boolean>> { outcome ->
             when (outcome) {
                 is Outcome.Success -> {
-                    refreshing = false
-                    loadingMore = false
-                    refreshLayout.isRefreshing = false
+                    disableRefreshLayout()
                 }
             }
         })
     }
 
     private fun loadPosts() {
-        refreshLayout.isRefreshing = true
+        enableRefreshLayout()
         postSearchViewModel.loadPosts(getHttpUrl())
     }
 
@@ -449,26 +472,26 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 R.color.orange,
                 R.color.red
         )
-        refreshLayout.isRefreshing = true
+        enableRefreshLayout()
         refreshLayout.setOnRefreshListener {
             if (!this.isNetworkConnected) {
-                refreshLayout.isRefreshing = false
+                disableRefreshLayout()
                 takeSnackbarShort(refreshLayout, "Network without connection", paddingBottom)
                 return@setOnRefreshListener
             }
-            if (!loadingMore && !refreshing) {
+            if (status == STATUS_IDLE) {
                 refresh()
             } else {
-                refreshLayout.isRefreshing = false
+                disableRefreshLayout()
             }
         }
     }
 
     private fun refresh() {
-        refreshLayout.isRefreshing = true
-        notiNotMore = true
         page = 1
-        refreshing = true
+        notiNotMore = true
+        status = STATUS_REFRESH
+        enableRefreshLayout()
         postSearchViewModel.refreshPosts(getHttpUrl())
     }
 
@@ -499,9 +522,9 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         }
         if (posts.isEmpty() || posts.size < limit) return
         val isNotMore = postSearchViewModel.isNotMore()
-        if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
-            loadingMore = true
-            refreshLayout.isRefreshing = true
+        if (!refreshLayout.isRefreshing && status == STATUS_IDLE && !isNotMore) {
+            status = STATUS_LOAD_MORE
+            enableRefreshLayout()
             page = posts.size/(limit-10) + 1
             postSearchViewModel.loadMorePosts(getHttpUrl())
             logi(TAG, "loadMoreData. page: $page")

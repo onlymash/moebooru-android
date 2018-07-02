@@ -28,6 +28,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
     private var idsThree: MutableList<Int> = mutableListOf()
 
     fun updateData(posts: MutableList<Post>) {
+        logi(TAG, "updateData")
         this.posts.clear()
         this.posts.addAll(posts)
         notifyDataSetChanged()
@@ -48,6 +49,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
     }
 
     fun addData(posts: MutableList<Post>) {
+        logi(TAG, "addData")
         val countBefore = itemCount
         this.posts.clear()
         this.posts.addAll(posts)
@@ -70,6 +72,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
+        logi(TAG, "onBindViewHolder: $position")
         if (position in 0 until spanCount) {
             holder.itemView.setPadding(padding, padding + context.toolbarHeight + statusBarHeight, padding, padding)
         } else {
@@ -86,6 +89,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
                 GlideApp.with(context)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .centerCrop()
+                        .dontAnimate()
                         .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
                         .into(holder.fixedImageView)
             }
@@ -94,6 +98,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
                 GlideApp.with(context)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .fitCenter()
+                        .dontAnimate()
                         .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
                         .into(holder.fixedImageView)
             }

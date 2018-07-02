@@ -51,6 +51,10 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     companion object {
         private const val TAG = "PostFragment"
+        private const val STATUS_LOADING = 0
+        private const val STATUS_REFRESH = 1
+        private const val STATUS_LOAD_MORE = 2
+        private const val STATUS_IDLE = -1
     }
 
     private lateinit var drawer: NavigationView
@@ -72,8 +76,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private var page = 1
     private var posts: MutableList<Post> = mutableListOf()
 
-    private var refreshing = false
-    private var loadingMore = false
+    private var status = STATUS_LOADING
     private var notiNotMore = true
     private var limit = 50
 
@@ -115,8 +118,20 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         initUserViewModel()
         mainActivity.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         if (savedInstanceState == null) {
-            refreshLayout.isRefreshing = true
+            enableRefreshLayout()
             postViewModel.loadPosts(getHttpUrl())
+        }
+    }
+
+    private fun disableRefreshLayout() {
+        if (refreshLayout.isRefreshing) {
+            refreshLayout.isRefreshing = false
+        }
+    }
+
+    private fun enableRefreshLayout() {
+        if (!refreshLayout.isRefreshing) {
+            refreshLayout.isRefreshing = true
         }
     }
 
@@ -133,8 +148,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                         }
                     }
                     val data = outcome.data
+                    logi(TAG, "idsOutcomeOneTwo size: ${data.size}")
                     if (data.size > 0) {
-                        logi(TAG, "idsOutcomeOneTwo size: ${data.size}")
                         postAdapter.updateVoteIdsOneTwo(data)
                         if (postAdapter.itemCount > 0) {
                             data.forEach { tag ->
@@ -165,8 +180,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 is Outcome.Progress -> {}
                 is Outcome.Success -> {
                     val data = outcome.data
+                    logi(TAG, "idsOutcomeThree size: ${data.size}")
                     if (data.size > 0) {
-                        logi(TAG, "idsOutcomeThree size: ${data.size}")
                         postAdapter.updateVoteIdsThree(data)
                         if (postAdapter.itemCount > 0) {
                             data.forEach { tag ->
@@ -239,12 +254,40 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    refreshing = false
-                    refreshLayout.isRefreshing = false
+                    logi(TAG, "postViewModel Outcome.Success. status: $status")
+                    disableRefreshLayout()
                     val data = outcome.data
-                    if (loadingMore) {
-                        loadingMore = false
-                        if (posts != data) {
+                    when (status) {
+                        STATUS_LOADING -> {
+                            status = STATUS_IDLE
+                            posts = data
+                            if (safeMode) {
+                                postAdapter.updateData(getSafePosts())
+                            } else {
+                                postAdapter.updateData(posts)
+                            }
+                            if (firstStart && posts.isEmpty()) {
+                                firstStart = false
+                                if (!mainActivity.isNetworkConnected) {
+                                    takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
+                                } else {
+                                    refresh()
+                                }
+                            }
+                        }
+                        STATUS_REFRESH -> {
+                            status = STATUS_IDLE
+                            if (posts != data) {
+                                posts = data
+                                if (safeMode) {
+                                    postAdapter.updateData(getSafePosts())
+                                } else {
+                                    postAdapter.updateData(posts)
+                                }
+                            }
+                        }
+                        STATUS_LOAD_MORE -> {
+                            status = STATUS_IDLE
                             posts = data
                             if (safeMode) {
                                 postAdapter.addData(getSafePosts())
@@ -252,29 +295,11 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                                 postAdapter.addData(posts)
                             }
                         }
-                    } else {
-                        if (posts != data) {
-                            posts = data
-                            if (safeMode) {
-                                postAdapter.updateData(getSafePosts())
-                            } else {
-                                postAdapter.updateData(posts)
-                            }
-                        } else if (firstStart) {
-                            firstStart = false
-                            if (!mainActivity.isNetworkConnected) {
-                                takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
-                            } else {
-                                refresh()
-                            }
-                        }
                     }
-                    logi(TAG, "postViewModel Outcome.Success. data.size: ${posts.size}")
                 }
                 is Outcome.Failure -> {
-                    loadingMore = false
-                    refreshLayout.isRefreshing = false
-                    refreshing = false
+                    status = STATUS_IDLE
+                    disableRefreshLayout()
                     when (outcome.e) {
                         is HttpException -> {
                             val httpException = outcome.e as HttpException
@@ -294,9 +319,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postViewModel.isEndOutcome.observe(this, Observer<Outcome<Boolean>> { outcome ->
             when (outcome) {
                 is Outcome.Success -> {
-                    refreshing = false
-                    loadingMore = false
-                    refreshLayout.isRefreshing = false
+                    disableRefreshLayout()
                 }
             }
         })
@@ -324,23 +347,23 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         )
         refreshLayout.setOnRefreshListener {
             if (!mainActivity.isNetworkConnected) {
-                refreshLayout.isRefreshing = false
+                disableRefreshLayout()
                 takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
                 return@setOnRefreshListener
             }
-            if (!loadingMore && !refreshing) {
+            if (status == STATUS_IDLE) {
                 refresh()
             } else {
-                refreshLayout.isRefreshing = false
+                disableRefreshLayout()
             }
         }
     }
 
     private fun refresh() {
-        refreshLayout.isRefreshing = true
-        notiNotMore = true
         page = 1
-        refreshing = true
+        notiNotMore = true
+        status = STATUS_REFRESH
+        enableRefreshLayout()
         postViewModel.refreshPosts(getHttpUrl())
     }
 
@@ -800,23 +823,14 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         }
     }
 
-    private fun loadData() {
-        if (!loadingMore && !refreshLayout.isRefreshing) {
-            refreshLayout.isRefreshing = true
-            notiNotMore = true
-            postViewModel.reLoadPosts(getHttpUrl())
-        }
-    }
-
     private fun loadMoreData() {
         if (!mainActivity.isNetworkConnected) {
             takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
         }
         val isNotMore = postViewModel.isNotMore()
-        if (!refreshLayout.isRefreshing && !loadingMore && !isNotMore) {
-            logi(TAG, "loadMoreData()")
-            refreshLayout.isRefreshing = true
-            loadingMore = true
+        if (!refreshLayout.isRefreshing && status == STATUS_IDLE && !isNotMore) {
+            status = STATUS_LOAD_MORE
+            enableRefreshLayout()
             page = posts.size/(limit-10) + 1
             postViewModel.loadMorePosts(getHttpUrl())
         }
