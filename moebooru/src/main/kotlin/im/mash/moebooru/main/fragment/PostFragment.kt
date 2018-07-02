@@ -390,7 +390,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     @SuppressLint("InflateParams")
     private fun initPostView(view: View) {
         postView = view.findViewById(R.id.posts_list)
-        (postView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+//        (postView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postView.setItemViewCacheSize(20)
         when (app.settings.gridModeString) {

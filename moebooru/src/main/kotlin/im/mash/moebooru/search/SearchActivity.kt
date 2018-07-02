@@ -315,7 +315,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         }
         toolbar.setNavigationOnClickListener { finish() }
         postSearchView = findViewById(R.id.posts_list)
-        (postSearchView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+//        (postSearchView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postSearchView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation)
         postSearchView.setItemViewCacheSize(20)
         when (app.settings.gridModeString) {
