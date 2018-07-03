@@ -1,11 +1,14 @@
 package im.mash.moebooru.main.adapter
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.data.local.entity.Post
@@ -72,7 +75,6 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        logi(TAG, "onBindViewHolder: $position")
         if (position in 0 until spanCount) {
             holder.itemView.setPadding(padding, padding + context.toolbarHeight + statusBarHeight, padding, padding)
         } else {
@@ -89,7 +91,6 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
                 GlideApp.with(context)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .centerCrop()
-                        .dontAnimate()
                         .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
                         .into(holder.fixedImageView)
             }
@@ -98,7 +99,6 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
                 GlideApp.with(context)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .fitCenter()
-                        .dontAnimate()
                         .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
                         .into(holder.fixedImageView)
             }

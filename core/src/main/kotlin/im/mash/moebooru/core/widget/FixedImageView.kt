@@ -34,7 +34,7 @@ class FixedImageView(context: Context, attrs: AttributeSet) : AppCompatImageView
         this.heightWeight = heightWeight
     }
 
-    public override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         val width = this.measuredWidth
         val height = width * heightWeight / widthWeight

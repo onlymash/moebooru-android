@@ -225,6 +225,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                 is Outcome.Progress -> {
                 }
                 is Outcome.Success -> {
+                    logi(TAG, "boorus outcome success")
                     boorus = outcome.data
                     initUser()
                 }
@@ -248,6 +249,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                     if (outcome.data.size > 0) {
                         users.addAll(outcome.data)
                         if (this.isNetworkConnected && init) {
+                            logi(TAG, "User Outcome success. init")
                             init = false
                             users.forEach { user ->
                                 val url = user.url + "/data/avatars/" + user.id + ".jpg"
@@ -258,13 +260,17 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                                             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                                                 val os = ByteArrayOutputStream()
                                                 resource.compress(Bitmap.CompressFormat.JPEG, 100, os)
-                                                user.avatar = os.toByteArray()
-                                                userViewModel.updateUser(user)
+                                                val avatar = os.toByteArray()
+                                                if (user.avatar == null || avatar.size != user.avatar!!.size) {
+                                                    user.avatar = avatar
+                                                    userViewModel.updateUser(user)
+                                                }
                                             }
                                         })
                             }
                         }
                     }
+                    logi(TAG, "User Outcome success")
                     initHeaderItem()
                 }
                 is Outcome.Failure -> {
@@ -343,6 +349,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     }
 
     internal fun setHeaderBackground(schema: String, host: String) {
+        logi(TAG, "setHeaderBackground")
         var activeUser: User? = null
         val baseUrl = "$schema://$host"
         users.forEach { user ->
