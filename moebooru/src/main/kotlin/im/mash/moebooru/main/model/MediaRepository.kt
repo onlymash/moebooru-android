@@ -9,8 +9,9 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
 class MediaRepository(private val source: MediaStoreDataSource,
-                      private val scheduler: Scheduler,
-                      private val compositeDisposable: CompositeDisposable) : MediaDataContract.Repository {
+                      private val scheduler: Scheduler) : MediaDataContract.Repository {
+
+    private val compositeDisposable = CompositeDisposable()
 
     override val mediaOutcome: PublishSubject<Outcome<MutableList<MediaStoreData>>>
             = PublishSubject.create<Outcome<MutableList<MediaStoreData>>>()

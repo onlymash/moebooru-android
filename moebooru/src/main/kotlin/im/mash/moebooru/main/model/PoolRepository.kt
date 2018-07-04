@@ -11,10 +11,17 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import okhttp3.HttpUrl
 
-class PoolRepository(private val database: MoeDatabase,
-                     private val poolService: PoolService,
-                     private val scheduler: Scheduler,
-                     private val compositeDisposable: CompositeDisposable) : PoolDataContract.Repository {
+class PoolRepository(private val poolService: PoolService,
+                     private val database: MoeDatabase,
+                     private val scheduler: Scheduler) : PoolDataContract.Repository {
+
+    private val compositeDisposable = CompositeDisposable()
+
+    private var notMore = false
+    override fun isNotMore(): Boolean = notMore
+
+    override val isEndOutCome: PublishSubject<Outcome<Boolean>>
+            = PublishSubject.create<Outcome<Boolean>>()
 
     override val poolFetchOutcome: PublishSubject<Outcome<MutableList<Pool>>>
             = PublishSubject.create<Outcome<MutableList<Pool>>>()
@@ -26,6 +33,38 @@ class PoolRepository(private val database: MoeDatabase,
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ pools ->
                     poolFetchOutcome.success(pools)
+                }, { error -> handleError(error)})
+                .addTo(compositeDisposable)
+    }
+
+    override fun refreshPools(url: HttpUrl) {
+        notMore = false
+        poolService.getPools(url)
+                .performOnBackOutOnMain(scheduler)
+                .subscribe({ pools ->
+                    val host = url.host()
+                    pools.forEach { pool ->
+                        pool.host = host
+                    }
+                    deleteAndSavePools(pools, url.host(), 20)
+                    isEndOutCome.success(true)
+                }, { error -> handleError(error)})
+                .addTo(compositeDisposable)
+    }
+
+    override fun loadMorePools(url: HttpUrl) {
+        poolService.getPools(url)
+                .performOnBackOutOnMain(scheduler)
+                .subscribe({ pools ->
+                    val host = url.host()
+                    pools.forEach { pool ->
+                        pool.host = host
+                    }
+                    if (pools.size < 20) {
+                        notMore = true
+                    }
+                    savePools(pools)
+                    isEndOutCome.success(true)
                 }, { error -> handleError(error)})
                 .addTo(compositeDisposable)
     }
@@ -55,24 +94,6 @@ class PoolRepository(private val database: MoeDatabase,
         }
                 .performOnBack(scheduler)
                 .subscribe()
-    }
-
-    override fun refreshPools(url: HttpUrl) {
-        poolService.getPools(url)
-                .performOnBackOutOnMain(scheduler)
-                .subscribe({ pools ->
-                    deleteAndSavePools(pools, url.host(), 20)
-                }, { error -> handleError(error)})
-                .addTo(compositeDisposable)
-    }
-
-    override fun loadMorePools(url: HttpUrl) {
-        poolService.getPools(url)
-                .performOnBackOutOnMain(scheduler)
-                .subscribe({ pools ->
-                    savePools(pools)
-                }, { error -> handleError(error)})
-                .addTo(compositeDisposable)
     }
 
     override fun handleError(error: Throwable) {

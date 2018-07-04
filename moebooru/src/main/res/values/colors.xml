@@ -29,6 +29,8 @@
 
     <color name="stats_title">#aaffffff</color>
 
+    <color name="pool_title">@color/primary_1</color>
+
     <color name="black">#FF000000</color>
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFFFF</color>

@@ -10,7 +10,6 @@ import android.widget.ImageView
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.data.local.entity.PostSearch
-import im.mash.moebooru.core.widget.FixedImageView
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.MoeGlideUrl
 import im.mash.moebooru.util.*

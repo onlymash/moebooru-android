@@ -8,12 +8,13 @@ import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.main.model.MediaDataContract
 import io.reactivex.disposables.CompositeDisposable
 
-class MediaViewModel(private val repo: MediaDataContract.Repository,
-                     private val compositeDisposable: CompositeDisposable) : ViewModel() {
+class MediaViewModel(private val repo: MediaDataContract.Repository) : ViewModel() {
 
     companion object {
         private const val TAG = "MediaViewModel"
     }
+
+    private val compositeDisposable = CompositeDisposable()
 
     val mediaOutcome: LiveData<Outcome<MutableList<MediaStoreData>>> by lazy {
         repo.mediaOutcome.toLiveData(compositeDisposable)

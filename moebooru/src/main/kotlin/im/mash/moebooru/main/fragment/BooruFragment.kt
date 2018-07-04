@@ -1,7 +1,6 @@
 package im.mash.moebooru.main.fragment
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.Observer
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.TextInputEditText
@@ -21,15 +20,12 @@ import android.widget.Spinner
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.ToolbarFragment
 import im.mash.moebooru.common.data.local.entity.Booru
-import im.mash.moebooru.core.scheduler.Outcome
-import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.main.adapter.BooruAdapter
-import im.mash.moebooru.main.viewmodel.BooruViewModel
 import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.takeSnackbarShort
 
-class BooruFragment : ToolbarFragment() {
+class BooruFragment : ToolbarFragment(), MainActivity.BooruChangeListener {
 
     companion object {
         private const val TAG = "BooruFragment"
@@ -45,7 +41,6 @@ class BooruFragment : ToolbarFragment() {
     private var paddingButton = 0
 
     private val mainActivity: MainActivity by lazy { activity as MainActivity }
-    private val booruViewModel: BooruViewModel by lazy { this.getViewModel<BooruViewModel>(mainActivity.booruViewModelFactory) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.layout_booru, container, false)
@@ -53,8 +48,12 @@ class BooruFragment : ToolbarFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (savedInstanceState != null) {
+            boorus.clear()
+        }
+        boorus.addAll(mainActivity.getBoorus())
         initView(view)
-        initViewModel()
+        mainActivity.setBooruChangeListener(this)
     }
 
     @SuppressLint("InflateParams")
@@ -115,7 +114,7 @@ class BooruFragment : ToolbarFragment() {
                             }
                             if (TextUtils.isEmpty(hashSalt)) hashSalt = ""
                             val b = Booru(null, name, schema, domain, "$schema://$domain", hashSalt)
-                            booruViewModel.addBooru(b)
+                            mainActivity.addBooru(b)
                         }
                         .setNegativeButton(R.string.cancel, null)
                         .create()
@@ -130,7 +129,7 @@ class BooruFragment : ToolbarFragment() {
                         .setTitle(R.string.delete_booru)
                         .setMessage("Do you confirm delete the booru?")
                         .setPositiveButton(getString(R.string.ok)) { _, _ ->
-                            booruViewModel.deleteBooru(booru)
+                            mainActivity.deleteBooru(booru)
                         }
                         .setNegativeButton(R.string.cancel, null)
                         .show()
@@ -170,7 +169,7 @@ class BooruFragment : ToolbarFragment() {
                         }
                         if (TextUtils.isEmpty(hashSalt)) hashSalt = ""
                         val booru = Booru(null, name, schema, domain, "$schema://$domain", hashSalt)
-                        booruViewModel.addBooru(booru)
+                        mainActivity.addBooru(booru)
                     }
                     .setNegativeButton(R.string.cancel, null)
                     .create()
@@ -182,23 +181,13 @@ class BooruFragment : ToolbarFragment() {
         }
     }
 
-    private fun initViewModel() {
-        booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome ->
-            when (outcome) {
-                is Outcome.Progress -> {
+    override fun onBooruChanged(boorus: MutableList<Booru>) {
+        this.boorus = boorus
+        booruAdapter.updateData(this.boorus)
+    }
 
-                }
-                is Outcome.Success -> {
-                    boorus = outcome.data
-                    booruAdapter.updateData(boorus)
-                    mainActivity.resetBoorus(boorus)
-                    mainActivity.initHeaderItem()
-                }
-                is Outcome.Failure -> {
-
-                }
-            }
-        })
-        booruViewModel.loadBoorus()
+    override fun onDestroy() {
+        super.onDestroy()
+        mainActivity.setBooruChangeListener(null)
     }
 }

@@ -8,12 +8,12 @@ import android.arch.persistence.room.PrimaryKey
 data class Pool(
         @PrimaryKey(autoGenerate = true)
         var uid: Int?,
-        val host: String?,
+        var host: String?,
         val id: Int,
         val name: String,
         val created_at: String,
         val user_id: Int,
         val is_public: Boolean,
         val post_count: Int,
-        val description: String
+        val description: String?
 )

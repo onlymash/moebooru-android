@@ -171,4 +171,6 @@
     <string name="transition_name_post" translatable="false">transition_name_post</string>
 
     <string name="vote">Vote</string>
+
+    <string name="pools">Pools</string>
 </resources>

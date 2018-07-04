@@ -1,4 +1,4 @@
-package im.mash.moebooru.util
+package im.mash.moebooru.util.crash
 
 import android.annotation.SuppressLint
 import android.content.Context

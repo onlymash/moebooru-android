@@ -85,7 +85,8 @@ class AccountFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceC
                     requesting = false
                     progressBar.visibility = View.GONE
                     setAccount.visibility = View.VISIBLE
-                    users = outcome.data
+                    users.clear()
+                    users.addAll(outcome.data)
                     initUser()
                     logi(TAG, "User: $users, size: ${users.size}")
                 }

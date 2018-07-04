@@ -9,9 +9,8 @@ import android.widget.FrameLayout
 import im.mash.moebooru.R
 import im.mash.moebooru.content.UriRetriever
 import im.mash.moebooru.main.MainActivity
-import im.mash.moebooru.util.CrashFile
+import im.mash.moebooru.util.crash.CrashFile
 import im.mash.moebooru.util.MailUtil
-import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.takeSnackbarShort
 import moe.shizuku.preference.PreferenceFragment
 import java.io.File

@@ -7,7 +7,9 @@ import okhttp3.HttpUrl
 
 interface PoolDataContract {
     interface Repository {
+        val isEndOutCome: PublishSubject<Outcome<Boolean>>
         val poolFetchOutcome: PublishSubject<Outcome<MutableList<Pool>>>
+        fun isNotMore(): Boolean
         fun getPools(host: String)
         fun savePools(pools: MutableList<Pool>)
         fun refreshPools(url: HttpUrl)

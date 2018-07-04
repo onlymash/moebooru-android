@@ -13,6 +13,7 @@ import im.mash.moebooru.R
 import im.mash.moebooru.common.data.local.entity.Booru
 import im.mash.moebooru.util.ColorUtil
 import im.mash.moebooru.util.TextUtil
+import im.mash.moebooru.util.logi
 
 class BooruAdapter(private val context: Context, private var boorus: MutableList<Booru>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -27,6 +28,8 @@ class BooruAdapter(private val context: Context, private var boorus: MutableList
 
     fun updateData(boorus: MutableList<Booru>) {
         this.boorus = boorus
+        detailPosition = -1
+        logi(TAG, "boorus size: ${boorus.size}")
         notifyDataSetChanged()
     }
 

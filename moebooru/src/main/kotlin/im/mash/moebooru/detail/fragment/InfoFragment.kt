@@ -90,15 +90,7 @@ class InfoFragment : Fragment(), DetailActivity.InfoChangeListener {
                 this.post = post
                 id.text = post.id.toString()
                 author.text = post.author
-                val date = Date()
-                date.time = post.created_at * 1000L
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    val df = android.icu.text.DateFormat.getDateInstance()
-                    createdAt.text = df.format(date)
-                } else {
-                    val df = DateFormat.getDateFormat(this.requireContext())
-                    createdAt.text = df.format(date)
-                }
+                createdAt.text = formatDate(post.created_at * 1000L)
                 creatorId.text = post.creator_id.toString()
                 val hw = "${post.height} x ${post.width}"
                 heightWidth.text = hw

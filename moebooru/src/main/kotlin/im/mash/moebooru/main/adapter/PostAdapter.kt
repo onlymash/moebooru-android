@@ -1,19 +1,15 @@
 package im.mash.moebooru.main.adapter
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.bumptech.glide.request.target.SimpleTarget
-import com.bumptech.glide.request.transition.Transition
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.data.local.entity.Post
-import im.mash.moebooru.core.widget.FixedImageView
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.MoeGlideUrl
 import im.mash.moebooru.util.*

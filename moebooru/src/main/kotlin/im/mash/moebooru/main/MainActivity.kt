@@ -64,12 +64,13 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     companion object {
         private const val TAG = "MainActivity"
         private const val DRAWER_ITEM_POSTS = 0L
-        private const val DRAWER_ITEM_ACCOUNT = 1L
-        private const val DRAWER_ITEM_DOWNLOADS = 2L
-        private const val DRAWER_ITEM_LOCAL_GALLERY = 3L
-        private const val DRAWER_ITEM_SETTINGS = 4L
-        private const val DRAWER_ITEM_FEEDBACK = 5L
-        private const val DRAWER_ITEM_ABOUT = 6L
+        private const val DRAWER_ITEM_POOLS = 1L
+        private const val DRAWER_ITEM_ACCOUNT = 2L
+        private const val DRAWER_ITEM_DOWNLOADS = 3L
+        private const val DRAWER_ITEM_LOCAL_GALLERY = 4L
+        private const val DRAWER_ITEM_SETTINGS = 5L
+        private const val DRAWER_ITEM_FEEDBACK = 6L
+        private const val DRAWER_ITEM_ABOUT = 7L
         private const val SETTING_PROFILE_ID = 100L
     }
 
@@ -79,18 +80,17 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     private var previousSelectedDrawer: Long = 0L
     private var selectedNewItem = false
 
-    private val component by lazy { MoeDH.mainComponent() }
+    private val mainComponent by lazy { MoeDH.mainComponent() }
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
     @Inject
     lateinit var booruViewModelFactory: BooruViewModelFactory
-    private val booruViewModel: BooruViewModel by lazy { this.getViewModel<BooruViewModel>(booruViewModelFactory) }
-    internal var boorus: MutableList<Booru> = mutableListOf()
-
     @Inject
     lateinit var postViewModelFactory: PostViewModelFactory
+    @Inject
+    lateinit var poolViewModelFactory: PoolViewModelFactory
     @Inject
     lateinit var tagViewModelFactory: TagViewModelFactory
     @Inject
@@ -99,8 +99,14 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     lateinit var downloadViewModelFactory: DownloadViewModelFactory
     @Inject
     lateinit var userViewModelFactory: UserViewModelFactory
+    @Inject
+    lateinit var voteViewModelFactory: VoteViewModelFactory
+
     private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(userViewModelFactory) }
     private val users: MutableList<User> = mutableListOf()
+
+    private val booruViewModel: BooruViewModel by lazy { this.getViewModel<BooruViewModel>(booruViewModelFactory) }
+    internal var boorus: MutableList<Booru> = mutableListOf()
 
     @Inject
     lateinit var database: MoeDatabase
@@ -108,8 +114,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     lateinit var postSearchService: PostSearchService
     @Inject
     lateinit var scheduler: Scheduler
-    @Inject
-    lateinit var voteViewModelFactory: VoteViewModelFactory
 
     private var isNullState = true
     private var isNewCreate = true
@@ -119,7 +123,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
 
         setContentView(R.layout.activity_moebooru)
 
-        component.inject(this)
+        mainComponent.inject(this)
 
         isNullState = savedInstanceState == null
 
@@ -158,7 +162,12 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                         PrimaryDrawerItem()
                                 .withIdentifier(DRAWER_ITEM_POSTS)
                                 .withName(R.string.posts)
-                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_posts_24dp))
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_photo_24dp))
+                                .withIconTintingEnabled(true),
+                        PrimaryDrawerItem()
+                                .withIdentifier(DRAWER_ITEM_POOLS)
+                                .withName(R.string.pools)
+                                .withIcon(AppCompatResources.getDrawable(this, R.drawable.ic_drawer_photo_album_24dp))
                                 .withIconTintingEnabled(true),
                         PrimaryDrawerItem()
                                 .withIdentifier(DRAWER_ITEM_ACCOUNT)
@@ -211,7 +220,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
 
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-        initBooru()
+        initBoorus()
 
         if (!isNullState && app.settings.isChangedNightMode) {
             drawer.setSelection(DRAWER_ITEM_SETTINGS)
@@ -219,17 +228,21 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
         }
     }
 
-    private fun initBooru() {
+    private fun initBoorus() {
         booruViewModel.booruOutcome.observe(this, Observer<Outcome<MutableList<Booru>>> { outcome ->
             when (outcome) {
                 is Outcome.Progress -> {
+                    logi(TAG, "boorus outcome progress")
                 }
                 is Outcome.Success -> {
                     logi(TAG, "boorus outcome success")
-                    boorus = outcome.data
+                    boorus.clear()
+                    boorus.addAll(outcome.data)
                     initUser()
+                    booruChangeListener?.onBooruChanged(boorus)
                 }
                 is Outcome.Failure -> {
+                    logi(TAG, "boorus outcome failed")
                     if (outcome.e is IOException) {
                         outcome.e.printStackTrace()
                     }
@@ -485,6 +498,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
             selectedNewItem = false
             when (previousSelectedDrawer) {
                 DRAWER_ITEM_POSTS -> displayFragment(PostFragment())
+                DRAWER_ITEM_POOLS -> displayFragment(PoolFragment())
                 DRAWER_ITEM_ACCOUNT -> displayFragment(AccountFragment())
                 DRAWER_ITEM_DOWNLOADS -> displayFragment(DownloadFragment())
                 DRAWER_ITEM_LOCAL_GALLERY -> displayFragment(GalleryFragment())
@@ -543,5 +557,41 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
         val position = app.settings.activeProfileId.toInt()
         if (position >= boorus.size) return ""
         return boorus[position].hash_salt
+    }
+
+    fun getUser(): User? {
+        var user: User? = null
+        val host = app.settings.activeProfileHost
+        val schema = app.settings.activeProfileSchema
+        val baseUrl = "$schema://$host"
+        users.forEach {  u ->
+            if (u.url == baseUrl) {
+                user = u
+                return@forEach
+            }
+        }
+        return user
+    }
+
+    private var booruChangeListener: BooruChangeListener? = null
+
+    fun setBooruChangeListener(booruChangeListener: BooruChangeListener?) {
+        this.booruChangeListener = booruChangeListener
+    }
+
+    interface BooruChangeListener {
+        fun onBooruChanged(boorus: MutableList<Booru>)
+    }
+
+    fun getBoorus(): MutableList<Booru> {
+        return boorus
+    }
+
+    fun addBooru(booru: Booru) {
+        booruViewModel.addBooru(booru)
+    }
+
+    fun deleteBooru(booru: Booru) {
+        booruViewModel.deleteBooru(booru)
     }
 }

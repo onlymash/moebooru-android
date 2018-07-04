@@ -1,4 +1,4 @@
-package im.mash.moebooru.util
+package im.mash.moebooru.util.crash
 
 import android.content.Context
 import java.io.File

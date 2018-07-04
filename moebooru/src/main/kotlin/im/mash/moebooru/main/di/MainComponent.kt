@@ -65,18 +65,13 @@ class MainModule {
     /*BooruViewModel*/
     @Provides
     @MainScope
-    fun booruViewModelFactory(repository: BooruDataContract.Repository,
-                             compositeDisposable: CompositeDisposable): BooruViewModelFactory
-            = BooruViewModelFactory(repository,compositeDisposable)
+    fun booruViewModelFactory(repository: BooruDataContract.Repository): BooruViewModelFactory
+            = BooruViewModelFactory(repository)
 
     @Provides
     @MainScope
-    fun booruRepo(local: BooruDataContract.Local, scheduler: Scheduler, compositeDisposable: CompositeDisposable) : BooruDataContract.Repository
-            = BooruRepository(local, scheduler, compositeDisposable)
-
-    @Provides
-    @MainScope
-    fun localBooruData(database: MoeDatabase, scheduler: Scheduler): BooruDataContract.Local = BooruLocalData(database, scheduler)
+    fun booruRepo(database: MoeDatabase, scheduler: Scheduler) : BooruDataContract.Repository
+            = BooruRepository(database, scheduler)
 
     /*TagViewModel*/
     @Provides
@@ -98,15 +93,14 @@ class MainModule {
     /*MediaViewModel*/
     @Provides
     @MainScope
-    fun mediaViewModelFactory(repository: MediaDataContract.Repository,
-                             compositeDisposable: CompositeDisposable): MediaViewModelFactory
-            = MediaViewModelFactory(repository,compositeDisposable)
+    fun mediaViewModelFactory(repository: MediaDataContract.Repository): MediaViewModelFactory
+            = MediaViewModelFactory(repository)
 
     /*MediaRepository*/
     @Provides
     @MainScope
-    fun mediaRepo(source: MediaStoreDataSource, scheduler: Scheduler, compositeDisposable: CompositeDisposable): MediaDataContract.Repository
-            = MediaRepository(source, scheduler, compositeDisposable)
+    fun mediaRepo(source: MediaStoreDataSource, scheduler: Scheduler): MediaDataContract.Repository
+            = MediaRepository(source, scheduler)
 
     @Provides
     @MainScope
@@ -154,4 +148,14 @@ class MainModule {
     @Provides
     @MainScope
     fun poolService(retrofit: Retrofit): PoolService = retrofit.create(PoolService::class.java)
+
+    @Provides
+    @MainScope
+    fun poolRepo(poolService: PoolService, database: MoeDatabase, scheduler: Scheduler): PoolDataContract.Repository
+            = PoolRepository(poolService, database, scheduler)
+
+    @Provides
+    @MainScope
+    fun poolViewModelFactory(poolRepo: PoolDataContract.Repository): PoolViewModelFactory
+            = PoolViewModelFactory(poolRepo)
 }

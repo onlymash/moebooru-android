@@ -1,44 +1,61 @@
 package im.mash.moebooru.main.model
 
+import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.local.entity.Booru
 import im.mash.moebooru.core.extensions.*
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.util.logi
+import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 
-class BooruRepository(private val local: BooruDataContract.Local,
-                      private val scheduler: Scheduler,
-                      private val compositeDisposable: CompositeDisposable) : BooruDataContract.Repository {
+class BooruRepository(private val database: MoeDatabase,
+                      private val scheduler: Scheduler) : BooruDataContract.Repository {
 
     companion object {
         private const val TAG = "BooruRepository"
     }
 
-    override val booruFetchOutcome: PublishSubject<Outcome<MutableList<Booru>>> =
-            PublishSubject.create<Outcome<MutableList<Booru>>>()
+    private val compositeDisposable = CompositeDisposable()
+
+    override val booruFetchOutcome: PublishSubject<Outcome<MutableList<Booru>>>
+            = PublishSubject.create<Outcome<MutableList<Booru>>>()
 
     override fun loadBoorus() {
         booruFetchOutcome.loading(true)
-        local.getBoorus()
+        database.booruDao()
+                .getBoorus()
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ boorus ->
+                    logi(TAG, "loadBoorus success")
                     booruFetchOutcome.success(boorus)
                 }, { error -> handleError(error) })
                 .addTo(compositeDisposable)
     }
 
     override fun deleteBooru(booru: Booru) {
-        local.delete(booru)
+        Completable.fromAction {
+            database.booruDao().delete(booru)
+        }
+                .performOnBack(scheduler)
+                .subscribe()
     }
 
     override fun addBooru(booru: Booru) {
-        local.saveBooru(booru)
+        Completable.fromAction {
+            database.booruDao().insertBooru(booru)
+        }
+                .performOnBack(scheduler)
+                .subscribe()
     }
 
     override fun addBoorus(boorus: MutableList<Booru>) {
-        local.saveBoorus(boorus)
+        Completable.fromAction {
+            database.booruDao().insertBoorus(boorus)
+        }
+                .performOnBack(scheduler)
+                .subscribe()
     }
 
     override fun handleError(error: Throwable) {

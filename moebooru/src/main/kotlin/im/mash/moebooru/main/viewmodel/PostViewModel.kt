@@ -31,16 +31,10 @@ class PostViewModel(private val repo: PostDataContract.Repository,
     }
 
     fun loadPosts(httpUrl: HttpUrl) {
-        if (postsOutcome.value == null)
-            repo.fetchPosts(httpUrl)
-    }
-
-    fun reLoadPosts(httpUrl: HttpUrl) {
         repo.fetchPosts(httpUrl)
     }
 
     fun refreshPosts(httpUrl: HttpUrl) {
-        logi(TAG, "refreshPosts")
         repo.refreshPosts(httpUrl)
     }
 
