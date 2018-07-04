@@ -103,7 +103,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     lateinit var voteViewModelFactory: VoteViewModelFactory
 
     private val userViewModel: UserViewModel by lazy { this.getViewModel<UserViewModel>(userViewModelFactory) }
-    private val users: MutableList<User> = mutableListOf()
+    private var users: MutableList<User> = mutableListOf()
 
     private val booruViewModel: BooruViewModel by lazy { this.getViewModel<BooruViewModel>(booruViewModelFactory) }
     internal var boorus: MutableList<Booru> = mutableListOf()
@@ -236,8 +236,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                 }
                 is Outcome.Success -> {
                     logi(TAG, "boorus outcome success")
-                    boorus.clear()
-                    boorus.addAll(outcome.data)
+                    boorus = outcome.data
                     initUser()
                     booruChangeListener?.onBooruChanged(boorus)
                 }
@@ -260,7 +259,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                 is Outcome.Success -> {
                     users.clear()
                     if (outcome.data.size > 0) {
-                        users.addAll(outcome.data)
+                        users = outcome.data
                         if (this.isNetworkConnected && init) {
                             logi(TAG, "User Outcome success. init")
                             init = false
@@ -293,11 +292,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
             }
         })
         userViewModel.loadUsers()
-    }
-
-    internal fun resetBoorus(boorus: MutableList<Booru>) {
-        this.boorus.clear()
-        this.boorus.addAll(boorus)
     }
 
     internal fun initHeaderItem() {
@@ -357,8 +351,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     }
 
     internal fun setUsers(users: MutableList<User>) {
-        this.users.clear()
-        this.users.addAll(users)
+        this.users = users
     }
 
     internal fun setHeaderBackground(schema: String, host: String) {

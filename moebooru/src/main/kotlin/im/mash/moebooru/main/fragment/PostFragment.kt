@@ -805,8 +805,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 }
             }
             Settings.ACTIVE_PROFILE_HOST -> {
-                posts.clear()
-                postAdapter.clearData()
+                posts = mutableListOf()
+                postAdapter.updateData(posts)
                 mainActivity.supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_moebooru, PostFragment())
                         .commitAllowingStateLoss()

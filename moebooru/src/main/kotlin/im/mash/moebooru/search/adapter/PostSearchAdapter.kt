@@ -28,19 +28,16 @@ class PostSearchAdapter(private val context: Context, private var gridMode: Stri
     private var idsThree: MutableList<Int> = mutableListOf()
 
     fun updateData(posts: MutableList<PostSearch>) {
-        this.posts.clear()
-        this.posts.addAll(posts)
+        this.posts = posts
         notifyDataSetChanged()
     }
 
     fun updateVoteIdsOneTwo(idsOneTwo: MutableList<Int>) {
-        this.idsOneTwo.clear()
-        this.idsOneTwo.addAll(idsOneTwo)
+        this.idsOneTwo = idsOneTwo
     }
 
     fun updateVoteIdsThree(idsThree: MutableList<Int>) {
-        this.idsThree.clear()
-        this.idsThree.addAll(idsThree)
+        this.idsThree = idsThree
     }
 
     fun setGridMode(gridMode: String) {
@@ -49,14 +46,8 @@ class PostSearchAdapter(private val context: Context, private var gridMode: Stri
 
     fun addData(posts: MutableList<PostSearch>) {
         val countBefore = itemCount
-        this.posts.clear()
-        this.posts.addAll(posts)
+        this.posts = posts
         notifyItemRangeInserted(countBefore, itemCount)
-    }
-
-    fun clearData() {
-        posts.clear()
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostSearchViewHolder {

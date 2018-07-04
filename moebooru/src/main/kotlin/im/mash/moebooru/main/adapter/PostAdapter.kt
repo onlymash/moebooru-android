@@ -28,20 +28,16 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
     private var idsThree: MutableList<Int> = mutableListOf()
 
     fun updateData(posts: MutableList<Post>) {
-        logi(TAG, "updateData")
-        this.posts.clear()
-        this.posts.addAll(posts)
+        this.posts = posts
         notifyDataSetChanged()
     }
 
     fun updateVoteIdsOneTwo(idsOneTwo: MutableList<Int>) {
-        this.idsOneTwo.clear()
-        this.idsOneTwo.addAll(idsOneTwo)
+        this.idsOneTwo = idsOneTwo
     }
 
     fun updateVoteIdsThree(idsThree: MutableList<Int>) {
-        this.idsThree.clear()
-        this.idsThree.addAll(idsThree)
+        this.idsThree = idsThree
     }
 
     fun setGridMode(gridMode: String) {
@@ -51,8 +47,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
     fun addData(posts: MutableList<Post>) {
         logi(TAG, "addData")
         val countBefore = itemCount
-        this.posts.clear()
-        this.posts.addAll(posts)
+        this.posts = posts
         notifyItemRangeInserted(countBefore, itemCount)
     }
 
