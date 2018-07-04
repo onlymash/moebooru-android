@@ -6,10 +6,7 @@ import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.media.MediaStoreDataSource
-import im.mash.moebooru.common.data.remote.PostSearchService
-import im.mash.moebooru.common.data.remote.PostService
-import im.mash.moebooru.common.data.remote.UserService
-import im.mash.moebooru.common.data.remote.VoteService
+import im.mash.moebooru.common.data.remote.*
 import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.common.model.*
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
@@ -153,4 +150,8 @@ class MainModule {
     fun voteViewModelFactory(voteRepo: VoteDataContract.Repository,
                              compositeDisposable: CompositeDisposable): VoteViewModelFactory
             = VoteViewModelFactory(voteRepo, compositeDisposable)
+
+    @Provides
+    @MainScope
+    fun poolService(retrofit: Retrofit): PoolService = retrofit.create(PoolService::class.java)
 }

@@ -318,20 +318,20 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
 //        (postSearchView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postSearchView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation)
         postSearchView.setItemViewCacheSize(20)
-        postSearchView.setHasFixedSize(true)
         when (app.settings.gridModeString) {
             Settings.GRID_MODE_GRID -> {
                 val layoutManager = SafeGridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
+                postSearchView.setHasFixedSize(true)
                 postSearchView.layoutManager = layoutManager
             }
             else -> {
                 val layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                 layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                postSearchView.setHasFixedSize(false)
                 postSearchView.layoutManager = layoutManager
             }
         }
         postSearchAdapter = PostSearchAdapter(this, app.settings.gridModeString)
-//        postSearchAdapter.setHasStableIds(true)
         postSearchView.adapter = postSearchAdapter
         postSearchView.addOnScrollListener(object : LastItemListener() {
             override fun onLastItemVisible() {
@@ -540,7 +540,9 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             Settings.GRID_MODE -> {
                 when (app.settings.gridModeString) {
                     Settings.GRID_MODE_GRID -> {
-                        postSearchView.layoutManager = SafeGridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
+                        val layoutManager = SafeGridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
+                        postSearchView.setHasFixedSize(true)
+                        postSearchView.layoutManager = layoutManager
                         postSearchAdapter.setGridMode(Settings.GRID_MODE_GRID)
                         postSearchAdapter.updateData(mutableListOf())
                         if (safeMode) postSearchAdapter.updateData(getSafePosts()) else postSearchAdapter.updateData(posts)
@@ -548,6 +550,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                     Settings.GRID_MODE_STAGGERED_GRID -> {
                         val layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                         layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                        postSearchView.setHasFixedSize(false)
                         postSearchView.layoutManager = layoutManager
                         postSearchAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
                         postSearchAdapter.updateData(mutableListOf())

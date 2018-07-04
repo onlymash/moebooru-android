@@ -393,20 +393,20 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 //        (postView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postView.setItemViewCacheSize(20)
-        postView.setHasFixedSize(true)
         when (app.settings.gridModeString) {
             Settings.GRID_MODE_GRID -> {
                 val layoutManager = SafeGridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                postView.setHasFixedSize(true)
                 postView.layoutManager = layoutManager
             }
             else -> {
                 val layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                 layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                postView.setHasFixedSize(false)
                 postView.layoutManager = layoutManager
             }
         }
         postAdapter = PostAdapter(this.requireContext(), app.settings.gridModeString)
-//        postAdapter.setHasStableIds(true)
         postView.adapter = postAdapter
 
         postView.addOnScrollListener(object : LastItemListener() {
@@ -786,7 +786,9 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             Settings.GRID_MODE -> {
                 when (app.settings.gridModeString) {
                     Settings.GRID_MODE_GRID -> {
-                        postView.layoutManager = SafeGridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                        val layoutManager = SafeGridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
+                        postView.setHasFixedSize(true)
+                        postView.layoutManager = layoutManager
                         postAdapter.setGridMode(Settings.GRID_MODE_GRID)
                         postAdapter.updateData(mutableListOf())
                         if (safeMode) postAdapter.updateData(getSafePosts()) else postAdapter.updateData(posts)
@@ -794,6 +796,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     Settings.GRID_MODE_STAGGERED_GRID -> {
                         val layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                         layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
+                        postView.setHasFixedSize(false)
                         postView.layoutManager = layoutManager
                         postAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
                         postAdapter.updateData(mutableListOf())

@@ -1,6 +1,7 @@
 package im.mash.moebooru.search.adapter
 
 import android.content.Context
+import android.support.constraint.ConstraintLayout
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -82,20 +83,24 @@ class PostSearchAdapter(private val context: Context, private var gridMode: Stri
         }
         when (gridMode) {
             Settings.GRID_MODE_GRID -> {
-                holder.fixedImageView.setWidthAndHeightWeight(1, 1)
+                val lp = holder.post.layoutParams as ConstraintLayout.LayoutParams
+                lp.dimensionRatio = "H, 1:1"
+                holder.post.layoutParams = lp
                 GlideApp.with(context)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .centerCrop()
                         .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
-                        .into(holder.fixedImageView)
+                        .into(holder.post)
             }
             else -> {
-                holder.fixedImageView.setWidthAndHeightWeight(posts[position].width, posts[position].height)
+                val lp = holder.post.layoutParams as ConstraintLayout.LayoutParams
+                lp.dimensionRatio = "H, ${posts[position].actual_preview_width}:${posts[position].actual_preview_height}"
+                holder.post.layoutParams = lp
                 GlideApp.with(context)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .fitCenter()
                         .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
-                        .into(holder.fixedImageView)
+                        .into(holder.post)
             }
         }
         val id = posts[position].id
@@ -128,7 +133,7 @@ class PostSearchAdapter(private val context: Context, private var gridMode: Stri
     }
 
     inner class PostSearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val fixedImageView: FixedImageView = itemView.findViewById(R.id.post_item)
+        val post: ImageView = itemView.findViewById(R.id.post_item)
         val rate: ImageView = itemView.findViewById(R.id.rate)
     }
 }

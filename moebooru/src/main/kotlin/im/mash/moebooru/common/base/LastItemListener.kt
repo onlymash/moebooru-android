@@ -40,9 +40,9 @@ abstract class LastItemListener : RecyclerView.OnScrollListener() {
 
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         super.onScrollStateChanged(recyclerView, newState)
-//        if (recyclerView.layoutManager is StaggeredGridLayoutManager) {
-//            (recyclerView.layoutManager as StaggeredGridLayoutManager).invalidateSpanAssignments()
-//        }
+        if (recyclerView.layoutManager is StaggeredGridLayoutManager) {
+            (recyclerView.layoutManager as StaggeredGridLayoutManager).invalidateSpanAssignments()
+        }
     }
 
     /**
