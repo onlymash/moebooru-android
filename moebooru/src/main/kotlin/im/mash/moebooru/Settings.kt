@@ -36,9 +36,6 @@ class Settings(private val sp: SharedPreferences) {
         const val ACTIVE_PROFILE_ID = "active_profile_id"
         const val ACTIVE_PROFILE_SCHEME = "active_profile_scheme"
         const val ACTIVE_PROFILE_HOST = "active_profile_host"
-        const val SPAN_COUNT = "span_count"
-        const val IS_NOT_MORE_DATA = "not_more_data"
-        const val IS_CHANGED_NIGHT_MODE = "changed_night_mode"
         const val ENABLE_CRASH_REPORT = "enable_crash_report"
         const val SAFE_MODE = "safe_mode"
     }
@@ -67,7 +64,7 @@ class Settings(private val sp: SharedPreferences) {
         set(value) = editor.putString(POST_LIMIT, value.toString()).apply()
 
     var cacheMemoryInt: Int
-        get() = sp.getString(CACHE_MEMORY, "256").toInt()
+        get() = sp.getString(CACHE_MEMORY, "128").toInt()
         set(value) = editor.putString(CACHE_MEMORY, value.toString()).apply()
 
     var cacheDiskInt: Int
@@ -86,18 +83,6 @@ class Settings(private val sp: SharedPreferences) {
     var activeProfileSchema: String
         get() = sp.getString(ACTIVE_PROFILE_SCHEME, "https")
         set(value) = editor.putString(ACTIVE_PROFILE_SCHEME, value).apply()
-
-    var spanCountInt: Int
-        get() = sp.getInt(SPAN_COUNT, 3)
-        set(value) = editor.putInt(SPAN_COUNT, value).apply()
-
-    var isNotMoreData: Boolean
-        get() = sp.getBoolean(IS_NOT_MORE_DATA, true)
-        set(value) = editor.putBoolean(IS_NOT_MORE_DATA, value).apply()
-
-    var isChangedNightMode: Boolean
-        get() = sp.getBoolean(IS_CHANGED_NIGHT_MODE, false)
-        set(value) = editor.putBoolean(IS_CHANGED_NIGHT_MODE, value).apply()
 
     var enabledCrashReport: Boolean
         get() = sp.getBoolean(ENABLE_CRASH_REPORT, true)

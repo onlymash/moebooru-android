@@ -111,11 +111,10 @@
     </string-array>
 
     <string-array name="cache_memory">
-        <item>128 MiB</item>
-        <item>256 MiB</item>
         <item>@string/disk_memory_default</item>
+        <item>256 MiB</item>
+        <item>512 MiB</item>
         <item>1 GiB</item>
-        <item>2 GiB</item>
     </string-array>
 
     <string-array name="cache_memory_values">
@@ -123,13 +122,12 @@
         <item>256</item>
         <item>512</item>
         <item>1024</item>
-        <item>2048</item>
     </string-array>
 
     <string-array name="cache_disk">
         <item>128 MiB</item>
-        <item>256 MiB</item>
         <item>@string/cache_memory_default</item>
+        <item>512 MiB</item>
         <item>1 GiB</item>
         <item>2 GiB</item>
     </string-array>

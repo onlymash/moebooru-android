@@ -222,9 +222,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
 
         initBoorus()
 
-        if (!isNullState && app.settings.isChangedNightMode) {
+        if (!isNullState && supportFragmentManager.findFragmentById(R.id.fragment_moebooru) is SettingsFragment) {
             drawer.setSelection(DRAWER_ITEM_SETTINGS)
-            app.settings.isChangedNightMode = false
         }
     }
 
@@ -510,7 +509,6 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
         when (key) {
             Settings.NIGHT_MODE -> {
                 AppCompatDelegate.setDefaultNightMode(app.settings.nightMode)
-                app.settings.isChangedNightMode = true
                 recreate()
             }
         }
@@ -525,14 +523,29 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
         if (drawer.isDrawerOpen) {
             drawer.closeDrawer()
         } else {
-            val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_moebooru) as ToolbarFragment
-            if (!currentFragment.onBackPressed()) {
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.fragment_moebooru)
+            if (currentFragment != null && !(currentFragment as ToolbarFragment).onBackPressed()) {
                 if (currentFragment is PostFragment) {
                     super.onBackPressed()
                 } else {
+                    displayFragment(PostFragment())
+                    previousSelectedDrawer = DRAWER_ITEM_POSTS
                     drawer.setSelection(DRAWER_ITEM_POSTS)
                 }
+            } else if (currentFragment == null) {
+                displayFragment(PostFragment())
+                previousSelectedDrawer = DRAWER_ITEM_POSTS
+                drawer.setSelection(DRAWER_ITEM_POSTS)
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (supportFragmentManager.findFragmentById(R.id.fragment_moebooru) == null) {
+            displayFragment(PostFragment())
+            previousSelectedDrawer = DRAWER_ITEM_POSTS
+            drawer.setSelection(DRAWER_ITEM_POSTS)
         }
     }
 
