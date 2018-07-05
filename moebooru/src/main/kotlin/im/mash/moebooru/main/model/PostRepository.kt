@@ -11,9 +11,9 @@ import io.reactivex.subjects.PublishSubject
 import okhttp3.HttpUrl
 
 class PostRepository(private val local: PostDataContract.Local,
-                 private val remote: PostDataContract.Remote,
-                 private val scheduler: Scheduler,
-                 private val compositeDisposable: CompositeDisposable) : PostDataContract.Repository {
+                     private val remote: PostDataContract.Remote,
+                     private val scheduler: Scheduler,
+                     private val compositeDisposable: CompositeDisposable) : PostDataContract.Repository {
 
     companion object {
         private const val TAG = "PostRepository"
