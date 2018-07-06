@@ -8,7 +8,7 @@ import im.mash.moebooru.common.data.local.entity.*
 
 @Keep
 @Database(entities = [(Booru::class), (Post::class), (PostSearch::class), (Tag::class),
-    (PostDownload::class), (User::class), (Pool::class), (Comment::class)], version = 2, exportSchema = false)
+    (PostDownload::class), (User::class), (Pool::class), (Comment::class)], version = 3, exportSchema = false)
 abstract class MoeDatabase : RoomDatabase() {
 
     abstract fun booruDao(): BooruDao

@@ -34,8 +34,8 @@ class CommentLocalData(private val database: MoeDatabase,
                 .subscribe()
     }
 
-    override fun deleteComment(comment: Comment) {
-        Completable.fromAction { database.commentDao().deleteComment(comment) }
+    override fun deleteComment(host: String, commentId: Int) {
+        Completable.fromAction { database.commentDao().deleteCommentById(host, commentId) }
                 .performOnBack(scheduler)
                 .subscribe()
     }

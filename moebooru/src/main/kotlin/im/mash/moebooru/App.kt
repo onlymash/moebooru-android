@@ -10,6 +10,7 @@ import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp
 import im.mash.moebooru.common.di.CoreComponent
 import im.mash.moebooru.common.di.DaggerCoreComponent
+import im.mash.moebooru.core.constants.Constants
 import im.mash.moebooru.core.module.AppModule
 import im.mash.moebooru.download.DownloadManager
 import im.mash.moebooru.util.crash.CrashHandler
@@ -18,6 +19,7 @@ import im.mash.moebooru.util.glideHeader
 import im.mash.moebooru.util.logi
 import io.fabric.sdk.android.Fabric
 import java.io.File
+import java.io.IOException
 
 class App : Application() {
 
@@ -41,6 +43,18 @@ class App : Application() {
         if (settings.enabledCrashReport && !Fabric.isInitialized()) {
             Fabric.with(this, Crashlytics())
         }
+        if (settings.versionCode < 22) {
+            val dbFile = File(getDatabasePath(Constants.DB_NAME), "")
+            logi(TAG, "delete old database")
+            if (dbFile.exists()) {
+                try {
+                    dbFile.delete()
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        settings.versionCode = BuildConfig.VERSION_CODE
         AppCompatDelegate.setDefaultNightMode(settings.nightMode)
         glideHeaders = this.glideHeader
     }

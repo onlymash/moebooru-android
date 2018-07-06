@@ -4,8 +4,11 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import im.mash.moebooru.common.data.local.MoeDatabase
+import im.mash.moebooru.common.data.remote.CommentService
 import im.mash.moebooru.common.data.remote.VoteService
 import im.mash.moebooru.common.di.CoreComponent
+import im.mash.moebooru.common.model.*
+import im.mash.moebooru.common.viewmodel.CommentViewModelFactory
 import im.mash.moebooru.core.scheduler.Scheduler
 import im.mash.moebooru.detail.DetailActivity
 import im.mash.moebooru.detail.model.DetailDataContract
@@ -13,10 +16,6 @@ import im.mash.moebooru.detail.model.DetailLocalData
 import im.mash.moebooru.detail.model.DetailRepository
 import im.mash.moebooru.detail.viewmodel.DetailViewModelFactory
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
-import im.mash.moebooru.common.model.DownloadDataContract
-import im.mash.moebooru.common.model.DownloadRepository
-import im.mash.moebooru.common.model.VoteDataContract
-import im.mash.moebooru.common.model.VoteRepository
 import im.mash.moebooru.main.model.TagDataContract
 import im.mash.moebooru.main.model.TagRepository
 import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
@@ -95,4 +94,29 @@ class DetailModule {
     fun voteViewModelFactory(voteRepo: VoteDataContract.Repository,
                              compositeDisposable: CompositeDisposable): VoteViewModelFactory
             = VoteViewModelFactory(voteRepo, compositeDisposable)
+
+    @Provides
+    @DetailScope
+    fun localComment(database: MoeDatabase, scheduler: Scheduler): CommentDataContract.Local
+            = CommentLocalData(database, scheduler)
+
+    @Provides
+    @DetailScope
+    fun commentService(retrofit: Retrofit): CommentService = retrofit.create(CommentService::class.java)
+
+    @Provides
+    @DetailScope
+    fun remoteComment(commentService: CommentService): CommentDataContract.Remote
+            = CommentRemoteData(commentService)
+
+    @Provides
+    @DetailScope
+    fun commentRepo(localComment: CommentDataContract.Local, remoteComment: CommentDataContract.Remote,
+                    scheduler: Scheduler): CommentDataContract.Repository
+            = CommentRepository(localComment, remoteComment, scheduler)
+
+    @Provides
+    @DetailScope
+    fun commentViewModelFactory(repo: CommentDataContract.Repository): CommentViewModelFactory
+            = CommentViewModelFactory(repo)
 }

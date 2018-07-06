@@ -38,6 +38,7 @@ class Settings(private val sp: SharedPreferences) {
         const val ACTIVE_PROFILE_HOST = "active_profile_host"
         const val ENABLE_CRASH_REPORT = "enable_crash_report"
         const val SAFE_MODE = "safe_mode"
+        const val VERSION_CODE = "version_code"
     }
 
     private val editor: SharedPreferences.Editor = sp.edit()
@@ -99,4 +100,8 @@ class Settings(private val sp: SharedPreferences) {
     var safeMode: Boolean
         get() = sp.getBoolean(SAFE_MODE, true)
         set(value) = editor.putBoolean(SAFE_MODE, value).apply()
+
+    var versionCode: Int
+        get() = sp.getInt(VERSION_CODE, 22)
+        set(value) = editor.putInt(VERSION_CODE, value).apply()
 }

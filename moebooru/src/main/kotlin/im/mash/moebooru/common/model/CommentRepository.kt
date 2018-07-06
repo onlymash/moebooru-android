@@ -7,6 +7,7 @@ import im.mash.moebooru.core.scheduler.Scheduler
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
 import okhttp3.HttpUrl
+import java.net.URI
 
 class CommentRepository(private val local: CommentDataContract.Local,
                         private val remote: CommentDataContract.Remote,
@@ -66,11 +67,12 @@ class CommentRepository(private val local: CommentDataContract.Local,
                 .subscribe()
     }
 
-    override fun deleteComment(url: String, comment: Comment, username: String, passwordHash: String) {
-        remote.destroyComment(url, comment.id, username, passwordHash)
+    override fun deleteComment(url: String, commentId: Int, username: String, passwordHash: String) {
+        remote.destroyComment(url, commentId, username, passwordHash)
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({
-                    local.deleteComment(comment)
+                    val host = URI(url).host
+                    local.deleteComment(host, commentId)
                 }, { error -> handleError(error)})
                 .addTo(compositeDisposable)
     }

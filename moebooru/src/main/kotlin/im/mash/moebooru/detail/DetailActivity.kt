@@ -25,6 +25,7 @@ import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.common.data.local.entity.PostSearch
+import im.mash.moebooru.common.viewmodel.*
 import im.mash.moebooru.core.application.SlidingActivity
 import im.mash.moebooru.core.scheduler.Outcome
 import im.mash.moebooru.core.widget.VerticalViewPager
@@ -35,15 +36,12 @@ import im.mash.moebooru.detail.viewmodel.PositionViewModel
 import im.mash.moebooru.detail.viewmodel.PositionViewModelFactory
 import im.mash.moebooru.download.DownloadService
 import im.mash.moebooru.helper.getViewModel
-import im.mash.moebooru.common.viewmodel.DownloadViewModel
-import im.mash.moebooru.common.viewmodel.DownloadViewModelFactory
-import im.mash.moebooru.common.viewmodel.VoteViewModel
-import im.mash.moebooru.common.viewmodel.VoteViewModelFactory
 import im.mash.moebooru.main.viewmodel.TagViewModelFactory
 import im.mash.moebooru.util.launchUrl
 import im.mash.moebooru.util.logi
 import im.mash.moebooru.util.mayRequestStoragePermission
 import im.mash.moebooru.util.takeSnackbarShort
+import okhttp3.HttpUrl
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -83,6 +81,10 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
     @Inject
     lateinit var voteViewModelFactory: VoteViewModelFactory
     private val voteViewModel: VoteViewModel by lazy { this.getViewModel<VoteViewModel>(voteViewModelFactory) }
+
+    @Inject
+    lateinit var commentViewModelFactory: CommentViewModelFactory
+    private val commentViewModel: CommentViewModel by lazy { this.getViewModel<CommentViewModel>(commentViewModelFactory) }
 
     private var posts: MutableList<Post> = mutableListOf()
     private var postsSearch: MutableList<PostSearch> = mutableListOf()
@@ -322,8 +324,51 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                     dialog.dismiss()
                 }
             }
+            R.id.action_comment -> {
+                val id = getCurrentPostId()
+                if (id > -1) {
+//                    val host = app.settings.activeProfileHost
+//                    val schema = app.settings.activeProfileSchema
+//                    val url = "$schema://$host/comment/destroy.json"
+//                    val id1 = 168446
+//                    val id2 = 168445
+//                    commentViewModel.deleteComment(url, id2, username, passwordHash)
+//                    commentViewModel.refreshComments(getCommentUrl(463748))
+//                    if (username != "") {
+//                        val url = "$schema://$host/comment/create.json"
+//                        val body = "This is a test comment from Android client(https://github.com/onlymash/moebooru-android)"
+//                        commentViewModel.createComment(url, id, body, 0, username, passwordHash)
+//                    }
+                }
+            }
         }
         return true
+    }
+
+    private fun getCommentUrl(id: Int): HttpUrl {
+        return HttpUrl.Builder()
+                .scheme(app.settings.activeProfileSchema)
+                .host(app.settings.activeProfileHost)
+                .addPathSegment("comment.json")
+                .addQueryParameter("post_id", id.toString())
+                .build()
+    }
+
+    private fun getCurrentPostId(): Int {
+        var id = -1
+        when (type) {
+            "post" -> {
+                if (posts.size > position) {
+                    id = posts[position].id
+                }
+            }
+            else -> {
+                if (postsSearch.size > position) {
+                    id = postsSearch[position].id
+                }
+            }
+        }
+        return id
     }
 
     private fun getDownloadPost(): PostDownload {

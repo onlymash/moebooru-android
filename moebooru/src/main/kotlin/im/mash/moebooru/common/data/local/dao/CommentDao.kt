@@ -3,6 +3,7 @@ package im.mash.moebooru.common.data.local.dao
 import android.arch.persistence.room.*
 import im.mash.moebooru.common.data.local.entity.Comment
 import io.reactivex.Flowable
+import retrofit2.http.DELETE
 
 @Dao
 interface CommentDao {
@@ -24,6 +25,9 @@ interface CommentDao {
 
     @Delete
     fun deleteComment(comment: Comment)
+
+    @Query("DELETE FROM comments WHERE host = :host AND id = :commentId")
+    fun deleteCommentById(host: String, commentId: Int)
 
     @Delete
     fun deleteComments(comment: MutableList<Comment>)
