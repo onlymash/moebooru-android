@@ -83,7 +83,7 @@ dependencies {
     implementation "com.android.support:support-annotations:$support_library_version"
     implementation "com.android.support:exifinterface:$support_library_version"
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
-    implementation 'com.mikepenz:materialdrawer:6.0.8'
+    implementation 'com.github.onlymash:MaterialDrawer:6.0.8'
     implementation "moe.shizuku.preference:preference:$rikka_preference_version"
     implementation "moe.shizuku.preference:preference-simplemenu:$rikka_preference_version"
     implementation "moe.shizuku.preference:preference-switchcompat:$rikka_preference_version"

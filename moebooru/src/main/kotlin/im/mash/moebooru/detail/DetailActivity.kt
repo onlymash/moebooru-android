@@ -5,11 +5,14 @@ import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.AppBarLayout
+import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
+import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
@@ -21,6 +24,7 @@ import im.mash.moebooru.App.Companion.app
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.MoeDH
+import im.mash.moebooru.common.base.FullScreenNavigationView
 import im.mash.moebooru.common.data.local.MoeDatabase
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostDownload
@@ -57,6 +61,8 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
 
     private lateinit var detailPager: VerticalViewPager
     private lateinit var detailAdapter: DetailAdapter
+    private lateinit var commentDrawer: FullScreenNavigationView
+    private lateinit var drawerLayout: DrawerLayout
 
     private val component by lazy { MoeDH.detailComponent() }
 
@@ -225,6 +231,8 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
 
     @SuppressLint("InflateParams")
     private fun initView() {
+        commentDrawer = findViewById(R.id.right_drawer_view)
+        drawerLayout = findViewById(R.id.drawer_layout_details)
         detailPager = findViewById(R.id.detail_pager)
         bg = findViewById(R.id.detail_bg)
         appBarLayout = findViewById(R.id.appbar_layout)
@@ -232,21 +240,28 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
         appBarLayout.setBackgroundColor(ContextCompat.getColor(this, R.color.toolbar_post))
         toolbar.setBackgroundColor(ContextCompat.getColor(this, R.color.transparent))
         appBarLayout.addView(toolbar)
-        ViewCompat.setOnApplyWindowInsetsListener(appBarLayout) { _, insets ->
+        toolbar.inflateMenu(R.menu.menu_details)
+        toolbar.setOnMenuItemClickListener(this)
+        toolbar.setNavigationOnClickListener { finish() }
+        val drawerAppBarLayout: AppBarLayout = findViewById(R.id.appbar_layout_drawer)
+        val toolbarDrawer = layoutInflater.inflate(R.layout.layout_toolbar_drawer, null) as Toolbar
+        drawerAppBarLayout.addView(toolbarDrawer)
+        ViewCompat.setOnApplyWindowInsetsListener(drawerLayout) { _, insets ->
             paddingTop = insets.systemWindowInsetTop
             paddingBottom = insets.systemWindowInsetBottom
             appBarLayout.minimumHeight = toolbar.minimumHeight + paddingTop
             toolbar.setPadding(0, paddingTop, 0, 0)
             appBarLayout.removeView(toolbar)
             appBarLayout.addView(toolbar)
+            drawerAppBarLayout.minimumHeight = toolbar.minimumHeight + paddingTop
+            toolbarDrawer.setPadding(0, paddingTop, 0, 0)
+            drawerAppBarLayout.removeView(toolbarDrawer)
+            drawerAppBarLayout.addView(toolbarDrawer)
             insets
         }
-        toolbar.inflateMenu(R.menu.menu_details)
-        toolbar.setOnMenuItemClickListener(this)
-        toolbar.setNavigationOnClickListener { finish() }
     }
 
-    @SuppressLint("InflateParams")
+    @SuppressLint("InflateParams", "RtlHardcoded")
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.action_share_url -> {
@@ -325,8 +340,9 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                 }
             }
             R.id.action_comment -> {
-                val id = getCurrentPostId()
-                if (id > -1) {
+                drawerLayout.openDrawer(Gravity.RIGHT)
+//                val id = getCurrentPostId()
+//                if (id > -1) {
 //                    val host = app.settings.activeProfileHost
 //                    val schema = app.settings.activeProfileSchema
 //                    val url = "$schema://$host/comment/destroy.json"
@@ -339,7 +355,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
 //                        val body = "This is a test comment from Android client(https://github.com/onlymash/moebooru-android)"
 //                        commentViewModel.createComment(url, id, body, 0, username, passwordHash)
 //                    }
-                }
+//                }
             }
         }
         return true

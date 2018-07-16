@@ -24,8 +24,7 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".main.MainActivity"
-            android:theme="@style/MoeTheme.Main"
-            android:launchMode="singleTask">
+            android:theme="@style/MoeTheme.Main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

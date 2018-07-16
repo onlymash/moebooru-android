@@ -10,16 +10,24 @@
   ~
   -->
 
-<android.support.constraint.ConstraintLayout
+<im.mash.moebooru.core.widget.FitWindowFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/window_background">
+
+    <View
+        android:id="@+id/detail_bg"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:background="@color/black"/>
 
     <im.mash.moebooru.core.widget.VerticalViewPager
-        android:id="@+id/post_page_pager"
+        android:id="@+id/detail_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
     <include layout="@layout/layout_appbar" />
 
-</android.support.constraint.ConstraintLayout>
+</im.mash.moebooru.core.widget.FitWindowFrameLayout>
