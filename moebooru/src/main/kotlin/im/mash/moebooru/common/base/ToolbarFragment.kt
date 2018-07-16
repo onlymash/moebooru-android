@@ -2,11 +2,11 @@ package im.mash.moebooru.common.base
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
-import android.support.v7.widget.Toolbar
+import com.google.android.material.appbar.AppBarLayout
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.appcompat.widget.Toolbar
 import android.view.View
 import im.mash.moebooru.R
 import im.mash.moebooru.main.MainActivity

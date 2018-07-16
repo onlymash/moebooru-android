@@ -1,5 +1,5 @@
 package im.mash.moebooru.content
 
-import android.support.v4.content.FileProvider
+import androidx.core.content.FileProvider
 
 class MoeProvider : FileProvider()

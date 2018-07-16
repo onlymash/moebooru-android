@@ -1,7 +1,7 @@
 package im.mash.moebooru.main.fragment
 
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +16,7 @@ class SettingsFragment : ToolbarFragment() {
         return inflater.inflate(R.layout.layout_settings, container, false)
     }
 
+    @Suppress("CAST_NEVER_SUCCEEDS")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.window_background))

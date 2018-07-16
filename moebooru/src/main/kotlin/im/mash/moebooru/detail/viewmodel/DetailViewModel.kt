@@ -1,7 +1,7 @@
 package im.mash.moebooru.detail.viewmodel
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import im.mash.moebooru.common.MoeDH
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.common.data.local.entity.PostSearch

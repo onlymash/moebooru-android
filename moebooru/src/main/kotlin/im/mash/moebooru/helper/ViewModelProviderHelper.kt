@@ -1,9 +1,9 @@
 package im.mash.moebooru.helper
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 
 inline fun <reified M : ViewModel> Fragment.getViewModel(viewModelFactory: ViewModelProvider.Factory): M {
     return ViewModelProvider(this, viewModelFactory).get(M::class.java)

@@ -1,17 +1,17 @@
 package im.mash.moebooru.detail
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.AppBarLayout
-import android.support.design.widget.NavigationView
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
-import android.support.v4.view.ViewPager
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.Toolbar
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.navigation.NavigationView
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.viewpager.widget.ViewPager
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.MotionEvent

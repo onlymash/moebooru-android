@@ -12,7 +12,7 @@
 package im.mash.moebooru.core.widget
 
 import android.content.Context
-import android.support.v4.widget.SlidingPaneLayout
+import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewConfiguration

@@ -1,8 +1,8 @@
 package im.mash.moebooru.common.base
 
 import android.content.Context
-import android.support.design.widget.NavigationView
-import android.support.v4.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
+import androidx.drawerlayout.widget.DrawerLayout
 import android.util.AttributeSet
 import im.mash.moebooru.util.screenWidth
 

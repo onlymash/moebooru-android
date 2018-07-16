@@ -1,6 +1,6 @@
 package im.mash.moebooru.common.data.local.entity
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import java.util.*

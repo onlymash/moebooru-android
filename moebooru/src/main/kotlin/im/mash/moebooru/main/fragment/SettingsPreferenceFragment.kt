@@ -2,8 +2,8 @@ package im.mash.moebooru.main.fragment
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import android.view.View
 import android.widget.FrameLayout
 import com.crashlytics.android.Crashlytics

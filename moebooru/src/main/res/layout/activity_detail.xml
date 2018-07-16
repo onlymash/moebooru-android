@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,14 +16,14 @@
         android:id="@+id/right_drawer_view"
         style="@style/NavView">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/drawer_right_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <android.support.design.widget.AppBarLayout
+            <com.google.android.material.appbar.AppBarLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/appbar_layout_drawer"
@@ -40,13 +40,13 @@
                 app:layout_constraintTop_toBottomOf="@+id/appbar_layout_drawer"
                 app:layout_constraintBottom_toBottomOf="parent">
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/drawer_rv_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
 
             </LinearLayout>
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </im.mash.moebooru.common.base.FullScreenNavigationView>
 
-</android.support.v4.widget.DrawerLayout>
+</androidx.drawerlayout.widget.DrawerLayout>

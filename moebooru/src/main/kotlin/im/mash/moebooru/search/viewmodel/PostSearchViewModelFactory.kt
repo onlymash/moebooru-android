@@ -1,7 +1,7 @@
 package im.mash.moebooru.search.viewmodel
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import im.mash.moebooru.search.model.PostSearchDataContract
 import io.reactivex.disposables.CompositeDisposable
 

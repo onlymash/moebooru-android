@@ -3,8 +3,8 @@ package im.mash.moebooru.core.application
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v4.widget.SlidingPaneLayout
+import androidx.core.content.ContextCompat
+import androidx.slidingpanelayout.widget.SlidingPaneLayout
 import android.view.View
 import android.view.ViewGroup
 import im.mash.moebooru.core.widget.PagerEnabledSlidingPaneLayout

@@ -1,12 +1,12 @@
 package im.mash.moebooru.main.fragment
 
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.support.design.widget.TextInputEditText
-import android.support.v4.view.ViewCompat
-import android.support.v7.app.AlertDialog
+import com.google.android.material.textfield.TextInputEditText
+import androidx.core.view.ViewCompat
+import androidx.appcompat.app.AlertDialog
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View

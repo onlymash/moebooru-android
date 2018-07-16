@@ -22,7 +22,7 @@ android {
         versionCode rootProject.version_code
         versionName rootProject.version_name
         signingConfig signingConfigs.release
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId "im.mash.moebooru.test"
     }
     setProperty("archivesBaseName", "moebooru_" + defaultConfig.versionName)
@@ -77,16 +77,13 @@ kotlin {
 
 dependencies {
     implementation project(':core')
-    implementation "com.android.support:support-v4:$support_library_version"
-    implementation "com.android.support:cardview-v7:$support_library_version"
-    implementation "com.android.support:customtabs:$support_library_version"
-    implementation "com.android.support:support-annotations:$support_library_version"
-    implementation "com.android.support:exifinterface:$support_library_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation "androidx.legacy:legacy-support-v4:$androidx_version"
+    implementation "androidx.cardview:cardview:$androidx_version"
+    implementation "androidx.browser:browser:$androidx_version"
+    implementation "androidx.annotation:annotation:$androidx_version"
+    implementation "androidx.exifinterface:exifinterface:$androidx_version"
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha1'
     implementation 'com.github.onlymash:MaterialDrawer:6.0.8'
-    implementation "moe.shizuku.preference:preference:$rikka_preference_version"
-    implementation "moe.shizuku.preference:preference-simplemenu:$rikka_preference_version"
-    implementation "moe.shizuku.preference:preference-switchcompat:$rikka_preference_version"
     implementation "com.google.firebase:firebase-core:$firebase_version"
     implementation 'com.crashlytics.sdk.android:crashlytics:2.9.4'
     implementation "com.github.bumptech.glide:glide:$glide_version"
@@ -96,20 +93,22 @@ dependencies {
     implementation "com.liulishuo.okdownload:okdownload:$okdownload_version"
     implementation "com.liulishuo.okdownload:sqlite:$okdownload_version"
     implementation "com.liulishuo.okdownload:okhttp:$okdownload_version"
+    implementation "com.android.support:support-annotations:$support_library_version"
+    kapt "com.android.support:support-annotations:$support_library_version"
     kapt "com.github.bumptech.glide:compiler:$glide_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
     implementation "com.squareup.okhttp3:okhttp:$okhttp3_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp3_version"
-    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
-    implementation "android.arch.lifecycle:runtime:$lifecycle_version"
-    implementation "android.arch.lifecycle:livedata:$lifecycle_version"
-    kapt "android.arch.lifecycle:compiler:$lifecycle_version"
-    kapt "android.arch.persistence.room:compiler:$room_version"
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
+    kapt "androidx.room:room-compiler:$lifecycle_version"
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'junit:junit:4.12'
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha3'
 }
 
 apply plugin: 'com.google.gms.google-services'

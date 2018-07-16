@@ -15,7 +15,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.Interpolator
 import android.widget.ImageView
-import android.support.v7.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatImageView
 import android.widget.OverScroller
 import android.widget.Scroller
 

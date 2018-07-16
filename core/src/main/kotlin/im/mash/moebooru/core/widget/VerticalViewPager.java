@@ -22,19 +22,19 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.SystemClock;
-import android.support.annotation.CallSuper;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.AbsSavedState;
-import android.support.v4.view.AccessibilityDelegateCompat;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.WindowInsetsCompat;
-import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
+import androidx.annotation.CallSuper;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.customview.view.AbsSavedState;
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager.widget.ViewPager.OnPageChangeListener;
+import androidx.core.view.AccessibilityDelegateCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.FocusFinder;
@@ -289,7 +289,7 @@ public class VerticalViewPager extends ViewGroup {
                     ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_YES);
         }
         ViewCompat.setOnApplyWindowInsetsListener(this,
-                new android.support.v4.view.OnApplyWindowInsetsListener() {
+                new androidx.core.view.OnApplyWindowInsetsListener() {
                     private final Rect mTempRect = new Rect();
                     @Override
                     public WindowInsetsCompat onApplyWindowInsets(final View v,

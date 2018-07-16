@@ -11,7 +11,7 @@ android {
         targetSdkVersion rootProject.sdk_version
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -30,10 +30,12 @@ android {
 
 dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    api "com.android.support:design:$support_library_version"
-    api "com.android.support:appcompat-v7:$support_library_version"
-    api "android.arch.persistence.room:runtime:$room_version"
-    api "android.arch.persistence.room:rxjava2:$room_version"
+    api "com.google.android.material:material:$androidx_version"
+    api "androidx.appcompat:appcompat:$androidx_version"
+//    api "androidx.preference:preference:$androidx_version"
+    api 'com.github.onlymash:MaterialPreference:2.2.4'
+    api "androidx.room:room-runtime:$lifecycle_version"
+    api "androidx.room:room-rxjava2:$lifecycle_version"
     api "com.squareup.okhttp3:okhttp:$okhttp3_version"
     api "com.squareup.okhttp3:logging-interceptor:$okhttp3_version"
     api 'com.squareup.okio:okio:1.14.0'

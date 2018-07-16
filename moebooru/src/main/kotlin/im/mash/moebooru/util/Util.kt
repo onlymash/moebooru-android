@@ -11,11 +11,11 @@ import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.net.Uri
 import android.os.Build
-import android.support.customtabs.CustomTabsIntent
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.content.ContextCompat
+import androidx.browser.customtabs.CustomTabsIntent
+import com.google.android.material.snackbar.Snackbar
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.core.content.ContextCompat
 import android.text.format.DateFormat
 import android.util.DisplayMetrics
 import android.util.TypedValue

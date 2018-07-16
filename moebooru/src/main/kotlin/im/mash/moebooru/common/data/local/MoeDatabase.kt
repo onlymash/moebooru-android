@@ -1,8 +1,8 @@
 package im.mash.moebooru.common.data.local
 
-import android.arch.persistence.room.Database
-import android.arch.persistence.room.RoomDatabase
-import android.support.annotation.Keep
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.annotation.Keep
 import im.mash.moebooru.common.data.local.dao.*
 import im.mash.moebooru.common.data.local.entity.*
 

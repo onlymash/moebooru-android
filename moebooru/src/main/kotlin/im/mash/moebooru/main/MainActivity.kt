@@ -1,16 +1,16 @@
 package im.mash.moebooru.main
 
 import android.annotation.SuppressLint
-import android.arch.lifecycle.Observer
+import androidx.lifecycle.Observer
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.view.ViewCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AppCompatDelegate
-import android.support.v7.content.res.AppCompatResources
+import androidx.fragment.app.Fragment
+import androidx.core.view.ViewCompat
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.content.res.AppCompatResources
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View

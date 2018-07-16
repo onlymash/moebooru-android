@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.os.Environment
-import android.support.v7.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate
 import com.bumptech.glide.load.model.Headers
 import com.crashlytics.android.Crashlytics
 import com.google.firebase.FirebaseApp

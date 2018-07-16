@@ -1,7 +1,7 @@
 package im.mash.moebooru.common.viewmodel
 
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import im.mash.moebooru.common.data.local.entity.PostDownload
 import im.mash.moebooru.core.extensions.toLiveData
 import im.mash.moebooru.core.scheduler.Outcome

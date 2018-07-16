@@ -1,7 +1,7 @@
 package im.mash.moebooru.common.viewmodel
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import im.mash.moebooru.common.model.CommentDataContract
 
 @Suppress("UNCHECKED_CAST")

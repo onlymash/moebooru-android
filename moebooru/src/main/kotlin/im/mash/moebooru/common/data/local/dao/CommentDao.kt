@@ -1,6 +1,6 @@
 package im.mash.moebooru.common.data.local.dao
 
-import android.arch.persistence.room.*
+import androidx.room.*
 import im.mash.moebooru.common.data.local.entity.Comment
 import io.reactivex.Flowable
 import retrofit2.http.DELETE
