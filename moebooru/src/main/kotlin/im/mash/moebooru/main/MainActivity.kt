@@ -1,6 +1,8 @@
 package im.mash.moebooru.main
 
 import android.annotation.SuppressLint
+import android.app.UiModeManager
+import android.content.Context
 import androidx.lifecycle.Observer
 import android.content.SharedPreferences
 import android.graphics.Bitmap
@@ -224,6 +226,10 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
 
         if (!isNullState && supportFragmentManager.findFragmentById(R.id.fragment_moebooru) is SettingsFragment) {
             drawer.setSelection(DRAWER_ITEM_SETTINGS)
+        }
+        if (app.settings.nightMode == AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                && AppCompatDelegate.getDefaultNightMode() != AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         }
     }
 
@@ -508,7 +514,12 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             Settings.NIGHT_MODE -> {
-                AppCompatDelegate.setDefaultNightMode(app.settings.nightMode)
+                val mode = app.settings.nightMode
+                AppCompatDelegate.setDefaultNightMode(when (mode) {
+                    AppCompatDelegate.getDefaultNightMode() -> return
+                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> (getSystemService(Context.UI_MODE_SERVICE) as UiModeManager).nightMode
+                    else -> mode
+                })
                 recreate()
             }
         }
