@@ -15,11 +15,17 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <include layout="@layout/layout_appbar"/>
-
-    <WebView android:id="@+id/web_view"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_height="match_parent"
+        android:scrollbars="vertical">
+        <im.mash.moebooru.common.base.HackyTextView
+            android:id="@+id/tv_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:textIsSelectable="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"/>
+    </ScrollView>
 </LinearLayout>

@@ -1,14 +1,21 @@
 package im.mash.moebooru.main.fragment
 
+import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.URLSpan
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.widget.FrameLayout
+import android.widget.TextView
+import androidx.core.net.toUri
+import androidx.core.text.HtmlCompat
+import androidx.core.text.parseAsHtml
 import im.mash.moebooru.BuildConfig
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.ToolbarFragment
@@ -16,39 +23,36 @@ import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.util.launchUrl
 
 class AboutFragment : ToolbarFragment() {
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val configuration = resources.configuration
-        val view = inflater.inflate(R.layout.layout_about, container, false)
-        if (resources.configuration != configuration) {
-            (activity as MainActivity).recreate()
-        }
-        return view
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.layout_about, container, false)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
-            view.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
+            val lp = view.layoutParams as FrameLayout.LayoutParams
+            lp.bottomMargin = insets.systemWindowInsetBottom
+            view.layoutParams = lp
             insets
         }
-        view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.window_background))
+        view.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.background))
         toolbar.title = getString(R.string.about_title) + " " + BuildConfig.VERSION_NAME
-        val web = view.findViewById<WebView>(R.id.web_view)
-        web.setBackgroundColor(ContextCompat.getColor(activity as MainActivity, R.color.background))
-        web.loadUrl(getString(R.string.about_url))
-        web.webViewClient = object : WebViewClient() {
-
-            @Suppress("OverridingDeprecatedMember")
-            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                (activity as MainActivity).launchUrl(url)
-                return true
+        view.findViewById<TextView>(R.id.tv_about).apply {
+            text = SpannableStringBuilder(resources.openRawResource(R.raw.about).bufferedReader().readText()
+                    .parseAsHtml(HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM)).apply {
+                for (span in getSpans(0, length, URLSpan::class.java)) {
+                    setSpan(object : ClickableSpan() {
+                        override fun onClick(view: View) {
+                            if (span.url.startsWith("mailto:")) {
+                                startActivity(Intent.createChooser(Intent().apply {
+                                    action = Intent.ACTION_SENDTO
+                                    data = span.url.toUri()
+                                }, getString(R.string.send_email)))
+                            } else this@AboutFragment.requireContext().launchUrl(span.url)
+                        }
+                    }, getSpanStart(span), getSpanEnd(span), getSpanFlags(span))
+                    removeSpan(span)
+                }
             }
-
-            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest): Boolean {
-                (activity as MainActivity).launchUrl(request.url)
-                return true
-            }
+            movementMethod = LinkMovementMethod.getInstance()
         }
     }
-
 }

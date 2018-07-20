@@ -13,6 +13,7 @@ package im.mash.moebooru
 
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.edit
 
 class Settings(private val sp: SharedPreferences) {
 
@@ -41,11 +42,9 @@ class Settings(private val sp: SharedPreferences) {
         const val VERSION_CODE = "version_code"
     }
 
-    private val editor: SharedPreferences.Editor = sp.edit()
-
     private var nightModeString: String
         get() = sp.getString(NIGHT_MODE, NIGHT_MODE_SYSTEM)
-        set(value) = editor.putString(NIGHT_MODE, value).apply()
+        set(value) = sp.edit { putString(NIGHT_MODE, value) }
 
     @AppCompatDelegate.NightMode
     val nightMode: Int
@@ -58,50 +57,50 @@ class Settings(private val sp: SharedPreferences) {
 
     var gridModeString: String
         get() = sp.getString(GRID_MODE, GRID_MODE_STAGGERED_GRID)
-        set(value) = editor.putString(GRID_MODE, value).apply()
+        set(value) = sp.edit { putString(GRID_MODE, value) }
 
     var postLimitInt: Int
         get() = sp.getString(POST_LIMIT, "50").toInt()
-        set(value) = editor.putString(POST_LIMIT, value.toString()).apply()
+        set(value) = sp.edit { putString(POST_LIMIT, value.toString()) }
 
     var cacheMemoryInt: Int
         get() = sp.getString(CACHE_MEMORY, "128").toInt()
-        set(value) = editor.putString(CACHE_MEMORY, value.toString()).apply()
+        set(value) = sp.edit { putString(CACHE_MEMORY, value.toString()) }
 
     var cacheDiskInt: Int
         get() = sp.getString(CACHE_DISK, "256").toInt()
-        set(value) = editor.putString(CACHE_DISK, value.toString()).apply()
+        set(value) = sp.edit { putString(CACHE_DISK, value.toString()) }
 
     var activeProfileId: Long
         get() = sp.getLong(ACTIVE_PROFILE_ID, 0L)
-        set(value) = editor.putLong(ACTIVE_PROFILE_ID, value).apply()
+        set(value) = sp.edit { putLong(ACTIVE_PROFILE_ID, value) }
 
 
     var activeProfileHost: String
         get() = sp.getString(ACTIVE_PROFILE_HOST, "mash.im")
-        set(value) = editor.putString(ACTIVE_PROFILE_HOST, value).apply()
+        set(value) = sp.edit { putString(ACTIVE_PROFILE_HOST, value) }
 
     var activeProfileSchema: String
         get() = sp.getString(ACTIVE_PROFILE_SCHEME, "https")
-        set(value) = editor.putString(ACTIVE_PROFILE_SCHEME, value).apply()
+        set(value) = sp.edit { putString(ACTIVE_PROFILE_SCHEME, value) }
 
     var enabledCrashReport: Boolean
         get() = sp.getBoolean(ENABLE_CRASH_REPORT, true)
-        set(value) = editor.putBoolean(ENABLE_CRASH_REPORT, value).apply()
+        set(value) = sp.edit { putBoolean(ENABLE_CRASH_REPORT, value) }
 
     var postSizeBrowse: String
         get() = sp.getString(POST_SIZE_BROWSE, POST_SIZE_SAMPLE)
-        set(value) = editor.putString(POST_SIZE_BROWSE, value).apply()
+        set(value) = sp.edit { putString(POST_SIZE_BROWSE, value) }
 
     var postSizeDownload: String
         get() = sp.getString(POST_SIZE_DOWNLOAD, POST_SIZE_LARGER)
-        set(value) = editor.putString(POST_SIZE_DOWNLOAD, value).apply()
+        set(value) = sp.edit { putString(POST_SIZE_DOWNLOAD, value) }
 
     var safeMode: Boolean
         get() = sp.getBoolean(SAFE_MODE, true)
-        set(value) = editor.putBoolean(SAFE_MODE, value).apply()
+        set(value) = sp.edit { putBoolean(SAFE_MODE, value) }
 
     var versionCode: Int
         get() = sp.getInt(VERSION_CODE, 22)
-        set(value) = editor.putInt(VERSION_CODE, value).apply()
+        set(value) = sp.edit { putInt(VERSION_CODE, value) }
 }

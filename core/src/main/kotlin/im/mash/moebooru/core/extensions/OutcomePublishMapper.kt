@@ -4,18 +4,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.PublishSubject
-import  im.mash.moebooru.core.scheduler.Outcome
-
-/**
- * Created by karn on 18/1/18.
- **/
+import im.mash.moebooru.core.scheduler.Outcome
 
 /**
  * Extension function to convert a Publish subject into a LiveData by subscribing to it.
  **/
 fun <T> PublishSubject<T>.toLiveData(compositeDisposable: CompositeDisposable): LiveData<T> {
     val data = MutableLiveData<T>()
-    compositeDisposable.add(this.subscribe({ t: T -> data.value = t }))
+    compositeDisposable.add(this.subscribe { t: T -> data.value = t })
     return data
 }
 

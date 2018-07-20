@@ -79,8 +79,8 @@ class App : Application() {
         super.onCreate()
         app = this
         CrashHandler.getInstance().init(this)
-        coreComponent = DaggerCoreComponent.builder().appModule(AppModule(this)).build()
         FirebaseApp.initializeApp(deviceContext)
+        coreComponent = DaggerCoreComponent.builder().appModule(AppModule(this)).build()
         if (settings.enabledCrashReport && !Fabric.isInitialized()) {
             Fabric.with(this, Crashlytics())
         }

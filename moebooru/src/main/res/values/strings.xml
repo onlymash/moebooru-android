@@ -26,8 +26,8 @@
     <string name="cache_disk">Disk cache</string>
 
     <string name="about">About</string>
-    <string name="about_url" translatable="false">file:///android_asset/pages/about.html</string>
     <string name="about_title">Moebooru</string>
+    <string name="send_email">Send email</string>
 
     <string name="drawer_header_desc">Drawer header</string>
     <string name="drawer_open">Open drawer</string>

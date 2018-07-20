@@ -77,6 +77,9 @@ kotlin {
 
 dependencies {
     implementation project(':core')
+    // A set of Kotlin extensions for Android app development.
+    // https://github.com/android/android-ktx
+    implementation "androidx.core:core-ktx:$androidx_version"
     implementation "androidx.legacy:legacy-support-v4:$androidx_version"
     implementation "androidx.cardview:cardview:$androidx_version"
     implementation "androidx.browser:browser:$androidx_version"
