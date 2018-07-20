@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import im.mash.moebooru.App.Companion.app
+import im.mash.moebooru.App.Companion.getMoePath
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.RecyclerViewClickListener
 import im.mash.moebooru.common.base.SafeGridLayoutManager
@@ -109,11 +109,11 @@ class GalleryFragment : ToolbarFragment() {
             override fun onItemClick(position: Int) {
                 if (position == 0) {
                     if (mayRequestStoragePermission(mainActivity, 0)) {
-                        mediaViewModel.loadMedia(app.getMoePath())
+                        mediaViewModel.loadMedia(getMoePath())
                     }
                 } else if (position > 0) {
                     if (mayRequestStoragePermission(mainActivity, 0)) {
-                        val path = app.getMoePath() + File.separator + mainActivity.boorus[position - 1].host
+                        val path = getMoePath() + File.separator + mainActivity.boorus[position - 1].host
                         mediaViewModel.loadMedia(path)
                     }
                 }
@@ -143,7 +143,7 @@ class GalleryFragment : ToolbarFragment() {
         })
 
         if (mayRequestStoragePermission(mainActivity, 0)) {
-            mediaViewModel.loadMedia(app.getMoePath())
+            mediaViewModel.loadMedia(getMoePath())
         }
     }
     private fun initGalleryView(view: View) {
