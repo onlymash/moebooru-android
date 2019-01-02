@@ -198,6 +198,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 is Outcome.Success -> {
                     logi(TAG, "postViewModel Outcome.Success. status: $status")
                     disableRefreshLayout()
+                    if (outcome.data.size > 0 && outcome.data[0].keyword != keyword) return@Observer
                     val posts = outcome.data
                     when (status) {
                         STATUS_LOADING -> {
@@ -383,7 +384,6 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                     scoreTv.text = voteChangedScore.toString()
                 }
                 val dialog = AlertDialog.Builder(this@SearchActivity)
-                        .setTitle("Vote post")
                         .create()
                 dialog.apply {
                     setView(v)

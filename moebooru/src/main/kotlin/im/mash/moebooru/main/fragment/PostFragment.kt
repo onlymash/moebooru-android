@@ -461,7 +461,6 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     scoreTv.text = voteChangedScore.toString()
                 }
                 val dialog = AlertDialog.Builder(this@PostFragment.requireContext())
-                        .setTitle("Vote post")
                         .create()
                 dialog.apply {
                     setView(v)

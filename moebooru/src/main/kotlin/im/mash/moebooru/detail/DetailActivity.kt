@@ -307,7 +307,6 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                     scoreTv.text = score.toString()
                 }
                 val dialog = AlertDialog.Builder(this)
-                        .setTitle("Vote post")
                         .create()
                 dialog.apply {
                     setView(v)
@@ -482,7 +481,6 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             logi(TAG, "position >= posts size")
                         }
-                        detailViewModel.postOutcome.removeObservers(this)
                     }
                     is Outcome.Failure -> {
                         logi(TAG, "Outcome.Failure")
@@ -500,6 +498,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                     }
                     is Outcome.Success -> {
                         logi(TAG, "Outcome.Success. type = search")
+                        if (outcome.data.size > 0 && outcome.data[0].keyword != keyword) return@Observer
                         val data = outcome.data
                         postsSearch = if (app.settings.safeMode) {
                             val postsSafe: MutableList<PostSearch> = mutableListOf()
@@ -521,7 +520,6 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                         } else {
                             logi(TAG, "position >= posts size")
                         }
-                        detailViewModel.postSearchOutcome.removeObservers(this)
                     }
                     is Outcome.Failure -> {
                         logi(TAG, "Outcome.Failure")

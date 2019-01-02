@@ -14,7 +14,7 @@ android {
         }
     }
     compileSdkVersion rootProject.sdk_version
-    buildToolsVersion '28.0.3'
+    buildToolsVersion rootProject.build_tools_version
     defaultConfig {
         applicationId "im.mash.moebooru"
         minSdkVersion rootProject.min_sdk_version

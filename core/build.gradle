@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.sdk_version
-    buildToolsVersion '28.0.3'
+    buildToolsVersion rootProject.build_tools_version
     defaultConfig {
         minSdkVersion rootProject.min_sdk_version
         targetSdkVersion rootProject.sdk_version
@@ -38,7 +38,7 @@ dependencies {
     api "androidx.room:room-rxjava2:$lifecycle_version"
     api "com.squareup.okhttp3:okhttp:$okhttp3_version"
     api "com.squareup.okhttp3:logging-interceptor:$okhttp3_version"
-    api 'com.squareup.okio:okio:1.14.0'
+    api 'com.squareup.okio:okio:1.15.0'
     api "com.squareup.retrofit2:retrofit:$retrofit2_version"
     api "com.squareup.retrofit2:converter-gson:$retrofit2_version"
     api "com.squareup.retrofit2:adapter-rxjava2:$retrofit2_version"
