@@ -3,9 +3,9 @@
 
     <Preference
         android:title="@string/author"
-        android:summary="http://mash.im">
+        android:summary="http://fiepi.me">
         <intent android:action="android.intent.action.VIEW"
-            android:data="http://mash.im"/>
+            android:data="http://fiepi.me"/>
     </Preference>
 
     <Preference
