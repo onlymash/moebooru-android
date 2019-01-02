@@ -7,7 +7,7 @@ import java.io.FileFilter
 class CrashFile {
     fun getLogFile(context: Context): Array<File> {
         try {
-            val path = File(context.getExternalFilesDir("logs").absolutePath)
+            val path = File(context.getExternalFilesDir("logs")?.absolutePath)
             if (path.exists() && path.isDirectory) {
                 val logs = path.listFiles(CrashLogFilter())
                 if (logs != null && logs.isNotEmpty()) {

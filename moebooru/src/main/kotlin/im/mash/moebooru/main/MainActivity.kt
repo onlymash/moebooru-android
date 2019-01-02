@@ -6,6 +6,7 @@ import android.content.Context
 import androidx.lifecycle.Observer
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -17,7 +18,7 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
-import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.mikepenz.materialdrawer.AccountHeader
 import com.mikepenz.materialdrawer.AccountHeaderBuilder
@@ -273,7 +274,9 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                                 GlideApp.with(app)
                                         .asBitmap()
                                         .load(MoeGlideUrl(url))
-                                        .into(object : SimpleTarget<Bitmap>() {
+                                        .into(object : CustomTarget<Bitmap>() {
+                                            override fun onLoadCleared(placeholder: Drawable?) {
+                                            }
                                             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                                                 val os = ByteArrayOutputStream()
                                                 resource.compress(Bitmap.CompressFormat.JPEG, 100, os)
@@ -383,7 +386,10 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                 GlideApp.with(app)
                         .asBitmap()
                         .load(Uri.fromFile(bg))
-                        .into(object : SimpleTarget<Bitmap>() {
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                            }
+
                             override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                                 header.headerBackgroundView.setImageBitmap(resource)
                             }
@@ -424,7 +430,11 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                                                         GlideApp.with(app)
                                                                 .asBitmap()
                                                                 .load(MoeGlideUrl(url))
-                                                                .into(object : SimpleTarget<Bitmap>() {
+                                                                .into(object : CustomTarget<Bitmap>() {
+                                                                    override fun onLoadCleared(placeholder: Drawable?) {
+                                                                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                                                                    }
+
                                                                     override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                                                                         var fos: FileOutputStream? = null
                                                                         try {

@@ -150,8 +150,7 @@ abstract class CrashLog : Thread.UncaughtExceptionHandler {
     }
 
     /**
-     * 最大文件数量
-     * @param crashLogLimit
+     * @param crashLogLimit log 数限制
      */
     private fun limitLogCount(crashLogLimit: Int) {
 
@@ -240,6 +239,10 @@ abstract class CrashLog : Thread.UncaughtExceptionHandler {
 
     }
 
+    /**
+     * 保存 log 文件
+     * @param s log
+     */
     @SuppressLint("SimpleDateFormat")
     private fun writerToFile(s: String) {
 

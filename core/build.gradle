@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion rootProject.sdk_version
-    buildToolsVersion rootProject.build_tools_version
+    buildToolsVersion '28.0.3'
     defaultConfig {
         minSdkVersion rootProject.min_sdk_version
         targetSdkVersion rootProject.sdk_version
@@ -31,7 +31,7 @@ android {
 dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     api "com.google.android.material:material:$androidx_version"
-    api "androidx.appcompat:appcompat:$androidx_version"
+    api "androidx.appcompat:appcompat:1.0.2"
 //    api "androidx.preference:preference:$androidx_version"
     api 'com.github.onlymash:MaterialPreference:2.2.4'
     api "androidx.room:room-runtime:$lifecycle_version"

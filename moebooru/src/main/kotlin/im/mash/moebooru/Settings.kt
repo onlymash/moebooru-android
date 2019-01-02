@@ -43,7 +43,7 @@ class Settings(private val sp: SharedPreferences) {
     }
 
     private var nightModeString: String
-        get() = sp.getString(NIGHT_MODE, NIGHT_MODE_SYSTEM)
+        get() = sp.getString(NIGHT_MODE, NIGHT_MODE_SYSTEM)!!
         set(value) = sp.edit { putString(NIGHT_MODE, value) }
 
     @AppCompatDelegate.NightMode
@@ -56,19 +56,19 @@ class Settings(private val sp: SharedPreferences) {
     }
 
     var gridModeString: String
-        get() = sp.getString(GRID_MODE, GRID_MODE_STAGGERED_GRID)
+        get() = sp.getString(GRID_MODE, GRID_MODE_STAGGERED_GRID)!!
         set(value) = sp.edit { putString(GRID_MODE, value) }
 
     var postLimitInt: Int
-        get() = sp.getString(POST_LIMIT, "50").toInt()
+        get() = sp.getString(POST_LIMIT, "50")!!.toInt()
         set(value) = sp.edit { putString(POST_LIMIT, value.toString()) }
 
     var cacheMemoryInt: Int
-        get() = sp.getString(CACHE_MEMORY, "128").toInt()
+        get() = sp.getString(CACHE_MEMORY, "128")!!.toInt()
         set(value) = sp.edit { putString(CACHE_MEMORY, value.toString()) }
 
     var cacheDiskInt: Int
-        get() = sp.getString(CACHE_DISK, "256").toInt()
+        get() = sp.getString(CACHE_DISK, "256")!!.toInt()
         set(value) = sp.edit { putString(CACHE_DISK, value.toString()) }
 
     var activeProfileId: Long
@@ -77,11 +77,11 @@ class Settings(private val sp: SharedPreferences) {
 
 
     var activeProfileHost: String
-        get() = sp.getString(ACTIVE_PROFILE_HOST, "mash.im")
+        get() = sp.getString(ACTIVE_PROFILE_HOST, "mash.im")!!
         set(value) = sp.edit { putString(ACTIVE_PROFILE_HOST, value) }
 
     var activeProfileSchema: String
-        get() = sp.getString(ACTIVE_PROFILE_SCHEME, "https")
+        get() = sp.getString(ACTIVE_PROFILE_SCHEME, "https")!!
         set(value) = sp.edit { putString(ACTIVE_PROFILE_SCHEME, value) }
 
     var enabledCrashReport: Boolean
@@ -89,11 +89,11 @@ class Settings(private val sp: SharedPreferences) {
         set(value) = sp.edit { putBoolean(ENABLE_CRASH_REPORT, value) }
 
     var postSizeBrowse: String
-        get() = sp.getString(POST_SIZE_BROWSE, POST_SIZE_SAMPLE)
+        get() = sp.getString(POST_SIZE_BROWSE, POST_SIZE_SAMPLE)!!
         set(value) = sp.edit { putString(POST_SIZE_BROWSE, value) }
 
     var postSizeDownload: String
-        get() = sp.getString(POST_SIZE_DOWNLOAD, POST_SIZE_LARGER)
+        get() = sp.getString(POST_SIZE_DOWNLOAD, POST_SIZE_LARGER)!!
         set(value) = sp.edit { putString(POST_SIZE_DOWNLOAD, value) }
 
     var safeMode: Boolean

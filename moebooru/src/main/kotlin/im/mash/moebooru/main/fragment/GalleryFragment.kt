@@ -275,7 +275,7 @@ class GalleryFragment : ToolbarFragment() {
             val uiFlags = View.SYSTEM_UI_FLAG_IMMERSIVE or
                     View.SYSTEM_UI_FLAG_FULLSCREEN or
                     View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            window.decorView.systemUiVisibility = uiFlags
+            window!!.decorView.systemUiVisibility = uiFlags
         }
 
         override fun onPageScrollStateChanged(state: Int) {

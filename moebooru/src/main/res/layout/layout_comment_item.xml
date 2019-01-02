@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginTop="30dp"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
         android:orientation="vertical"
@@ -13,6 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp">
             <TextView
+                android:text="test"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:textColor="@color/moebooru"
                 android:ellipsize="marquee"
@@ -21,6 +24,7 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true" />
             <TextView
+                android:text="test"
                 android:textAppearance="?android:textAppearanceMedium"
                 android:textColor="@android:color/darker_gray"
                 android:gravity="right"
@@ -32,8 +36,8 @@
         </LinearLayout>
         <View
             android:background="@android:color/darker_gray"
-            android:layout_width="fill_parent"
-            android:layout_height="0.5dp" />
+            android:layout_width="match_parent"
+            android:layout_height="1dp" />
         <TextView
             android:textAppearance="?android:textAppearanceMedium"
             android:id="@+id/tv_comment_body"

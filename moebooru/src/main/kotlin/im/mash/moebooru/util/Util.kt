@@ -114,7 +114,7 @@ private fun getCustomTabsIntent(context: Context): CustomTabsIntent {
 
 fun Context.launchUrl(uri: Uri) = try {
     getCustomTabsIntent(this).launchUrl(this, uri)
-} catch (_: ActivityNotFoundException) { }  // ignore
+} catch (e: ActivityNotFoundException) { e.printStackTrace() }
 
 fun Context.launchUrl(url: String) = this.launchUrl(Uri.parse(url))
 

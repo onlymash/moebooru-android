@@ -15,7 +15,7 @@ abstract class SlidingDialog(context: Context) : Dialog(context, R.style.MoeThem
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initSwipeBackFinish()
-        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        window!!.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
 
     override fun onPanelClosed(panel: View) {
@@ -52,7 +52,7 @@ abstract class SlidingDialog(context: Context) : Dialog(context, R.style.MoeThem
             leftView.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
             slidingPaneLayout.addView(leftView, 0)  //添加到SlidingPaneLayout中
             // 右侧的内容视图
-            val decor = window.decorView as ViewGroup
+            val decor = window!!.decorView as ViewGroup
             val decorChild = decor.getChildAt(0) as ViewGroup
             decorChild.setBackgroundColor(ContextCompat.getColor(context, android.R.color.white))
             decor.removeView(decorChild)

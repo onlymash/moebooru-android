@@ -19,7 +19,7 @@ class CrashHandler : CrashLog() {
     }
 
     override fun initParams(context: Context, crashLog: CrashLog) {
-        crashLog.setCrashLogPath(context.getExternalFilesDir("logs").absolutePath)
+        crashLog.setCrashLogPath(context.getExternalFilesDir("logs")!!.absolutePath)
         crashLog.setCrashLogLimit(5)
     }
 
