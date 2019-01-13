@@ -50,10 +50,7 @@ import im.mash.moebooru.glide.MoeGlideUrl
 import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.main.fragment.*
 import im.mash.moebooru.main.viewmodel.*
-import im.mash.moebooru.util.ColorUtil
-import im.mash.moebooru.util.TextUtil
-import im.mash.moebooru.util.isNetworkConnected
-import im.mash.moebooru.util.logi
+import im.mash.moebooru.util.*
 import io.reactivex.Completable
 import okhttp3.HttpUrl
 import retrofit2.HttpException
@@ -82,6 +79,8 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
     private lateinit var profileSettingDrawerItem: ProfileSettingDrawerItem
     private var previousSelectedDrawer: Long = 0L
     private var selectedNewItem = false
+
+    var paddingTop = 0
 
     private val mainComponent by lazy { MoeDH.mainComponent() }
 
@@ -123,10 +122,10 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_moebooru)
-
         mainComponent.inject(this)
+
+        paddingTop = statusBarHeight
 
         isNullState = savedInstanceState == null
 
@@ -215,6 +214,7 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
                 .build()
 
         ViewCompat.setOnApplyWindowInsetsListener(drawer.drawerLayout) { _, insets ->
+            paddingTop = insets.systemWindowInsetTop
             drawer.stickyFooter.setPadding(0, 0, 0, insets.systemWindowInsetBottom)
             insets
         }

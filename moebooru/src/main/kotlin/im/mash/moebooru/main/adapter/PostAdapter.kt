@@ -1,6 +1,5 @@
 package im.mash.moebooru.main.adapter
 
-import android.content.Context
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -12,17 +11,18 @@ import im.mash.moebooru.Settings
 import im.mash.moebooru.common.data.local.entity.Post
 import im.mash.moebooru.glide.GlideApp
 import im.mash.moebooru.glide.MoeGlideUrl
+import im.mash.moebooru.main.MainActivity
 import im.mash.moebooru.util.*
 
-class PostAdapter(private val context: Context, private var gridMode: String) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
+class PostAdapter(private val activity: MainActivity, private var gridMode: String) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     companion object {
         private const val TAG = "PostAdapter"
     }
 
     private var posts = mutableListOf<Post>()
-    private var spanCount = context.screenWidth/context.resources.getDimension(R.dimen.item_width).toInt()
-    private val padding = context.resources.getDimension(R.dimen.item_padding).toInt()
+    private var spanCount = activity.screenWidth/activity.resources.getDimension(R.dimen.item_width).toInt()
+    private val padding = activity.resources.getDimension(R.dimen.item_padding).toInt()
 
     private var idsOneTwo: MutableList<Int> = mutableListOf()
     private var idsThree: MutableList<Int> = mutableListOf()
@@ -51,11 +51,6 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
         notifyItemRangeInserted(countBefore, itemCount)
     }
 
-    fun clearData() {
-        posts.clear()
-        notifyDataSetChanged()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val itemView: View = LayoutInflater.from(parent.context)
                 .inflate(R.layout.layout_post_item, parent, false)
@@ -68,7 +63,7 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         if (position in 0 until spanCount) {
-            holder.itemView.setPadding(padding, padding + context.toolbarHeight + statusBarHeight, padding, padding)
+            holder.itemView.setPadding(padding, padding + activity.toolbarHeight + activity.paddingTop, padding, padding)
         } else {
             holder.itemView.setPadding(padding, padding, padding, padding)
         }
@@ -82,20 +77,20 @@ class PostAdapter(private val context: Context, private var gridMode: String) : 
                 val lp = holder.post.layoutParams as ConstraintLayout.LayoutParams
                 lp.dimensionRatio = "H, 1:1"
                 holder.post.layoutParams = lp
-                GlideApp.with(context)
+                GlideApp.with(holder.itemView)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .centerCrop()
-                        .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
+                        .placeholder(activity.resources.getDrawable(placeHolderId, activity.theme))
                         .into(holder.post)
             }
             else -> {
                 val lp = holder.post.layoutParams as ConstraintLayout.LayoutParams
                 lp.dimensionRatio = "H, ${posts[position].actual_preview_width}:${posts[position].actual_preview_height}"
                 holder.post.layoutParams = lp
-                GlideApp.with(context)
+                GlideApp.with(holder.itemView)
                         .load(MoeGlideUrl(posts[position].preview_url))
                         .fitCenter()
-                        .placeholder(context.resources.getDrawable(placeHolderId, context.theme))
+                        .placeholder(activity.resources.getDrawable(placeHolderId, activity.theme))
                         .into(holder.post)
             }
         }

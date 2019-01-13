@@ -39,10 +39,7 @@ import im.mash.moebooru.helper.getViewModel
 import im.mash.moebooru.search.adapter.PostSearchAdapter
 import im.mash.moebooru.search.viewmodel.PostSearchViewModel
 import im.mash.moebooru.search.viewmodel.PostSearchViewModelFactory
-import im.mash.moebooru.util.isNetworkConnected
-import im.mash.moebooru.util.logi
-import im.mash.moebooru.util.screenWidth
-import im.mash.moebooru.util.takeSnackbarShort
+import im.mash.moebooru.util.*
 import okhttp3.HttpUrl
 import retrofit2.HttpException
 import java.io.IOException
@@ -57,7 +54,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         private const val STATUS_IDLE = -1
     }
     private var paddingBottom = 0
-    private var paddingTop = 0
+    var paddingTop = 0
 
     private var spanCount = 3
     private var page = 1
@@ -105,6 +102,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         setContentView(R.layout.layout_posts_content)
         component.inject(this)
         sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        paddingTop = statusBarHeight
         val key = intent.getStringExtra("keyword")
         if ( key == null) {
             finish()
@@ -216,13 +214,11 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                         }
                         STATUS_REFRESH -> {
                             status = STATUS_IDLE
-                            if (this.posts != posts ) {
-                                this.posts = posts
-                                if (safeMode) {
-                                    postSearchAdapter.updateData(getSafePosts())
-                                } else {
-                                    postSearchAdapter.updateData(posts)
-                                }
+                            this.posts = posts
+                            if (safeMode) {
+                                postSearchAdapter.updateData(getSafePosts())
+                            } else {
+                                postSearchAdapter.updateData(posts)
                             }
                         }
                         STATUS_LOAD_MORE -> {

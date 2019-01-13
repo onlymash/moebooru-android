@@ -74,7 +74,7 @@ class PoolFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         toolbar.setTitle(R.string.pools)
         refreshLayout = view.findViewById(R.id.refresh)
         poolView = view.findViewById(R.id.rv_pools)
-        poolView.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
+        poolView.layoutManager = LinearLayoutManager(this.context, RecyclerView.VERTICAL, false)
         poolView.addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
         poolAdapter = PoolAdapter()
         poolView.adapter = poolAdapter
@@ -121,10 +121,10 @@ class PoolFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 is Outcome.Progress -> {}
                 is Outcome.Success -> {
                     disableRefreshLayout()
+                    val data = outcome.data
                     when (status) {
                         STATUS_LOADING -> {
-                            pools.clear()
-                            pools.addAll(outcome.data)
+                            pools = data
                             poolAdapter.updateData(pools)
                             if (pools.isEmpty() && newStart) {
                                 newStart = false
@@ -132,18 +132,12 @@ class PoolFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                             }
                         }
                         STATUS_REFRESH -> {
-                            if (pools != outcome.data) {
-                                pools.clear()
-                                pools.addAll(outcome.data)
-                                poolAdapter.updateData(pools)
-                            }
+                            pools = data
+                            poolAdapter.updateData(pools)
                         }
                         STATUS_LOAD_MORE -> {
-                            if (outcome.data.size > pools.size) {
-                                pools.clear()
-                                pools.addAll(outcome.data)
-                                poolAdapter.addData(pools)
-                            }
+                            pools = data
+                            poolAdapter.updateData(pools)
                         }
                     }
                     status = STATUS_IDLE

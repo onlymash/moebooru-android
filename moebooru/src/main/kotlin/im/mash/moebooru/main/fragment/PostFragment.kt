@@ -3,6 +3,7 @@ package im.mash.moebooru.main.fragment
 import android.annotation.SuppressLint
 import androidx.lifecycle.Observer
 import android.content.*
+import android.os.Build
 import android.os.Bundle
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
@@ -24,6 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import im.mash.moebooru.App.Companion.app
+import im.mash.moebooru.BuildConfig
 import im.mash.moebooru.R
 import im.mash.moebooru.Settings
 import im.mash.moebooru.common.base.LastItemListener
@@ -81,7 +83,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     private var posts: MutableList<Post> = mutableListOf()
 
     private var status = STATUS_LOADING
-    private var notiNotMore = true
+    private var isNotMore = false
     private var limit = 50
 
     private var firstStart = true
@@ -258,11 +260,12 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     logi(TAG, "postViewModel Outcome.Progress")
                 }
                 is Outcome.Success -> {
-                    logi(TAG, "postViewModel Outcome.Success. status: $status")
                     disableRefreshLayout()
                     val data = outcome.data
+                    if (BuildConfig.DEBUG && data.size > 0) logi(TAG, "Last id = ${data[0].id}")
                     when (status) {
                         STATUS_LOADING -> {
+                            logi(TAG, "status: STATUS_LOADING")
                             status = STATUS_IDLE
                             posts = data
                             if (safeMode) {
@@ -280,14 +283,13 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                             }
                         }
                         STATUS_REFRESH -> {
+                            logi(TAG, "status: STATUS_REFRESH")
                             status = STATUS_IDLE
-                            if (posts != data) {
-                                posts = data
-                                if (safeMode) {
-                                    postAdapter.updateData(getSafePosts())
-                                } else {
-                                    postAdapter.updateData(posts)
-                                }
+                            posts = data
+                            if (safeMode) {
+                                postAdapter.updateData(getSafePosts())
+                            } else {
+                                postAdapter.updateData(posts)
                             }
                         }
                         STATUS_LOAD_MORE -> {
@@ -365,7 +367,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     private fun refresh() {
         page = 1
-        notiNotMore = true
+        isNotMore = false
         status = STATUS_REFRESH
         enableRefreshLayout()
         postViewModel.refreshPosts(getHttpUrl())
@@ -410,7 +412,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 postView.layoutManager = layoutManager
             }
         }
-        postAdapter = PostAdapter(this.requireContext(), app.settings.gridModeString)
+        postAdapter = PostAdapter(mainActivity, app.settings.gridModeString)
         postView.adapter = postAdapter
 
         postView.addOnScrollListener(object : LastItemListener() {
@@ -717,8 +719,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             return@setOnMenuItemClickListener true
         }
         tagView = view.findViewById(R.id.drawer_rv_list)
-        tagView.layoutManager = LinearLayoutManager(this.requireContext(),
-                LinearLayoutManager.VERTICAL, false)
+        tagView.layoutManager = LinearLayoutManager(this.requireContext(), RecyclerView.VERTICAL, false)
         tagAdapter = TagDrawerAdapter(this.requireContext())
         tagView.adapter = tagAdapter
 
@@ -833,15 +834,14 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         if (!mainActivity.isNetworkConnected) {
             takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
         }
-        val isNotMore = postViewModel.isNotMore()
         if (!refreshLayout.isRefreshing && status == STATUS_IDLE && !isNotMore) {
             status = STATUS_LOAD_MORE
             enableRefreshLayout()
             page = posts.size/(limit-10) + 1
             postViewModel.loadMorePosts(getHttpUrl())
         }
-        if (isNotMore && notiNotMore) {
-            notiNotMore = false
+        isNotMore = postViewModel.isNotMore()
+        if (isNotMore) {
             takeSnackbarShort(this.view!!, "Not more posts", paddingBottom)
         }
     }
