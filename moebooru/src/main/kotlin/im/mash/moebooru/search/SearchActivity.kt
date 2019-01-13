@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.*
 import androidx.appcompat.widget.Toolbar
 import android.view.MenuItem
 import android.view.animation.AnimationUtils
@@ -60,7 +59,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
     private var page = 1
     private var posts = mutableListOf<PostSearch>()
 
-    private var notiNotMore = true
+    private var isNotMore = false
     private var limit = 50
     private var keyword = ""
     private var safeMode = true
@@ -196,6 +195,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 is Outcome.Success -> {
                     logi(TAG, "postViewModel Outcome.Success. status: $status")
                     disableRefreshLayout()
+                    isNotMore = postSearchViewModel.isNotMore()
                     if (outcome.data.size > 0 && outcome.data[0].keyword != keyword) return@Observer
                     val posts = outcome.data
                     when (status) {
@@ -228,6 +228,15 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                                 postSearchAdapter.addData(getSafePosts())
                             } else {
                                 postSearchAdapter.addData(posts)
+                            }
+                        }
+                        else -> {
+                            status = STATUS_IDLE
+                            this.posts = posts
+                            if (safeMode) {
+                                postSearchAdapter.updateData(getSafePosts())
+                            } else {
+                                postSearchAdapter.updateData(posts)
                             }
                         }
                     }
@@ -488,7 +497,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
 
     private fun refresh() {
         page = 1
-        notiNotMore = true
+        isNotMore = false
         status = STATUS_REFRESH
         enableRefreshLayout()
         postSearchViewModel.refreshPosts(getHttpUrl())
@@ -519,18 +528,20 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
             takeSnackbarShort(refreshLayout, "Network without connection", paddingBottom)
             return
         }
-        if (posts.isEmpty() || posts.size < limit) return
-        val isNotMore = postSearchViewModel.isNotMore()
+        if (isNotMore || postSearchViewModel.isNotMore()) {
+            disableRefreshLayout()
+            takeSnackbarShort(refreshLayout, "Not more posts", paddingBottom)
+            return
+        }
         if (!refreshLayout.isRefreshing && status == STATUS_IDLE && !isNotMore) {
             status = STATUS_LOAD_MORE
             enableRefreshLayout()
             page = posts.size/(limit-10) + 1
             postSearchViewModel.loadMorePosts(getHttpUrl())
             logi(TAG, "loadMoreData. page: $page")
-        }
-        if (isNotMore && notiNotMore) {
-            notiNotMore = false
-            takeSnackbarShort(refreshLayout, "Not more posts", paddingBottom)
+        } else {
+            status = STATUS_IDLE
+            disableRefreshLayout()
         }
     }
 

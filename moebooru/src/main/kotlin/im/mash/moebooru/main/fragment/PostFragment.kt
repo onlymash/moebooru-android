@@ -3,7 +3,6 @@ package im.mash.moebooru.main.fragment
 import android.annotation.SuppressLint
 import androidx.lifecycle.Observer
 import android.content.*
-import android.os.Build
 import android.os.Bundle
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.navigation.NavigationView
@@ -13,7 +12,6 @@ import androidx.core.view.ViewCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.*
 import androidx.appcompat.widget.Toolbar
 import android.text.TextUtils
 import android.view.*
@@ -301,6 +299,16 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                                 postAdapter.addData(posts)
                             }
                         }
+                        else -> {
+                            logi(TAG, "status: OTHER")
+                            status = STATUS_IDLE
+                            posts = data
+                            if (safeMode) {
+                                postAdapter.updateData(getSafePosts())
+                            } else {
+                                postAdapter.updateData(posts)
+                            }
+                        }
                     }
                 }
                 is Outcome.Failure -> {
@@ -357,10 +365,12 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)
                 return@setOnRefreshListener
             }
+            logi(TAG, "status = $status")
             if (status == STATUS_IDLE) {
                 refresh()
             } else {
                 disableRefreshLayout()
+                status = STATUS_IDLE
             }
         }
     }
@@ -536,7 +546,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
     @SuppressLint("InflateParams")
     private fun initRightDrawer(view: View) {
         drawerLayout = view.findViewById(R.id.drawer_layout_posts)
-        drawer = view.findViewById(R.id.right_drawer_view)
+        drawer = view.findViewById<NavigationView>(R.id.right_drawer_view)
         drawerToolbar.setNavigationIcon(R.drawable.ic_action_close_white_24dp)
         drawerToolbar.setNavigationOnClickListener {
             closeRightDrawer()
