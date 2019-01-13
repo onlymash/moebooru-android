@@ -101,7 +101,7 @@ class GalleryFragment : ToolbarFragment() {
             insets
         }
         drawerBooruView = view.findViewById(R.id.drawer_rv_list)
-        drawerBooruView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
+        drawerBooruView.layoutManager = LinearLayoutManager(this.requireContext(), RecyclerView.VERTICAL, false)
         drawerBooruAdapter = GalleryDrawerAdapter()
         drawerBooruView.adapter = drawerBooruAdapter
         drawerBooruAdapter.updateData(mainActivity.boorus)

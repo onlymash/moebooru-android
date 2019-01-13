@@ -61,7 +61,7 @@ class DownloadFragment : ToolbarFragment(), Toolbar.OnMenuItemClickListener {
         toolbar.inflateMenu(R.menu.menu_downloads)
         toolbar.setOnMenuItemClickListener(this)
         downloadView = view.findViewById(R.id.rv_downloads)
-        downloadView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayout.VERTICAL, false)
+        downloadView.layoutManager = LinearLayoutManager(this.requireContext(), RecyclerView.VERTICAL, false)
         downloadView.setHasFixedSize(true)
         downloadView.addItemDecoration(DividerItemDecoration(this.requireContext(), DividerItemDecoration.VERTICAL))
         downloadAdapter = DownloadAdapter(this.requireContext(), app.downloadManager)

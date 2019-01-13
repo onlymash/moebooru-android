@@ -68,7 +68,7 @@ class BooruFragment : ToolbarFragment(), MainActivity.BooruChangeListener {
             insets
         }
         booruView = view.findViewById(R.id.booru_list)
-        booruView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayout.VERTICAL, false)
+        booruView.layoutManager = LinearLayoutManager(this.requireContext(), RecyclerView.VERTICAL, false)
         booruView.addItemDecoration(DividerItemDecoration(this.requireContext(), DividerItemDecoration.VERTICAL))
         booruAdapter = BooruAdapter(this.requireContext(), boorus)
         booruView.adapter = booruAdapter

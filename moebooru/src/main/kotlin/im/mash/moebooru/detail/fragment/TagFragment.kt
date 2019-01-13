@@ -54,7 +54,7 @@ class TagFragment : Fragment(), DetailActivity.TagsChangeListener {
             spanCount = 1
         }
         tagView = view.findViewById(R.id.rv_details_tags)
-        tagView.layoutManager = GridLayoutManager(this.requireContext(), spanCount, GridLayoutManager.VERTICAL, false)
+        tagView.layoutManager = GridLayoutManager(this.requireContext(), spanCount, RecyclerView.VERTICAL, false)
         tagView.setHasFixedSize(true)
         tagAdapter = TagAdapter()
         tagView.adapter = tagAdapter
