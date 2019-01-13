@@ -33,7 +33,7 @@ dependencies {
     api "com.google.android.material:material:$androidx_version"
     api "androidx.appcompat:appcompat:1.0.2"
 //    api "androidx.preference:preference:$androidx_version"
-    api 'com.github.onlymash:MaterialPreference:2.2.4'
+    api 'moe.shizuku.preference:preference:3.0.0'
     api "androidx.room:room-runtime:$lifecycle_version"
     api "androidx.room:room-rxjava2:$lifecycle_version"
     api "com.squareup.okhttp3:okhttp:$okhttp3_version"
