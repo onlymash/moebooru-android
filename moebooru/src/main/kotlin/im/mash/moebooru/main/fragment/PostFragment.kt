@@ -409,8 +409,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 //        (postView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
         postView.setItemViewCacheSize(20)
-        when (app.settings.gridModeString) {
-            Settings.GRID_MODE_GRID -> {
+        when (app.settings.enabledStaggered) {
+            false -> {
                 val layoutManager = SafeGridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
                 postView.setHasFixedSize(true)
                 postView.layoutManager = layoutManager
@@ -422,7 +422,7 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                 postView.layoutManager = layoutManager
             }
         }
-        postAdapter = PostAdapter(mainActivity, app.settings.gridModeString)
+        postAdapter = PostAdapter(mainActivity)
         postView.adapter = postAdapter
 
         postView.addOnScrollListener(object : LastItemListener() {
@@ -519,28 +519,17 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         toolbar.inflateMenu(R.menu.menu_main)
         toolbar.setOnMenuItemClickListener {item: MenuItem? ->
             when (item?.itemId) {
-                R.id.action_grid -> {
-                    if (!toolbar.menu.findItem(R.id.action_grid).isChecked) {
-                        toolbar.menu.findItem(R.id.action_grid).isChecked = true
-                        app.settings.gridModeString = Settings.GRID_MODE_GRID
-                    }
-                }
-                R.id.action_staggered_grid -> {
-                    if (!toolbar.menu.findItem(R.id.action_staggered_grid).isChecked) {
-                        toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
-                        app.settings.gridModeString = Settings.GRID_MODE_STAGGERED_GRID
-                    }
-                }
                 R.id.action_search_open -> openRightDrawer()
-                R.id.action_safe_mode -> { app.settings.safeMode = !app.settings.safeMode }
+                R.id.action_safe_mode -> app.settings.safeMode = !app.settings.safeMode
+                R.id.action_show_bar -> app.settings.showInfoBar = !app.settings.showInfoBar
+                R.id.action_staggered_grid -> app.settings.enabledStaggered = !app.settings.enabledStaggered
             }
             return@setOnMenuItemClickListener true
         }
-        when (app.settings.gridModeString) {
-            Settings.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).isChecked = true
-            Settings.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
-        }
+
         toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
+        toolbar.menu.findItem(R.id.action_show_bar).isChecked = app.settings.showInfoBar
+        toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = app.settings.enabledStaggered
     }
 
     @SuppressLint("InflateParams")
@@ -797,24 +786,19 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
-            Settings.GRID_MODE -> {
-                when (app.settings.gridModeString) {
-                    Settings.GRID_MODE_GRID -> {
+            Settings.STAGGERED_GRID -> {
+                toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = app.settings.enabledStaggered
+                when (app.settings.enabledStaggered) {
+                    false -> {
                         val layoutManager = SafeGridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
                         postView.setHasFixedSize(true)
                         postView.layoutManager = layoutManager
-                        postAdapter.setGridMode(Settings.GRID_MODE_GRID)
-                        postAdapter.updateData(mutableListOf())
-                        if (safeMode) postAdapter.updateData(getSafePosts()) else postAdapter.updateData(posts)
                     }
-                    Settings.GRID_MODE_STAGGERED_GRID -> {
+                    else -> {
                         val layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                         layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
                         postView.setHasFixedSize(false)
                         postView.layoutManager = layoutManager
-                        postAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
-                        postAdapter.updateData(mutableListOf())
-                        if (safeMode) postAdapter.updateData(getSafePosts()) else postAdapter.updateData(posts)
                     }
                 }
             }
@@ -831,15 +815,11 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
             Settings.SAFE_MODE -> {
                 safeMode = app.settings.safeMode
                 toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
-                if (safeMode) {
-                    postAdapter.updateData(getSafePosts())
-                } else {
-                    postAdapter.updateData(posts)
-                }
+                if (safeMode) postAdapter.updateData(getSafePosts()) else postAdapter.updateData(posts)
             }
+            Settings.SHOW_INFO_BAR -> toolbar.menu.findItem(R.id.action_show_bar).isChecked = app.settings.showInfoBar
         }
     }
-
     private fun loadMoreData() {
         if (!mainActivity.isNetworkConnected) {
             takeSnackbarShort(this.view!!, "Network without connection", paddingBottom)

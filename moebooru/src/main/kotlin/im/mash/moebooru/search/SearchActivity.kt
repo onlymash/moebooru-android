@@ -292,25 +292,13 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
         toolbar.subtitle = keyword
         toolbar.inflateMenu(R.menu.menu_search)
         toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
-        when (app.settings.gridModeString) {
-            Settings.GRID_MODE_GRID -> toolbar.menu.findItem(R.id.action_grid).isChecked = true
-            Settings.GRID_MODE_STAGGERED_GRID -> toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
-        }
+        toolbar.menu.findItem(R.id.action_show_bar).isChecked = app.settings.showInfoBar
+        toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = app.settings.enabledStaggered
         toolbar.setOnMenuItemClickListener {item: MenuItem? ->
             when (item?.itemId) {
-                R.id.action_grid -> {
-                    if (!toolbar.menu.findItem(R.id.action_grid).isChecked) {
-                        toolbar.menu.findItem(R.id.action_grid).isChecked = true
-                        app.settings.gridModeString = Settings.GRID_MODE_GRID
-                    }
-                }
-                R.id.action_staggered_grid -> {
-                    if (!toolbar.menu.findItem(R.id.action_staggered_grid).isChecked) {
-                        toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = true
-                        app.settings.gridModeString = Settings.GRID_MODE_STAGGERED_GRID
-                    }
-                }
                 R.id.action_safe_mode -> app.settings.safeMode = !app.settings.safeMode
+                R.id.action_show_bar -> app.settings.showInfoBar = !app.settings.showInfoBar
+                R.id.action_staggered_grid -> app.settings.enabledStaggered = !app.settings.enabledStaggered
             }
             return@setOnMenuItemClickListener true
         }
@@ -327,8 +315,8 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
 //        (postSearchView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postSearchView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation)
         postSearchView.setItemViewCacheSize(20)
-        when (app.settings.gridModeString) {
-            Settings.GRID_MODE_GRID -> {
+        when (app.settings.enabledStaggered) {
+            false -> {
                 val layoutManager = SafeGridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
                 postSearchView.setHasFixedSize(true)
                 postSearchView.layoutManager = layoutManager
@@ -340,7 +328,7 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
                 postSearchView.layoutManager = layoutManager
             }
         }
-        postSearchAdapter = PostSearchAdapter(this, app.settings.gridModeString)
+        postSearchAdapter = PostSearchAdapter(this)
         postSearchView.adapter = postSearchAdapter
         postSearchView.addOnScrollListener(object : LastItemListener() {
             override fun onLastItemVisible() {
@@ -547,36 +535,28 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
-            Settings.GRID_MODE -> {
-                when (app.settings.gridModeString) {
-                    Settings.GRID_MODE_GRID -> {
+            Settings.STAGGERED_GRID -> {
+                toolbar.menu.findItem(R.id.action_staggered_grid).isChecked = app.settings.enabledStaggered
+                when (app.settings.enabledStaggered) {
+                    false -> {
                         val layoutManager = SafeGridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)
                         postSearchView.setHasFixedSize(true)
                         postSearchView.layoutManager = layoutManager
-                        postSearchAdapter.setGridMode(Settings.GRID_MODE_GRID)
-                        postSearchAdapter.updateData(mutableListOf())
-                        if (safeMode) postSearchAdapter.updateData(getSafePosts()) else postSearchAdapter.updateData(posts)
                     }
-                    Settings.GRID_MODE_STAGGERED_GRID -> {
+                    else -> {
                         val layoutManager = SafeStaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL)
                         layoutManager.gapStrategy = StaggeredGridLayoutManager.GAP_HANDLING_NONE
                         postSearchView.setHasFixedSize(false)
                         postSearchView.layoutManager = layoutManager
-                        postSearchAdapter.setGridMode(Settings.GRID_MODE_STAGGERED_GRID)
-                        postSearchAdapter.updateData(mutableListOf())
-                        if (safeMode) postSearchAdapter.updateData(getSafePosts()) else postSearchAdapter.updateData(posts)
                     }
                 }
             }
             Settings.SAFE_MODE -> {
                 safeMode = app.settings.safeMode
                 toolbar.menu.findItem(R.id.action_safe_mode).isChecked = safeMode
-                if (safeMode) {
-                    postSearchAdapter.updateData(getSafePosts())
-                } else {
-                    postSearchAdapter.updateData(posts)
-                }
+                if (safeMode) postSearchAdapter.updateData(getSafePosts()) else postSearchAdapter.updateData(posts)
             }
+            Settings.SHOW_INFO_BAR -> toolbar.menu.findItem(R.id.action_show_bar).isChecked = app.settings.showInfoBar
         }
     }
 

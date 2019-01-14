@@ -18,14 +18,12 @@ import androidx.core.content.edit
 class Settings(private val sp: SharedPreferences) {
 
     companion object {
+        const val STAGGERED_GRID = "staggered_grid"
         const val NIGHT_MODE = "night_mode"
         const val NIGHT_MODE_SYSTEM = "system"
         const val NIGHT_MODE_AUTO = "auto"
         const val NIGHT_MODE_OFF = "off"
         const val NIGHT_MODE_ON = "on"
-        const val GRID_MODE = "grid_mode"
-        const val GRID_MODE_GRID = "grid"
-        const val GRID_MODE_STAGGERED_GRID = "staggered_grid"
         const val POST_LIMIT = "post_limit"
         const val POST_SIZE_BROWSE = "post_size_browse"
         const val POST_SIZE_DOWNLOAD = "post_size_download"
@@ -40,6 +38,7 @@ class Settings(private val sp: SharedPreferences) {
         const val ENABLE_CRASH_REPORT = "enable_crash_report"
         const val SAFE_MODE = "safe_mode"
         const val VERSION_CODE = "version_code"
+        const val SHOW_INFO_BAR = "show_info_bar"
     }
 
     private var nightModeString: String
@@ -55,9 +54,9 @@ class Settings(private val sp: SharedPreferences) {
         else -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
     }
 
-    var gridModeString: String
-        get() = sp.getString(GRID_MODE, GRID_MODE_STAGGERED_GRID)!!
-        set(value) = sp.edit { putString(GRID_MODE, value) }
+    var enabledStaggered: Boolean
+        get() = sp.getBoolean(STAGGERED_GRID, false)
+        set(value) = sp.edit { putBoolean(STAGGERED_GRID, value) }
 
     var postLimitInt: Int
         get() = sp.getString(POST_LIMIT, "50")!!.toInt()
@@ -77,7 +76,7 @@ class Settings(private val sp: SharedPreferences) {
 
 
     var activeProfileHost: String
-        get() = sp.getString(ACTIVE_PROFILE_HOST, "mash.im")!!
+        get() = sp.getString(ACTIVE_PROFILE_HOST, "fiepi.me")!!
         set(value) = sp.edit { putString(ACTIVE_PROFILE_HOST, value) }
 
     var activeProfileSchema: String
@@ -103,4 +102,8 @@ class Settings(private val sp: SharedPreferences) {
     var versionCode: Int
         get() = sp.getInt(VERSION_CODE, 22)
         set(value) = sp.edit { putInt(VERSION_CODE, value) }
+
+    var showInfoBar: Boolean
+        get() = sp.getBoolean(SHOW_INFO_BAR, true)
+        set(value) = sp.edit { putBoolean(SHOW_INFO_BAR, value) }
 }

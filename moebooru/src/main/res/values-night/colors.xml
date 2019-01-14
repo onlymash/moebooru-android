@@ -20,6 +20,7 @@
     <color name="primary_icon">@color/material_drawer_dark_primary_icon</color>
     <color name="settings_item_icon">@color/md_grey_400</color>
     <color name="toolbar">#FF1D1D1D</color>
+    <color name="bar_background">#FF252525</color>
 
     <!-- MaterialDrawer colors -->
     <color name="drawer_primary_text">@color/material_drawer_dark_primary_text</color>

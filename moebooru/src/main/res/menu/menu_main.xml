@@ -22,25 +22,22 @@
         app:showAsAction="always"
         tools:ignore="AlwaysShowAction" />
 
-    <group
-        android:id="@+id/menu_group"
-        android:checkableBehavior="single">
-
-        <item
-            android:id="@+id/action_grid"
-            android:title="@string/grid"
-            app:showAsAction="never"/>
-
-        <item
-            android:id="@+id/action_staggered_grid"
-            android:title="@string/staggered_grid"
-            app:showAsAction="never"/>
-
-    </group>
-
     <item
         android:id="@+id/action_safe_mode"
         android:title="@string/safe_mode"
+        android:checkable="true"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_show_bar"
+        android:title="@string/show_info_bar"
+        android:checkable="true"
+        app:showAsAction="never"/>
+
+
+    <item
+        android:id="@+id/action_staggered_grid"
+        android:title="@string/staggered_grid"
         android:checkable="true"
         app:showAsAction="never"/>
 

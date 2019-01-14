@@ -12,9 +12,7 @@
     <string name="cancel">Cancel</string>
     <string name="tag_can_not_be_empty">Tag can not be empty</string>
 
-    <string name="grid_mode">Grid mode</string>
-    <string name="grid">Grid</string>
-    <string name="staggered_grid">Staggered Grid</string>
+    <string name="staggered_grid">Staggered grid</string>
 
     <string name="advanced_options">Advanced options</string>
     <string name="image_loader">Image loader</string>
@@ -102,7 +100,7 @@
 
     <string name="share">Share</string>
     <string name="download">Download</string>
-    <string name="share_to">Share to:</string>
+    <string name="via">Via</string>
 
     <string name="state_idle">IDLE</string>
     <string name="state_pending">PENDING</string>
@@ -146,6 +144,7 @@
     <string name="select_crash_log_file">Select crash log file and send to developer</string>
 
     <string name="safe_mode">Safe mode</string>
+    <string name="show_info_bar">Show info bar</string>
 
     <string name="account_id">Id</string>
     <string name="account_name">Name</string>

@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.Spinner
 import im.mash.moebooru.R
 import im.mash.moebooru.common.base.ToolbarFragment

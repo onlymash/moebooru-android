@@ -15,6 +15,7 @@
     <color name="toolbar_post">#33000000</color>
     <color name="toolbar">@color/primary</color>
     <color name="posts_background">@color/primary_dark</color>
+    <color name="bar_background">@color/primary_dark_1</color>
 
     <!-- MaterialDrawer colors -->
     <color name="drawer_background">@color/background</color>

@@ -312,7 +312,7 @@ class GalleryFragment : ToolbarFragment() {
                     intent.type = "image/*"
                     intent.putExtra(Intent.EXTRA_STREAM, media[position].uri)
                     try {
-                        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_to)))
+                        context.startActivity(Intent.createChooser(intent, context.getString(R.string.via)))
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }

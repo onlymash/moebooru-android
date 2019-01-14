@@ -271,7 +271,7 @@ class DetailActivity : SlidingActivity(), ViewPager.OnPageChangeListener, Toolba
                 intent.type = "text/*"
                 intent.putExtra(Intent.EXTRA_TEXT, shareUrl)
                 try {
-                    startActivity(Intent.createChooser(intent, getString(R.string.share_to)))
+                    startActivity(Intent.createChooser(intent, getString(R.string.via)))
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

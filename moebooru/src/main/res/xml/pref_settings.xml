@@ -26,13 +26,12 @@
             android:icon="@drawable/ic_settings_time_24dp"
             app:iconSpaceReserved="true"/>
 
-        <SimpleMenuPreference
-            android:key="grid_mode"
-            android:entries="@array/grid_modes"
-            android:entryValues="@array/grid_mode_values"
-            android:defaultValue="staggered_grid"
-            android:summary="%s"
-            android:title="@string/grid_mode"
+        <SwitchPreference
+            android:key="staggered_grid"
+            android:title="@string/staggered_grid"
+            android:defaultValue="false"
+            android:summaryOn="@string/on"
+            android:summaryOff="@string/off"
             android:icon="@drawable/ic_settings_grid_24dp"
             app:iconSpaceReserved="true"/>
 

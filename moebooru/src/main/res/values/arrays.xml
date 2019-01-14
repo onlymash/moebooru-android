@@ -80,11 +80,6 @@
         <item>on</item>
     </string-array>
 
-    <string-array name="grid_modes">
-        <item>@string/grid</item>
-        <item>@string/staggered_grid</item>
-    </string-array>
-
     <string-array name="grid_mode_values">
         <item>grid</item>
         <item>staggered_grid</item>
