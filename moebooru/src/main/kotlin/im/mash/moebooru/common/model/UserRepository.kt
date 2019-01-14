@@ -38,15 +38,20 @@ class UserRepository(private val database: MoeDatabase,
                 .performOnBackOutOnMain(scheduler)
                 .subscribe({ rawUsers ->
                     logi(TAG, rawUsers.toString())
-                    if (rawUsers.size == 1) {
-                        val user = User(null, httpUrl.scheme() + "://" + httpUrl.host(),
-                                rawUsers[0].name,
-                                rawUsers[0].blacklisted_tags.toString()
-                                        .replace("[", "")
-                                        .replace("]", ""),
-                                rawUsers[0].id, passwordHash, null)
-                        saveUser(user)
-                    } else {
+                    val name = httpUrl.queryParameter("name").toString()
+                    var user: User? = null
+                    rawUsers.forEach { rawUser ->
+                        if (rawUser.name == name) {
+                            user = User(null, httpUrl.scheme() + "://" + httpUrl.host(), name,
+                                    rawUser.blacklisted_tags.toString()
+                                            .replace("[", "")
+                                            .replace("]", ""),
+                                    rawUser.id, passwordHash, null)
+                            saveUser(user!!)
+                            return@forEach
+                        }
+                    }
+                    if (user == null) {
                         loadUsers()
                     }
                 }, { error -> handleError(error)})
