@@ -51,7 +51,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".detail.DetailActivity">
+            android:name=".detail.DetailActivity"
+            android:theme="@style/MoeTheme.Sub">
             <intent-filter>
                 <action android:name="${applicationId}.action.SHOW_DETAILS" />
 
@@ -59,7 +60,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".search.SearchActivity">
+            android:name=".search.SearchActivity"
+            android:theme="@style/MoeTheme.Sub">
             <intent-filter>
                 <action android:name="${applicationId}.action.SEARCH" />
 
