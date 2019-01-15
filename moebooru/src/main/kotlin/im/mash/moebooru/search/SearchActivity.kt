@@ -330,6 +330,15 @@ class SearchActivity : SlidingActivity(), SharedPreferences.OnSharedPreferenceCh
 //        (postSearchView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postSearchView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this, R.anim.layout_animation)
         postSearchView.setItemViewCacheSize(20)
+        postSearchView.itemAnimator = null
+        postSearchView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (app.settings.enabledStaggered) {
+                    (postSearchView.layoutManager as SafeStaggeredGridLayoutManager).invalidateSpanAssignments()
+                }
+            }
+        })
         when (app.settings.enabledStaggered) {
             false -> {
                 val layoutManager = SafeGridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false)

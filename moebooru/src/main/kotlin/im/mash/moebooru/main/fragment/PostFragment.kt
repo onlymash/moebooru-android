@@ -423,7 +423,16 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
         postView = view.findViewById(R.id.posts_list)
 //        (postView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         postView.layoutAnimation = AnimationUtils.loadLayoutAnimation(this.requireContext(), R.anim.layout_animation)
+        postView.itemAnimator = null
         postView.setItemViewCacheSize(20)
+        postView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (app.settings.enabledStaggered) {
+                    (postView.layoutManager as SafeStaggeredGridLayoutManager).invalidateSpanAssignments()
+                }
+            }
+        })
         when (app.settings.enabledStaggered) {
             false -> {
                 val layoutManager = SafeGridLayoutManager(this.context, spanCount, GridLayoutManager.VERTICAL, false)
