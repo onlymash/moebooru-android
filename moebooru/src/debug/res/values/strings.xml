@@ -18,5 +18,5 @@
   -->
 
 <resources>
-    <string name="app_name">Moebooru Debug</string>
+    <string name="app_name" translatable="false">Moebooru Debug</string>
 </resources>

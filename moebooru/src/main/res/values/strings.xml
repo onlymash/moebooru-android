@@ -18,7 +18,7 @@
   -->
 
 <resources>
-    <string name="app_name">Moebooru</string>
+    <string name="app_name" translatable="false">Moebooru</string>
 
     <string name="post">Post</string>
     <string name="post_limit">Post limit</string>

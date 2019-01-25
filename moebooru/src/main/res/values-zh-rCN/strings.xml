@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Moebooru</string>
 
     <string name="post">投稿</string>
     <string name="post_limit">单页数量</string>
