@@ -21,6 +21,7 @@ android {
         targetSdkVersion rootProject.sdk_version
         versionCode rootProject.version_code
         versionName rootProject.version_name
+        resConfigs "en-rUS", "zh-rCN"
         signingConfig signingConfigs.release
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testApplicationId "im.mash.moebooru.test"
