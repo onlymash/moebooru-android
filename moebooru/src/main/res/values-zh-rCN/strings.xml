@@ -1,0 +1,181 @@
+<resources>
+    <string name="app_name">Moebooru</string>
+
+    <string name="post">投稿</string>
+    <string name="post_limit">单页数量</string>
+    <string name="posts">投稿</string>
+    <string name="settings">设置</string>
+    <string name="search">搜索</string>
+    <string name="add">添加</string>
+    <string name="add_a_tag">添加标签</string>
+    <string name="ok">确认</string>
+    <string name="cancel">取消</string>
+    <string name="tag_can_not_be_empty">标签不可为空</string>
+
+    <!--FIXME-->
+    <string name="staggered_grid">瀑布流</string>
+
+    <string name="advanced_options">高级设置</string>
+    <string name="image_loader">载图模式</string>
+    <!--FIXME-->
+    <string name="image_loader_glide">滑动</string>
+    <!--FIXME-->
+    <string name="image_loader_sketch">上拉</string>
+
+    <string name="cache">缓存</string>
+    <string name="cache_memory">内存</string>
+    <string name="cache_disk">本地存储</string>
+
+    <string name="about">关于</string>
+    <string name="about_title">Moebooru</string>
+    <string name="send_email">发送邮件</string>
+
+    <string name="drawer_header_desc">抽屉顶部</string>
+    <string name="drawer_open">打开抽屉</string>
+    <string name="drawer_close">关闭抽屉</string>
+    <string name="edit">编辑</string>
+
+    <string name="downloads">下载</string>
+
+    <string name="appearance">外观</string>
+
+    <string name="night_mode">夜间模式</string>
+    <string name="night_mode_system">跟随系统</string>
+    <string name="night_mode_auto">自动</string>
+    <string name="night_mode_on">开</string>
+    <string name="night_mode_off">关</string>
+
+    <string name="more_options">更多设置</string>
+
+    <string name="post_limit_default">50（默认）</string>
+    <string name="cache_memory_default">128 MiB（默认）</string>
+    <string name="disk_memory_default">256 MiB（默认）</string>
+
+    <string name="crash_report">崩溃报告</string>
+    <string name="enable_crash_report">激活崩溃报告</string>
+    <string name="on">开</string>
+    <string name="off">关</string>
+
+    <string name="remove">删除</string>
+    <string name="copy">复制</string>
+
+    <string name="post_size_download">下载尺寸</string>
+    <string name="post_size_browse">浏览尺寸</string>
+
+    <string name="post_size_sample">小图</string>
+    <string name="post_size_larger">大图</string>
+    <string name="post_size_origin">原图</string>
+
+    <!--FIXME author=uploader?-->
+    <string name="post_stats_author">作者</string>
+    <string name="post_stats_children">子投稿ID</string>
+    <string name="post_stats_created_at">创建于</string>
+    <string name="post_stats_creator">作者ID</string>
+    <string name="post_stats_id">ID</string>
+    <string name="post_stats_larger_size">大图大小</string>
+    <string name="post_stats_larger_url">大图链接</string>
+    <string name="post_stats_origin_size">原图大小</string>
+    <string name="post_stats_origin_url">原图链接</string>
+    <string name="post_stats_parent_id">父投稿ID</string>
+    <string name="post_stats_rating">评级</string>
+    <string name="post_stats_sample_size">小图大小</string>
+    <string name="post_stats_sample_url">小图链接</string>
+    <string name="post_stats_score">评分</string>
+    <string name="post_stats_size">分辨率</string>
+    <string name="post_stats_source">来源</string>
+
+    <string name="downloads_stop">停止</string>
+    <string name="downloads_start">开始</string>
+    <string name="downloads_stop_all">全部停止</string>
+    <string name="downloads_start_all">全部开始</string>
+
+    <string name="title_activity_login">登录</string>
+    <string name="title_account">账号</string>
+    <string name="title_login">登录</string>
+    <string name="username">用户名</string>
+    <string name="password">密  码</string>
+    <string name="password_hash_salt">哈希密码</string>
+    <string name="set_account">设定账户</string>
+    <string name="error_invalid_username">用户名无效</string>
+    <string name="error_invalid_password">密码太短</string>
+    <string name="error_incorrect_password">密码错误</string>
+    <string name="error_field_required">请填写此字段</string>
+
+
+    <string name="share">分享</string>
+    <string name="download">下载</string>
+    <string name="via">Via</string>
+
+    <string name="state_idle">空闲</string>
+    <string name="state_pending">待定</string>
+    <string name="state_unknown">未知</string>
+    <string name="state_running">运行</string>
+
+    <string name="downloads_notification">下载通知</string>
+
+    <string name="clear_completed">清除已完成</string>
+    <string name="clear_all">清除所有</string>
+
+    <string name="local_gallery">本地图集</string>
+    <string name="delete">删除</string>
+    <string name="set_as">设为</string>
+    <string name="edit_img">编辑</string>
+    <string name="img_info">图片信息o</string>
+
+    <string name="properties">属性</string>
+    <string name="path">路径</string>
+    <!--FIXME-->
+    <string name="size">大小</string>
+    <string name="name">名称</string>
+    <string name="filename">文件名</string>
+    <string name="open_on_website">在浏览器中打开</string>
+
+    <string name="stat_downloading_title">下载中...</string>
+    <string name="stat_download_done_title">下载完成</string>
+
+    <string name="sample_url_has_been_copied">复制成功！</string>
+    <string name="larger_url_has_been_copied">复制成功！</string>
+    <string name="origin_url_has_been_copied">复制成功！</string>
+
+    <string name="all_website">全部站点</string>
+
+    <string name="feedback">反馈</string>
+    <string name="telegram">Telegram</string>
+    <string name="email">电子邮件</string>
+    <string name="github">Github</string>
+    <string name="author">作者</string>
+
+    <string name="send_crash_log">发送崩溃日志</string>
+    <string name="select_crash_log_file">选择日志文件</string>
+
+    <string name="safe_mode">安全模式</string>
+    <string name="show_info_bar">显示信息</string>
+
+    <string name="account_id">ID</string>
+    <string name="account_name">名称</string>
+
+    <string name="my_favorites">收藏</string>
+    <string name="remove_account">登出账户</string>
+
+    <string name="boorus">图集</string>
+    <string name="schema">协议头</string>
+    <string name="domain">域名</string>
+
+    <string name="add_booru">添加图集</string>
+    <string name="booru_name">图集名</string>
+    <string name="save">保存</string>
+    <string name="edit_booru">编辑图集</string>
+    <string name="delete_booru">删除图集</string>
+
+    <string name="filter">过滤器</string>
+    <string name="filter_order">排序：</string>
+    <string name="filter_rating">评级：</string>
+    <string name="tag_filter">标签过滤</string>
+
+    <string name="transition_name_post" translatable="false">transition_name_post</string>
+    <string name="vote">投票</string>
+    <!--FIXME-->
+    <string name="pools">图板</string>
+    <string name="comment">评论</string>
+    <string name="comments">评论</string>
+</resources>
