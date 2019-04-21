@@ -332,8 +332,8 @@ class PostFragment : ToolbarFragment(), SharedPreferences.OnSharedPreferenceChan
                     when (outcome.e) {
                         is HttpException -> {
                             val httpException = outcome.e as HttpException
-                            val message = httpException.response().message()
-                            val code = httpException.response().code()
+                            val message = httpException.response()?.message()
+                            val code = httpException.response()?.code()
                             Toast.makeText(this.requireContext(), "code: $code, msg: $message", Toast.LENGTH_SHORT).show()
                         }
                         is IOException -> {

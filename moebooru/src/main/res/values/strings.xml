@@ -33,11 +33,6 @@
 
     <string name="staggered_grid">Staggered grid</string>
 
-    <string name="advanced_options">Advanced options</string>
-    <string name="image_loader">Image loader</string>
-    <string name="image_loader_glide">Glide</string>
-    <string name="image_loader_sketch">Sketch</string>
-
     <string name="cache">Cache</string>
     <string name="cache_memory">Memory cache</string>
     <string name="cache_disk">Disk cache</string>
@@ -46,9 +41,6 @@
     <string name="about_title">Moebooru</string>
     <string name="send_email">Send email</string>
 
-    <string name="drawer_header_desc">Drawer header</string>
-    <string name="drawer_open">Open drawer</string>
-    <string name="drawer_close">Close drawer</string>
     <string name="edit">Edit</string>
 
     <string name="downloads">Downloads</string>
@@ -83,7 +75,6 @@
     <string name="post_size_origin">Origin</string>
 
     <string name="post_stats_author">Author</string>
-    <string name="post_stats_children">Children</string>
     <string name="post_stats_created_at">Created at</string>
     <string name="post_stats_creator">Creator</string>
     <string name="post_stats_id">Id</string>
@@ -99,22 +90,14 @@
     <string name="post_stats_size">Size</string>
     <string name="post_stats_source">Source</string>
 
-    <string name="downloads_stop">Stop</string>
-    <string name="downloads_start">Start</string>
     <string name="downloads_stop_all">Stop all</string>
     <string name="downloads_start_all">Start all</string>
-    <string name="title_activity_login">Sign in</string>
 
     <string name="title_account">Account</string>
-    <string name="title_login">Login</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="password_hash_salt">Password hash salt</string>
     <string name="set_account">Set account</string>
-    <string name="error_invalid_username">This username is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
 
 
     <string name="share">Share</string>
@@ -137,11 +120,6 @@
     <string name="edit_img">Edit</string>
     <string name="img_info">Image info</string>
 
-    <string name="properties">Properties</string>
-    <string name="path">Path</string>
-    <string name="size">Size</string>
-    <string name="name">Name</string>
-    <string name="filename">Filename</string>
     <string name="open_on_website">Open on website</string>
 
     <string name="stat_downloading_title">Downloading</string>
@@ -186,9 +164,7 @@
     <string name="filter_rating">rating: </string>
     <string name="tag_filter">Tag filter</string>
 
-    <string name="transition_name_post" translatable="false">transition_name_post</string>
     <string name="vote">Vote</string>
     <string name="pools">Pools</string>
     <string name="comment">Comment</string>
-    <string name="comments">Comments</string>
 </resources>

@@ -88,11 +88,6 @@
         <item>on</item>
     </string-array>
 
-    <string-array name="grid_mode_values">
-        <item>grid</item>
-        <item>staggered_grid</item>
-    </string-array>
-
     <string-array name="post_limit">
         <item>40</item>
         <item>@string/post_limit_default</item>
@@ -153,16 +148,6 @@
         <item>sample</item>
         <item>larger</item>
         <item>origin</item>
-    </string-array>
-
-    <string-array name="image_loader">
-        <item>@string/image_loader_glide</item>
-        <item>@string/image_loader_sketch</item>
-    </string-array>
-
-    <string-array name="image_loader_values">
-        <item>glide</item>
-        <item>sketch</item>
     </string-array>
 
 </resources>

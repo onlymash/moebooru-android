@@ -38,13 +38,13 @@ dependencies {
     api "androidx.room:room-rxjava2:$lifecycle_version"
     api "com.squareup.okhttp3:okhttp:$okhttp3_version"
     api "com.squareup.okhttp3:logging-interceptor:$okhttp3_version"
-    api 'com.squareup.okio:okio:1.15.0'
+    api 'com.squareup.okio:okio:2.2.2'
     api "com.squareup.retrofit2:retrofit:$retrofit2_version"
     api "com.squareup.retrofit2:converter-gson:$retrofit2_version"
     api "com.squareup.retrofit2:adapter-rxjava2:$retrofit2_version"
-    api 'io.reactivex.rxjava2:rxjava:2.1.14'
-    api 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    api 'com.google.code.gson:gson:2.8.4'
+    api 'io.reactivex.rxjava2:rxjava:2.2.8'
+    api 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    api 'com.google.code.gson:gson:2.8.5'
     api "com.google.dagger:dagger:$dagger_version"
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
 }

@@ -33,6 +33,7 @@ import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.mikepenz.materialdrawer.AccountHeader
@@ -270,6 +271,15 @@ class MainActivity : BaseActivity(), Drawer.OnDrawerItemClickListener, DrawerLay
             }
         })
         booruViewModel.loadBoorus()
+        AlertDialog.Builder(this)
+                .setTitle("Important notice!")
+                .setMessage("This project has been replaced by Flexbooru. More powerful and stable")
+                .setPositiveButton("Open the new project") { _, _ ->
+                    launchUrl("https://github.com/flexbooru/flexbooru")
+                }
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show()
     }
 
     private fun initUser() {

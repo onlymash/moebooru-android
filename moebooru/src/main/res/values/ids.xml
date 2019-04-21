@@ -18,10 +18,4 @@
   ~  */
   -->
 
-<resources>
-    <item type="id" name="drawer_tags_item" />
-    <item type="id" name="loader_id_media_store_data" />
-    <item type="id" name="properties_size" />
-    <item type="id" name="properties_file_count" />
-    <item type="id" name="properties_last_modified" />
-</resources>
+<resources></resources>

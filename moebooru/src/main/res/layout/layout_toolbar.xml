@@ -25,6 +25,5 @@
     android:layout_height="?android:actionBarSize"
     android:minHeight="?android:actionBarSize"
     android:touchscreenBlocksFocus="false"
-    android:id="@+id/toolbar"
     app:navigationIcon="?android:attr/homeAsUpIndicator"
     style="@style/Toolbar" />

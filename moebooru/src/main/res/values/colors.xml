@@ -22,7 +22,6 @@
     <color name="primary">@color/primary_2</color>
     <color name="primary_1">#FF434E74</color>
     <color name="primary_2">#FF1B1F2E</color>
-    <color name="primary_3">#FF414A72</color>
     <color name="primary_dark">@color/primary_1</color>
     <color name="primary_dark_1">#FF23283C</color>
     <color name="accent">@color/primary_1</color>
@@ -33,7 +32,6 @@
     <color name="settings_item_icon">@color/primary_1</color>
     <color name="toolbar_post">#33000000</color>
     <color name="toolbar">@color/primary</color>
-    <color name="posts_background">@color/primary_dark</color>
     <color name="bar_background">@color/primary_dark_1</color>
 
     <!-- MaterialDrawer colors -->
@@ -65,29 +63,9 @@
     <color name="dark_orange" type="color">#FFFF8800</color>
     <color name="dark_red" type="color">#FFCC0000</color>
 
-    <color name="material_primary_800">@color/material_blue_grey_800</color>
-    <color name="material_primary_900">@color/material_blue_grey_900</color>
-
-    <color name="danbooru">#FFB1D2C1</color>
-    <color name="danbooru_1">#FFEBCDA7</color>
-    <color name="danbooru_2">#FF006FFA</color>
-    <color name="danbooru_3">#FFA4816F</color>
-    <color name="favorite">#FFF46256</color>
-    <color name="gelbooru">#FF98AED7</color>
-    <color name="gelbooru_1">#FF006FFA</color>
     <color name="moebooru">#FFEAA9B1</color>
-    <color name="moebooru_1">#FFFFAAAE</color>
     <color name="rating_e">#FFC9D7D2</color>
     <color name="rating_q">#FFCEC8C3</color>
     <color name="rating_s">#FFD7DBDF</color>
-    <color name="semi_transparent">#33000000</color>
-    <color name="error_color">#FFDD2C00</color>
-    <color name="tag_artist">#FFCCCC00</color>
-    <color name="tag_character">#FF00AA00</color>
-    <color name="tag_circle">#FF00BBBB</color>
-    <color name="tag_copyright">#FFDD00DD</color>
-    <color name="tag_fault">#FFFF2020</color>
-    <color name="tag_general">#FFFF8887</color>
-    <color name="tag_unknown">@color/white</color>
 
 </resources>

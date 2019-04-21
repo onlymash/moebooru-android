@@ -24,7 +24,6 @@
     android:layout_width="match_parent"
     android:layout_height="?android:actionBarSize"
     android:touchscreenBlocksFocus="false"
-    android:id="@+id/toolbar_drawer"
     app:contentInsetStart="0dp"
     app:contentInsetEnd="0dp"
     style="@style/Toolbar" />
